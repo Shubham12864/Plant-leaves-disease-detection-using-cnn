@@ -35,18 +35,15 @@ See [the Phase 2 results summary](reports/phase2_baseline/PHASE2_RESULTS_SUMMARY
 | `configs/` | Data contract and run settings |
 | `data/manifests/` | Image paths, labels, and split records |
 | `reports/` | Data audits and Phase 2 results |
-| `MEMORY.md` | Project memory and decisions |
-| `ARCHITECTURE.md` | System design notes |
-| `PHASE-II-ROADMAP.md` | Phase 2 work plan |
-| `Literature-Survey-Evidence-Register.md` | Evidence register for the literature survey |
-
-## Data
+## Data and results
 
 Git does not contain image files. The image files are large and have separate source terms. Keep the files in `data/raw/` on the local computer. The `.gitignore` file excludes them from Git.
 
 The prepared Kaggle input is also excluded from Git. To build it again, run `scripts/prepare_kaggle_upload.ps1`. Then upload the generated dataset to Kaggle.
 
 Read [data/README.md](data/README.md) before you use the datasets. It records the sources, split rules, and known count differences. Do not redistribute dataset images until you check the source terms.
+
+Read [the Phase 2 results summary](reports/phase2_baseline/PHASE2_RESULTS_SUMMARY.md) for the baseline scores, saved charts, and next work.
 
 ## Run the training notebook
 
@@ -64,9 +61,3 @@ The PlantVillage images have controlled backgrounds. High test scores on this da
 
 Phase 2 does not include a public web demo, a final model, Grad-CAM, or a completed PlantDoc evaluation. The next work is to review the class errors and evaluate compatible PlantDoc classes. Record all class mappings and exclusions before you report those results.
 
-## Project documents
-
-- [Project memory](MEMORY.md)
-- [Architecture notes](ARCHITECTURE.md)
-- [Phase 2 roadmap](PHASE-II-ROADMAP.md)
-- [Literature survey evidence register](Literature-Survey-Evidence-Register.md)
