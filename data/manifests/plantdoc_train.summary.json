@@ -1,0 +1,42 @@
+{
+  "dataset": "PlantDoc",
+  "domain": "field",
+  "images_indexed": 2342,
+  "unreadable_images": 0,
+  "classes": {
+    "Apple Scab Leaf": 83,
+    "Apple leaf": 82,
+    "Apple rust leaf": 79,
+    "Bell_pepper leaf": 53,
+    "Bell_pepper leaf spot": 62,
+    "Blueberry leaf": 106,
+    "Cherry leaf": 47,
+    "Corn Gray leaf spot": 64,
+    "Corn leaf blight": 180,
+    "Corn rust leaf": 106,
+    "Peach leaf": 103,
+    "Potato leaf early blight": 109,
+    "Potato leaf late blight": 97,
+    "Raspberry leaf": 112,
+    "Soyabean leaf": 57,
+    "Squash Powdery mildew leaf": 124,
+    "Strawberry leaf": 88,
+    "Tomato Early blight leaf": 79,
+    "Tomato Septoria leaf spot": 140,
+    "Tomato leaf": 55,
+    "Tomato leaf bacterial spot": 101,
+    "Tomato leaf late blight": 101,
+    "Tomato leaf mosaic virus": 44,
+    "Tomato leaf yellow virus": 70,
+    "Tomato mold leaf": 85,
+    "Tomato two spotted spider mites leaf": 2,
+    "grape leaf": 57,
+    "grape leaf black rot": 56
+  },
+  "splits": {
+    "train": 2342
+  },
+  "seed": null,
+  "split_warning": "Upstream split preserved; audit cross-split duplicates and grouping.",
+  "unreadable": []
+}

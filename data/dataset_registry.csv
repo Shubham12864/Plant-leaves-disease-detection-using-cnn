@@ -1,0 +1,3 @@
+dataset,source_url,version,download_date,license,license_url,domain,classes,notes
+PlantVillage,https://huggingface.co/datasets/mohanty/PlantVillage,9e97599868962bd0079b8db4b7f1efa9185fa1e7,2026-10-11,CC BY-SA 3.0,https://creativecommons.org/licenses/by-sa/3.0/,controlled,38,"Hugging Face color configuration; preserve upstream color_train/color_test lists; license shown by dataset card"
+PlantDoc,https://github.com/pratikkayal/PlantDoc-Dataset,5467f6012d78d1c446145d5f582da6096f852ae8,2026-10-11,CC BY 4.0,https://creativecommons.org/licenses/by/4.0/,field,,"Original repository train/test folders; Windows-invalid filename characters sanitized with reversible filename map"

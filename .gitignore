@@ -1,0 +1,18 @@
+# Ignore raw/private data, local environments, and generated model artifacts.
+data/incoming/**
+!data/incoming/.gitkeep
+.venv/
+__pycache__/
+*.py[cod]
+checkpoints/**
+reports/generated/**
+*.pt
+*.pth
+*.onnx
+!reports/phase2_baseline/plantvillage_smallcnn_best.pt
+
+data/raw/**
+!data/raw/.gitkeep
+
+kaggle_upload/**
+!kaggle_upload/.gitkeep

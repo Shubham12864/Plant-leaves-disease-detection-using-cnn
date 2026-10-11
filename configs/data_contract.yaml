@@ -1,0 +1,17 @@
+# Phase II data contract
+# Split ratios are planning targets. The frozen CSV manifests are authoritative for actual membership.
+project_title: "Plant leaves disease detection using CNN"
+seed: 42
+image_size: [224, 224]
+split:
+  validation_fraction_of_remaining_training_pool: 0.15
+  test: "published test after removing overlapping groups/hashes from development"
+  grouping_required: true
+  locked_test: true
+metrics:
+  - macro_f1
+  - balanced_accuracy
+  - per_class_precision_recall_f1
+  - confusion_matrix
+  - calibration
+  - selective_risk_coverage
