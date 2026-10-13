@@ -1,0 +1,4 @@
+model,pretrained,validation_images,val_accuracy,val_macro_precision,val_macro_recall,val_macro_f1,val_balanced_accuracy,best_epoch,train_minutes,parameters,checkpoint_mb,used_gpus,batch_size,training_mode,training_method
+SmallCNN,False,6544,0.96011614,0.94285192,0.95398347,0.94441062,0.95398347,12,,398662,1.54000000,2,64,reused_phase2_checkpoint,Trained from scratch; Phase 2 baseline checkpoint
+ResNet18,True,6544,0.96149144,0.96061402,0.95608189,0.95459994,0.95608189,8,9.45000000,11196006,42.79000000,2,64,imagenet_finetune,ImageNet transfer learning; fine-tuned
+EfficientNet-B0,True,6544,0.99541565,0.99314235,0.99456447,0.99368943,0.99456447,12,104.08000000,4056226,15.77000000,2,32,imagenet_finetune_ddp,ImageNet transfer learning; fine-tuned
