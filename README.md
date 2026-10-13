@@ -1,6 +1,6 @@
 # Plant Leaf Disease Detection using CNN
 
-This repository contains the Phase 2 research code and results. It is not the final application.
+This repository contains the research code and results. It is not the final application.
 
 ## Project question
 
