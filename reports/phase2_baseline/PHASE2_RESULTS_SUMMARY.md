@@ -42,7 +42,7 @@ The test set was evaluated after selecting the checkpoint with the validation se
 
 1. Use the training curve and test metrics in the Phase 2 guide presentation.
 2. Inspect the confusion matrix and per-class report; discuss classes with the weakest F1 or recall.
-3. Evaluate on PlantDoc as an external generalization check, after confirming compatible class labels and documenting any mapping or excluded classes.
+3. Evaluate on a larger independent field-photo collection after defining and documenting a compatible label map.
 4. Keep this PlantVillage test score fixed as the baseline; do not tune model choices against this test set.
 
 ## Source of these values

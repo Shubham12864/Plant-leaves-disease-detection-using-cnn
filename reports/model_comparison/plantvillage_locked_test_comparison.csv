@@ -1,0 +1,3 @@
+model,dataset,test_images,accuracy,balanced_accuracy,macro_precision,macro_recall,macro_f1,selected_epoch
+SmallCNN,PlantVillage test,10709,0.96946494,0.96016060,0.96296769,0.96016060,0.96068017,12
+EfficientNet-B0,PlantVillage test,10709,0.99505089,0.99312726,0.99327981,0.99312726,0.99314232,12
