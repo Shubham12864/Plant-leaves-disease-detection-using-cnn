@@ -73,3 +73,30 @@ These are not defects in the code; they are ways a report can be wrong while eve
 3. Any checkpoint or table in a document must have a tracked checksum and a stated provenance (D01, D20, D27).
 4. Partial-split metrics always report zero-support classes alongside the headline number (D06).
 5. Cross-dataset comparisons state the mapped-class subset and the interval width (D08, D10).
+
+## R12 — Protocol v1 cannot reproduce the reference result (BLOCKER)
+
+**Status:** open, blocks S9/S10. Evidence: `reports/model_comparison/SWEEP_V1_INVALID.md`.
+
+Twelve runs (4 architectures x 3 seeds) completed on 2026-10-25. All twelve
+carried the same dataset fingerprint, so the split was correct, but every
+architecture landed far below its established result: EfficientNet-B0 0.684
+against 0.9954, ResNet18 0.584 against 0.9615, SmallCNN 0.231 against 0.9601.
+
+Measured cause: the backbone never fine-tuned. Whole-model distance to pristine
+ImageNet weights is 0.49% for the sweep's EfficientNet-B0 against 1.96% for the
+verified reference. Four settings do it: weight decay 0.05 instead of 1e-4,
+global batch 128 instead of 32 (4x fewer optimizer steps), a warmup+cosine
+schedule instead of constant LR, and label smoothing plus class weights.
+
+**Fix before re-running:** baseline arm uses the proven optimisation settings;
+augmentation and class balancing move to a separate arm (which H3 needs anyway);
+gate any sweep behind a two-epoch check requiring B0 >= 0.95 val accuracy by
+epoch 2.
+
+## R13 — Sweep ran 4.5x slower per epoch than the pilot (UNEXPLAINED)
+
+Pilot measured 2.45 min/epoch for EfficientNet-B0; the sweep measured 7.52.
+SmallCNN 0.67 -> 3.01, ConvNeXt 3.15 -> 14.16. Total 5.6 h against a 4.2 h
+projection. Not visible in the artifacts; needs a session log to decide between
+data-loader throughput and `/kaggle/temp` read speed.
