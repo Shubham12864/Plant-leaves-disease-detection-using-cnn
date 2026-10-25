@@ -1,0 +1,78 @@
+/* Inference detail page: full class ranking, timing, checkpoint, JSON. */
+
+.ranklist { display: grid; gap: var(--s-50); }
+
+.rankrow {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 110px 64px;
+  gap: var(--s-100);
+  align-items: center;
+  padding: var(--s-25) 0;
+  font-size: var(--t-sm);
+  line-height: var(--lh-sm);
+}
+.rankrow[hidden] { display: none; }
+
+.rk-rank { color: var(--ink-3); font-family: "Geist Mono", ui-monospace, monospace; font-size: var(--t-xs); }
+.rk-name {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: var(--t-xs);
+  line-height: var(--lh-xs);
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rk-track {
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.rk-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: var(--r-full);
+  background: var(--ink-3);
+  transition: width 900ms var(--ease);
+}
+.rk-pct {
+  text-align: right;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: var(--t-xs);
+  color: var(--ink);
+}
+
+.rankrow.is-top .rk-name { color: var(--ink); }
+.rankrow.is-top .rk-fill { background: var(--accent); }
+.rankrow.is-true .rk-name { color: var(--ink); }
+.rankrow.is-true .rk-name::after {
+  content: " true label";
+  color: var(--bad);
+  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--t-xs);
+}
+.rankrow.is-empty .rk-name,
+.rankrow.is-empty .rk-pct { color: var(--ink-3); opacity: 0.55; }
+
+.json {
+  margin: 0;
+  padding: var(--s-300);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+  line-height: var(--lh-sm);
+  overflow: auto;
+  max-height: 420px;
+  tab-size: 2;
+}
+
+.row-actions { display: flex; gap: var(--s-75); flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .rankrow { grid-template-columns: 24px minmax(0, 1fr) 64px; }
+  .rk-track { display: none; }
+}

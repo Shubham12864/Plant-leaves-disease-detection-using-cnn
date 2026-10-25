@@ -72,6 +72,22 @@ The nominal LR went *up* (1e-4 → 3e-4), which is why the defect is not obvious
 from the config alone. It is outweighed by 4× fewer steps, a decaying schedule,
 and a 500× stronger weight decay.
 
+The schedule decay is now measured directly. Running the engine on CPU with
+three epochs and reading back the learning rate:
+
+| Protocol | epoch 1 | epoch 2 | epoch 3 |
+|---|---|---|---|
+| v2 (warmup 0.0, min_lr_factor 1.0) | 1.000e-03 | 1.000e-03 | 1.000e-03 |
+| v1 (warmup 0.10, min_lr_factor 0.01) | 8.033e-04 | 2.844e-04 | **1.000e-05** |
+
+Under v1 the final epoch trained at **1% of the nominal rate**. The nominal
+3e-4 that looks healthy in the config was 1e-5 by the end of the run, which is
+one to two orders of magnitude too small to move a backbone.
+
+This is also why the defect was invisible in the artifacts: the engine did not
+record the applied learning rate. It does now (`lr` column in
+`training_history.csv`).
+
 ## Secondary defect: everything ran ~4.5× slower than the pilot
 
 | Architecture | Pilot min/epoch | Sweep min/epoch | Ratio |

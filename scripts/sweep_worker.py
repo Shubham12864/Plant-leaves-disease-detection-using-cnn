@@ -56,6 +56,7 @@ def build_command(arch, seed, cfg, protocol, paths, out_dir, mode, script, devic
         "--ema-decay", str(protocol["ema_decay"]),
         "--grad-clip", str(protocol["grad_clip"]),
         "--warmup-fraction", str(protocol["warmup_fraction"]),
+        "--min-lr-factor", str(protocol.get("min_lr_factor", 0.01)),
         "--rotation-deg", str(protocol["rotation_deg"]),
         "--shuffle-mode", protocol["shuffle_mode"],
         "--image-size", str(protocol["image_size"]),

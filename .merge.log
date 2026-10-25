@@ -1,0 +1,14 @@
+read training_runs.zip: 33 entries
+read sweep_all.zip: 121 entries
+
+unique entries: 99  (3487.7 MB uncompressed)
+CONFLICTS: 2 path(s) differ between archives
+  comparison.csv
+      8c0673f7532c         806  training_runs.zip
+      6f316024f7ce        2152  sweep_all.zip
+  macro_f1_by_architecture.png
+      85b04ff57715       54327  training_runs.zip
+      c4dc7eb01091       50732  sweep_all.zip
+
+wrote C:\Users\Shubham\Downloads\sweep_combined.zip (3239.0 MB on disk)
+includes MANIFEST.csv and CONFLICTS.csv

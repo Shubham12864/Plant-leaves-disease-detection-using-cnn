@@ -736,9 +736,15 @@ def main():
                     chosen_metrics, chosen_source = ema_metrics, "ema"
                     y_true, y_pred = ema_true, ema_pred
 
+            # Record the applied learning rate. Without this the schedule is
+            # invisible in the artifacts: protocol v1 decayed to nearly zero
+            # every run and nothing on disk said so.
+            epoch_lr = scheduler.get_last_lr()[0] if scheduler is not None else args.lr
+
             row = {
                 "model": args.arch,
                 "epoch": epoch,
+                "lr": epoch_lr,
                 "train_loss": train_loss,
                 **{f"val_{key}": value for key, value in raw_metrics.items()},
                 f"val_macro_f1_{chosen_source}": chosen_metrics["macro_f1"],

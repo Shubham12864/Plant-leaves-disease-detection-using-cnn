@@ -8,12 +8,15 @@ app/static/
   index.html          landing page, one recorded case inline
   scan.html           single photo: file, camera, staged loading, result, Grad-CAM slider
   upload.html         batch: queue, per image progress, summary tiles, table, CSV
+  inference.html      one case in full: all 38 class scores, per stage timing, checkpoint, API JSON
   css/app.css         landing tokens and components
-  css/app-pages.css   app page layouts (scan, batch)
+  css/app-pages.css   app page layouts (scan, batch, inference)
+  css/inference.css   the 38 class ranking list and the JSON block
   js/ui.js            shared nav, scroll reveals, tagline, bars, model card
   js/api.js           inference client, POST /api/predict
   js/scan.js          scan page behaviour
   js/upload.js        batch page behaviour
+  js/inference.js     inference page behaviour
   js/app.js           landing page behaviour
   js/demo-data.js     GENERATED, do not edit
   js/config.example.js  set window.LEAFREAD_API to talk to a real backend

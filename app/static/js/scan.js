@@ -103,6 +103,7 @@
       <p class="read">${readCopy(vm, confident)}</p>
       <div class="toolbar">
         <button class="btn-ghost btn-sm" data-reset type="button">Scan another</button>
+        ${vm.truth ? `<a class="btn-ghost btn-sm" href="inference.html?case=${state.caseKey}">Every number</a>` : ''}
         <a class="btn-ghost btn-sm" href="upload.html">Batch upload</a>
       </div>
     `;

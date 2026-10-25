@@ -3,6 +3,7 @@
 
 /* ── page shell ─────────────────────────────────────────────────────── */
 .shell { padding-top: var(--s-900); padding-bottom: var(--s-900); }
+.shell section { padding-bottom: 0; }   /* app pages space sections with margins */
 
 .pagehead {
   display: grid;

@@ -25,6 +25,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -76,13 +77,27 @@ def preprocess(path: Path, size: int, mean, std) -> tuple[torch.Tensor, Image.Im
     return tensor, image
 
 
-def export_case(row, probabilities, label, name, cam_fn, mean, std, size) -> dict:
-    tensor, image = preprocess(IMAGE_ROOT / row.relative_path, size, mean, std)
-    best = int(probabilities.argmax())
+def export_case(row, label, name, cam_fn, mean, std, size) -> dict:
+    path = IMAGE_ROOT / row.relative_path
 
     started = time.perf_counter()
-    cam = cam_fn(tensor, torch.tensor([best]))[0]
-    gradcam_ms = (time.perf_counter() - started) * 1000
+    tensor, image = preprocess(path, size, mean, std)
+    preprocess_ms = (time.perf_counter() - started) * 1000
+
+    started = time.perf_counter()
+    with torch.no_grad():
+        logits = cam_fn.model(tensor)
+    forward_ms = (time.perf_counter() - started) * 1000
+
+    probabilities = F.softmax(logits, dim=1)[0]
+    best = int(probabilities.argmax())
+
+    gradcam_runs = []
+    for _ in range(3):
+        started = time.perf_counter()
+        cam = cam_fn(tensor, torch.tensor([best]))[0]
+        gradcam_runs.append((time.perf_counter() - started) * 1000)
+    gradcam_ms = sum(gradcam_runs) / len(gradcam_runs)
 
     big = image.resize((DISPLAY_PX, DISPLAY_PX), Image.BICUBIC)
     cam_big = np.asarray(
@@ -112,6 +127,17 @@ def export_case(row, probabilities, label, name, cam_fn, mean, std, size) -> dic
             "probability": round(probability, 6),
         })
 
+    order = torch.argsort(probabilities, descending=True).tolist()
+    ranking = []
+    for index in order:
+        crop_i, condition_i = pretty(label[index])
+        ranking.append({
+            "label": label[index],
+            "crop": crop_i,
+            "condition": condition_i,
+            "probability": round(float(probabilities[index]), 6),
+        })
+
     truth_crop, truth_condition = pretty(row.label)
     return {
         "label": top3[0]["label"],
@@ -131,7 +157,12 @@ def export_case(row, probabilities, label, name, cam_fn, mean, std, size) -> dic
             "condition": truth_condition,
             "match": bool(top3[0]["label"] == row.label),
         },
-        "timing_ms": {"gradcam": round(gradcam_ms, 1)},
+        "ranking": ranking,
+        "timing_ms": {
+            "preprocess": round(preprocess_ms, 1),
+            "forward": round(forward_ms, 1),
+            "gradcam": round(gradcam_ms, 1),
+        },
         "source_image": row.relative_path,
         "file": Path(row.relative_path).name,
     }
@@ -196,7 +227,7 @@ def main() -> None:
     with torch.no_grad():
         tensor, _ = preprocess(IMAGE_ROOT / row.relative_path, size, mean, std)
     probabilities = F.softmax(model(tensor), dim=1)[0]
-    cases["confident"] = export_case(row, probabilities, labels, "confident", cam_fn, mean, std, size)
+    cases["confident"] = export_case(row, labels, "confident", cam_fn, mean, std, size)
     print(f"confident: {cases['confident']['label']} at {cases['confident']['probability']:.4f}")
 
     hard = first_wrong if first_wrong is not None else lowest_correct
@@ -205,7 +236,7 @@ def main() -> None:
         with torch.no_grad():
             tensor, _ = preprocess(IMAGE_ROOT / row.relative_path, size, mean, std)
         probabilities = F.softmax(model(tensor), dim=1)[0]
-        cases["hard"] = export_case(row, probabilities, labels, "hard", cam_fn, mean, std, size)
+        cases["hard"] = export_case(row, labels, "hard", cam_fn, mean, std, size)
         summary = cases["hard"]
         kind = "misclassified" if first_wrong is not None else "lowest confidence in sample"
         print(f"hard     : {summary['label']} at {summary['probability']:.4f} "
@@ -216,7 +247,7 @@ def main() -> None:
         with torch.no_grad():
             tensor, _ = preprocess(IMAGE_ROOT / row.relative_path, size, mean, std)
         probabilities = F.softmax(model(tensor), dim=1)[0]
-        cases["uncertain"] = export_case(row, probabilities, labels, "uncertain", cam_fn, mean, std, size)
+        cases["uncertain"] = export_case(row, labels, "uncertain", cam_fn, mean, std, size)
         summary = cases["uncertain"]
         print(f"uncertain: {summary['label']} at {summary['probability']:.4f} "
               f"(truth {summary['truth']['label']}, below {threshold})")
@@ -235,7 +266,7 @@ def main() -> None:
             with torch.no_grad():
                 tensor, _ = preprocess(IMAGE_ROOT / row.relative_path, size, mean, std)
             probabilities = F.softmax(model(tensor), dim=1)[0]
-            batch.append(export_case(row, probabilities, labels, f"batch{index + 1:02d}", cam_fn, mean, std, size))
+            batch.append(export_case(row, labels, f"batch{index + 1:02d}", cam_fn, mean, std, size))
         correct = sum(1 for item in batch if item["truth"]["match"])
         print(f"batch    : {len(batch)} images, {correct} correct, {len(batch) - correct} wrong")
 
@@ -252,6 +283,8 @@ def main() -> None:
             "epoch": checkpoint.get("epoch"),
             "parameters": int(sum(p.numel() for p in model.parameters())),
             "checkpoint": CHECKPOINT.name,
+            "checkpoint_sha256": hashlib.sha256(CHECKPOINT.read_bytes()).hexdigest(),
+            "normalization": {"mean": list(mean), "std": list(std)},
             "confidence_threshold": threshold,
         },
         "cases": cases,

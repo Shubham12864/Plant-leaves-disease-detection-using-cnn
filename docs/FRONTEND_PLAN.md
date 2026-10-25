@@ -2,17 +2,20 @@
 
 Status: **static frontend built, backend not started.** Written 2026-10-25.
 
-What exists now (verified in a browser): three pages served as plain files with no server.
+What exists now (verified in a browser): four pages served as plain files with no server.
 
 | Page | Does |
 |---|---|
 | `app/static/index.html` | landing page, one recorded case inline, links into the app |
 | `app/static/scan.html` | one photo: file drop, camera, staged loading, result, Grad-CAM compare slider, session strip |
 | `app/static/upload.html` | batch: queue of twelve, per image progress, summary tiles, results table with expandable heat maps, CSV export |
+| `app/static/inference.html` | one case in full: all 38 class scores, per stage timings, checkpoint hash and normalisation, and the exact JSON the backend must return |
 
-Shared behaviour lives in `js/ui.js` (nav, reveals, tagline, bars, model card) and `js/api.js`
-(the inference client, empty until a backend exists). `scripts/make_demo_assets.py` precomputes two
-curated cases plus a twelve image batch from the checkpoint, so every number on screen is real.
+`scripts/make_demo_assets.py` also records the full 38 component probability vector, the preprocess,
+forward and Grad-CAM timings per case, and the checkpoint SHA-256, which is what makes the inference
+page possible without a server. Shared behaviour lives in `js/ui.js` (nav, reveals, tagline, bars,
+model card) and `js/api.js` (the inference client, empty until a backend exists). Every number on
+screen comes from that generated file, which is regenerated from the checkpoint, never hand written.
 Section 3 below describes the backend API that is still to be built; nothing on that endpoint exists
 yet, and `app/README.md` documents the contract the pages already expect.
 Design system: `landing-page-design` skill (elayadesign/ai-design-skills, MIT).

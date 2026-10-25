@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "supersedes": "configs/protocol.json (v1). v1 was measured to be invalid on 2026-10-25: the backbone never fine-tuned, EfficientNet-B0 reached 0.6815 validation accuracy against 0.9954 for the reference. Evidence: reports/model_comparison/SWEEP_V1_INVALID.md",
+  "note": "Restores the optimisation settings that actually produced the reference checkpoints, instead of a modern recipe that was never validated. Every value below is traceable to a source: efficientnet_b0 to notebooks/01_Train_EfficientNet_B0.ipynb (the script that produced the 99.54% checkpoint), smallcnn to reports/phase2_baseline/experiment_config.json (96.01%). resnet18 and convnext_tiny have no recorded original config, so they inherit the validated efficientnet_b0 recipe.",
+
+  "image_size": 224,
+  "epochs": 12,
+  "patience": 3,
+  "seeds": [42, 43, 44],
+  "eval_batch_size": 128,
+  "workers": 4,
+  "shuffle_mode": "blocked",
+  "rotation_deg": 12.0,
+  "grad_clip": 5.0,
+
+  "warmup_fraction": 0.0,
+  "min_lr_factor": 1.0,
+  "label_smoothing": 0.0,
+  "class_weight_alpha": 0.0,
+  "ema_decay": 0.0,
+
+  "selection_metric": "val_macro_f1",
+
+  "architectures": {
+    "smallcnn": {
+      "pretrained": false,
+      "local_batch_size": 32,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "why": "trains from scratch; values copied from reports/phase2_baseline/experiment_config.json (global batch 64 = 32 per GPU, AdamW lr 1e-3, weight decay 1e-4), which produced 96.01% validation accuracy. This is the only sanctioned deviation from the shared recipe."
+    },
+    "resnet18": {
+      "pretrained": true,
+      "local_batch_size": 16,
+      "lr": 0.0001,
+      "weight_decay": 0.0001,
+      "why": "no original config is on record for the 96.15% ResNet18 checkpoint, so it inherits the validated efficientnet_b0 recipe unchanged rather than a guessed one."
+    },
+    "efficientnet_b0": {
+      "pretrained": true,
+      "local_batch_size": 16,
+      "lr": 0.0001,
+      "weight_decay": 0.0001,
+      "why": "copied from notebooks/01_Train_EfficientNet_B0.ipynb: AdamW lr 1e-4, weight decay 1e-4, global batch 32 (16 per GPU), constant learning rate, no label smoothing, no class weights. This produced the 99.54% reference checkpoint, reaching 98.26% validation accuracy in epoch 1."
+    },
+    "convnext_tiny": {
+      "pretrained": true,
+      "local_batch_size": 16,
+      "lr": 0.0001,
+      "weight_decay": 0.0001,
+      "why": "no original config on record; inherits the validated efficientnet_b0 recipe. Its 2018-era-era activation cost is higher, but at 16 per GPU it fits, and keeping the recipe identical is what makes the cross-architecture check meaningful."
+    }
+  },
+
+  "notes": {
+    "constant_lr": "warmup_fraction 0.0 with min_lr_factor 1.0 makes the schedule flat: lr_lambda returns 1.0 for every step. This reproduces the constant learning rate of the original run. Setting either value back to its v1 value re-introduces decay.",
+    "what_v1_got_wrong": "v1 used weight decay 0.05 (500x the proven 1e-4), global batch 128 (4x fewer optimizer steps than the proven 32), warmup plus cosine decay to near zero (the proven run held the rate constant), and label smoothing 0.05 with class weights (the proven run used neither).",
+    "class_balancing": "Class-weighted loss and label smoothing are NOT part of the baseline arm. They belong to the H3 treatment arm and are introduced there, separately, so that if they change the result we know it was them.",
+    "augmentation": "Horizontal flip, rotation up to 12 degrees, brightness 0.88-1.12 and per-channel gain 0.92-1.08, applied on the GPU inside the engine. The original run used flip, rotation and brightness; the per-channel gain is the only addition, and it is kept because intensity variation is one of the documented differences between PlantVillage and field images.",
+    "gate": "No sweep may run until one 2-epoch EfficientNet-B0 run reaches 0.95 validation accuracy by epoch 2. The original reached 0.9826 in epoch 1, so the gate is deliberately loose: it detects a broken configuration, not a slightly weaker one."
+  }
+}
