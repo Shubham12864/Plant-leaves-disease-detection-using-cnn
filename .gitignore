@@ -4,7 +4,13 @@ data/incoming/**
 .venv/
 __pycache__/
 *.py[cod]
+# Model weights stay out of git; the checksum list and per-checkpoint
+# provenance records are tracked so a clone can still verify what it is given.
 checkpoints/**
+!checkpoints/
+!checkpoints/*/
+!checkpoints/SHA256SUMS
+!checkpoints/**/provenance.json
 reports/generated/**
 *.pt
 *.pth
@@ -16,3 +22,5 @@ data/raw/**
 
 kaggle_upload/**
 !kaggle_upload/.gitkeep
+.venv*/
+.smoke.log

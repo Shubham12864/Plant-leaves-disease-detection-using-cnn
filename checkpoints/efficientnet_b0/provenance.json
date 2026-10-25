@@ -1,0 +1,28 @@
+{
+  "architecture": "efficientnet_b0",
+  "file": "efficientnet_b0_best.pt",
+  "sha256": "90e003cfbfb3549e07ac937a8289597a26190febb5d0b567f5848f049032c8fd",
+  "size_bytes": 16531151,
+  "source_filename": "efficientnet_b0_best (1).pt",
+  "origin": "Trained by the student on Kaggle (2x Tesla T4), downloaded from the Kaggle Output panel.",
+  "training_script": "pilot script embedded in notebooks/01_Train_EfficientNet_B0.ipynb (pre-v2). It does not write a dataset_fingerprint, so the exact split used cannot be proven from the file alone; the class list was checked against data/manifests/plantvillage_development.csv and matches exactly in order.",
+  "checkpoint_reported_values": {
+    "epoch": 12,
+    "val_macro_f1": 0.9936894341462544,
+    "classes": 38,
+    "image_size": 224,
+    "pretrained": true,
+    "seed": 42,
+    "normalization_mean": [0.485, 0.456, 0.406],
+    "normalization_std": [0.229, 0.224, 0.225]
+  },
+  "parameters": 4056226,
+  "seconds_metadata_present": ["architecture", "model_state_dict", "classes", "image_size", "pretrained", "normalization_mean", "normalization_std", "epoch", "val_macro_f1", "seed"],
+  "metadata_absent": ["dataset_fingerprint", "weights_are_ema"],
+  "notes": [
+    "Classes match the development manifest exactly (38, identical order) - checked 2026-10-25.",
+    "State dict loads with strict=True into src/plant_disease/models.build_efficientnet_b0(38).",
+    "No optimizer/scaler state: this is a best-weights checkpoint, not a resume checkpoint.",
+    "Validity of the reported 99.37% macro-F1 was independently re-measured on the PlantVillage validation split; see reports/model_comparison/locked_test_efficientnet_b0_validation/."
+  ]
+}

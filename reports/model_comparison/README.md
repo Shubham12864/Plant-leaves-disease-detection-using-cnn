@@ -22,4 +22,12 @@ Do not compare a validation score with a test score. Use the three-model validat
 
 - Validation scores, histories, and run details came from the Kaggle model-comparison output bundle.
 - SmallCNN test scores and training history came from `reports/phase2_baseline/`.
-- EfficientNet-B0 test scores came from the Kaggle final-evaluation outputs, checked against the PlantVillage classification report and confusion matrix.
+- EfficientNet-B0 test scores were recorded from the Kaggle final-evaluation run. **Correction (2026-10-25):** the earlier wording said those scores had been "checked against the PlantVillage classification report and confusion matrix". Those files were never saved for EfficientNet-B0, so that check could not have happened. It is now reproducible instead: `notebooks/04_Locked_Test_Evaluation.ipynb` scores the locked test split with the restored checkpoint and writes the report and matrix to `reports/model_comparison/locked_test_efficientnet_b0/`.
+
+## Known gaps in this folder
+
+- `plantvillage_model_training_history.csv` contains ResNet18 and EfficientNet-B0 rows only. The SmallCNN series drawn in `plantvillage_training_curves.png` comes from `reports/phase2_baseline/training_history.csv`, not from this CSV.
+- `plantvillage_validation_comparison.png` starts its y-axis at 90, which visually exaggerates the SmallCNN↔ResNet18 difference. Read the CSV, not the chart, for magnitudes.
+- `balanced_accuracy` and `macro_recall` are the same quantity (mean per-class recall). They are not independent evidence.
+
+Current plan and defect register: [`docs/ROADMAP.md`](../../docs/ROADMAP.md), [`docs/KNOWN_ISSUES.md`](../../docs/KNOWN_ISSUES.md).

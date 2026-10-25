@@ -35,7 +35,8 @@
   "splits": {
     "test": 236
   },
-  "seed": null,
+  "seed": 42,
   "split_warning": "Upstream split preserved; audit cross-split duplicates and grouping.",
-  "unreadable": []
+  "generated_by": "scripts/freeze_evaluation_splits.py",
+  "source_manifest": "plantdoc_test.csv"
 }

@@ -11,6 +11,40 @@ SMALLCNN_MEAN = (0.5, 0.5, 0.5)
 SMALLCNN_STD = (0.5, 0.5, 0.5)
 
 
+def resolve_image_root(dataset_root: Path, frame: pd.DataFrame, sample: int = 25) -> Path:
+    """Find where a manifest's images actually live.
+
+    PlantVillage is materialised with two roots: the development pool (train and
+    validation rows) sits under ``data/raw/PlantVillage/train``, while the
+    published test rows sit under ``data/raw/PlantVillage/test``. Hard-coding
+    either one breaks the other split, so resolve it from the manifest itself.
+    """
+    base = Path(dataset_root) / "data" / "raw" / "PlantVillage"
+    if not base.is_dir():
+        raise FileNotFoundError(f"PlantVillage images not found under {base}")
+
+    relative = frame["relative_path"].head(sample).tolist()
+    if not relative:
+        raise ValueError("Cannot resolve an image root for an empty manifest")
+
+    candidates = [base / "train", base / "test"]
+    for candidate in candidates:
+        if candidate.is_dir() and all((candidate / rel).is_file() for rel in relative):
+            return candidate
+
+    scored = sorted(
+        ((sum((candidate / rel).is_file() for rel in relative), candidate) for candidate in candidates),
+        key=lambda item: item[0],
+        reverse=True,
+    )
+    if scored[0][0] > 0:
+        return scored[0][1]
+    raise FileNotFoundError(
+        f"None of {[str(c) for c in candidates]} contains the manifest's images. "
+        f"First expected file: {candidates[0] / relative[0]}"
+    )
+
+
 def load_split(dataset_root: Path, split: str):
     """Load train/validation rows from the development manifest only."""
     if split not in {"train", "validation"}:

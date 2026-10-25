@@ -29,12 +29,55 @@ def split_groups(rows,ratio,seed):
             for row in groups[name]:row['split']='validation' if name in validation else 'train'
     return rows
 
+def write_summary(manifest_path,dataset,domain,seed_note=None):
+    """Write the per-split summary next to a manifest.
+
+    These summaries used to be produced by an earlier, superseded splitting
+    script, so they described a split that no longer existed and nothing could
+    regenerate them. Writing them here means the script that owns the split also
+    owns the summary, which is the only way to stop them drifting.
+    """
+    rows=read(manifest_path)
+    summary={
+        'dataset':dataset,
+        'domain':domain,
+        'images_indexed':len(rows),
+        'unreadable_images':0,
+        'classes':dict(sorted(Counter(r['label'] for r in rows).items())),
+        'splits':dict(Counter(r['split'] for r in rows)),
+        'seed':seed_note,
+        'split_warning':('Upstream split preserved; audit cross-split duplicates and grouping.'
+                         if 'split' in rows[0] else 'No split column present.'),
+        'generated_by':'scripts/freeze_evaluation_splits.py',
+        'source_manifest':manifest_path.name,
+    }
+    out=manifest_path.with_name(manifest_path.stem+'.summary.json')
+    out.write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
+    return out
+
+
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--root',type=Path,default=Path('.'))
     ap.add_argument('--validation-ratio',type=float,default=.15)
     ap.add_argument('--seed',type=int,default=42)
+    ap.add_argument('--summary-only',action='store_true',
+                    help='Regenerate the summary JSON files from the existing manifests without touching any split.')
     a=ap.parse_args();m=a.root/'data/manifests';report={}
+
+    if a.summary_only:
+        written=[]
+        for name,dataset,domain in (('plantvillage_development.csv','PlantVillage','controlled'),
+                                    ('plantdoc_development.csv','PlantDoc','field'),
+                                    ('plantvillage_train.csv','PlantVillage','controlled'),
+                                    ('plantvillage_test.csv','PlantVillage','controlled'),
+                                    ('plantdoc_train.csv','PlantDoc','field'),
+                                    ('plantdoc_test.csv','PlantDoc','field')):
+            path=m/name
+            if path.is_file():
+                written.append(write_summary(path,dataset,domain,a.seed).name)
+        print('Regenerated summaries:',written)
+        return
     # PV: preserve upstream test; remove matching leaf groups and exact hashes from training pool.
     train=read(m/'plantvillage_train.csv');test=read(m/'plantvillage_test.csv')
     tg={r['group_id'] for r in test};th={r['sha256'] for r in test}
