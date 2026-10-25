@@ -9,7 +9,7 @@ Severity: **S1** = an evaluator or reviewer can catch a false or unsupported cla
 |---|---|---|---|---|
 | D01 | S1 | **Checkpoints are git-ignored, so a fresh clone cannot reproduce anything.** The restored EfficientNet-B0 artifact is excluded by the same rule that excludes the others. | `.gitignore:7` `checkpoints/**`; `git check-ignore` confirms all three checkpoints are ignored | 0.7 |
 | D02 | S1 | **`plantvillage_development.summary.json` describes a superseded split.** It reports 43,596 rows / 37,057 train / 6,539 validation; the manifest holds 43,306 / 36,762 / 6,544. Nothing regenerates it, so it can drift again. | `data/manifests/plantvillage_development.summary.json` `"rows": 43596` vs `pandas` count on `plantvillage_development.csv` | 0.5 |
-| D03 | S1 | **A report claims a check that never happened.** "checked against the PlantVillage classification report and confusion matrix" — those files do not exist for EfficientNet-B0. | `reports/model_comparison/README.md:25`; no such files under `reports/` | 0.2, 0.6 |
+| D03 | — | ~~A report claimed a check that never happened.~~ **Resolved 2026-10-25** — the check now exists: the locked test split was scored, producing `classification_report.csv` and `confusion_matrix.csv` under `reports/model_comparison/locked_test_efficientnet_b0/test/`. | `reports/model_comparison/README.md` corrected | done |
 | D04 | S1 | **Four planning documents contradict the code.** They still say no model was trained and no result exists. | `ARCHITECTURE.md:9`, `ARCHITECTURE.md:184`, `MEMORY.md:166`, `PHASE-II-ROADMAP.md:5`, `Literature-Survey-Evidence-Register.md:7` | 0.6 |
 | D05 | S1 | **Damaged front-matter title in an uncommitted working-tree change.** | `git diff` on `reports/guide_brief/UPDATED_LITERATURE_SURVEY.md`: `-title: Updated Literature Survey — ...` → `+title:  — ...` | 0.5 |
 | D06 | S2 | **Macro-F1 over a constant 38-class label list collapses on subsets.** Scoring 256 validation rows gave accuracy 0.996 but macro-F1 **0.105**, because 35 classes had zero support. Any partial-split table computed this way is meaningless unless zero-support classes are reported. | Observed while testing `scripts/evaluate_locked_test.py --limit 256`; `classes_with_zero_support` field added to `metrics.json` in response | 1.5 |
@@ -51,8 +51,18 @@ Severity: **S1** = an evaluator or reviewer can catch a false or unsupported cla
 | R08 | No end-to-end test of training + evaluation | `scripts/smoke_test_engine.py`, passing |
 | R09 | The P0.1 notebook imported `plant_disease.models` in its setup cell, but the cells that create the package ran afterwards, so the first cell always raised `ImportError` | Cells reordered: paths → writefile → checkpoint check → evaluate; the import now fails with an instruction instead of a bare traceback |
 | R10 | The evaluator hard-coded `data/raw/PlantVillage/train` as the image root, but published test rows are materialised under `.../test`, so every test evaluation would have failed with "images missing" | `plant_disease.data.resolve_image_root()` picks the root from the manifest; verified to return `train` for train/validation and `test` for test |
+| R11 | P0.1 could not be closed: no locked-test artifact existed for EfficientNet-B0 | Scored both splits on Kaggle. Validation macro-F1 reproduced **bit-identically** (0.9936894341462544); test = 53 errors in 10,709. All five README claims verified. Registered in `results/registry.json` |
+| R12 | The audit suspected background shortcuts from 20 of 32 `Soybean___healthy` errors landing on another crop's healthy class | For EfficientNet-B0 the cross-crop healthy total is **8 errors in 10,709** (Raspberry→Cherry 4, Apple→Blueberry 1, Apple→Soybean 1, Potato→Soybean 1, Soybean→Corn 1). The suspicion was drawn from SmallCNN and does **not** transfer to the stronger model. H2 now needs the occlusion probe, not this static count |
 
 ---
+
+## Reporting caveats learned from the first real run
+
+These are not defects in the code; they are ways a report can be wrong while every number is correct.
+
+- **MCE is not usable at this accuracy.** 10,709 test images fill 15 confidence bins so unevenly that the middle bins hold 1–36 images. The maximum calibration error (0.53) comes from one bin containing a single image. ECE (0.0022) is meaningful; MCE is not. Always publish ECE with the bin counts.
+- **Pipeline latency is not model latency.** The evaluator measured 37.6 ms/image end to end on a T4, which implies 26 images/second — far too slow for EfficientNet-B0 at batch 128. That figure describes the DataLoader and JPEG decode path in this notebook, not the network. Do not quote it as a model benchmark; a real latency measurement needs a warm cache and a batched loop.
+- **Abstention is nearly free on PlantVillage and says nothing about the field.** Accuracy at 90% coverage (99.76%) barely exceeds full coverage (99.51%) because the model is already well calibrated on controlled imagery. The interesting abstention curve is the one measured on field data, which does not exist yet.
 
 ## Rules that stop these from returning
 

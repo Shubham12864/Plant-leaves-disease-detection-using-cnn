@@ -48,6 +48,36 @@ Fixed now, before results exist:
 8. **Negative results are reported.** If H1–H4 fail, that is the result and it is written up as such. A null finding on "does PlantVillage accuracy predict field behaviour" is still a useful answer to a question people currently assume.
 9. **No number without an artifact.** Every reported value exists in `results/registry.json` with the path and command that produced it.
 
+## 4a. Preliminary observations (2026-10-25, EfficientNet-B0 only)
+
+Recorded now because they change what the experiments need to be, but they are
+single-model observations and must not be written up as findings yet.
+
+- **H2 evidence is weaker than the audit implied.** The suspicion that the model
+  reads background came from SmallCNN: 20 of its 32 `Soybean___healthy` errors
+  landed on another crop's healthy class. For EfficientNet-B0 the entire
+  cross-crop healthy confusion total is **8 errors in 10,709** (Raspberry→Cherry
+  4, Apple→Blueberry 1, Apple→Soybean 1, Potato→Soybean 1, Soybean→Corn 1). If a
+  shortcut exists, the stronger model largely avoids it. H2 therefore cannot rest
+  on confusion counts; it needs the occlusion probe (S15) and the saliency
+  localisation rate (S16), measured per architecture.
+- **H4 looks like a null result on controlled imagery.** Accuracy at 90% coverage
+  is 99.76% against 99.51% at full coverage, and ECE is 0.0022. On PlantVillage
+  the model is already calibrated and abstention buys a few tenths of a point.
+  The hypothesis only becomes interesting on field data, where calibration is
+  unmeasured.
+- **Confusion structure is stable across architectures.** Corn
+  Cercospora↔Northern Leaf Blight and Potato Late↔Tomato Late are the top
+  confusions for both SmallCNN and EfficientNet-B0. Similar lesions across a
+  class boundary is a dataset property, not a model property, which is worth
+  separating in the discussion.
+
+Implication for the plan: H2 and H4 are both now more likely to return "no
+effect" than the audit's framing suggested. That is fine — rule 8 says a null is
+reported — but it means the interesting result may end up being H1 (the size of
+the field gap) rather than H2 (its mechanism). Do not pre-write the mechanism
+narrative.
+
 ## 5. Why this is defensible as research
 
 - **It answers a question the literature assumes rather than tests.** PlantVillage papers routinely conclude "promising for real-world use" from controlled-condition accuracy. A measured gap, with a mechanism and an intervention test, is a direct challenge to that inference.

@@ -35,12 +35,19 @@ The validation results identify EfficientNet-B0 as the best of these three model
 
 ### Locked PlantVillage test split
 
-| Model | Images | Accuracy | Balanced accuracy | Macro precision | Macro recall | Macro-F1 |
-|---|---:|---:|---:|---:|---:|---:|
-| SmallCNN | 10,709 | 96.95% | 96.02% | 96.30% | 96.02% | 96.07% |
-| EfficientNet-B0 | 10,709 | **99.51%** | **99.31%** | **99.33%** | **99.31%** | **99.31%** |
+| Model | Images | Accuracy | 95% CI | Balanced accuracy | Macro precision | Macro recall | Macro-F1 | 95% CI (F1) |
+|---|---:|---:|---|---:|---:|---:|---:|---|
+| SmallCNN | 10,709 | 96.95% | — | 96.02% | 96.30% | 96.02% | 96.07% | — |
+| EfficientNet-B0 | 10,709 | **99.51%** | 99.37–99.64% | **99.31%** | **99.33%** | **99.31%** | **99.31%** | 99.10–99.51% |
 
 ResNet18 has no saved result on this locked test split. Do not infer its test score from its validation score.
+
+**EfficientNet-B0 verification (2026-10-25).** The earlier version of this page reported the EfficientNet-B0 test numbers without a retained artifact, so they could not be checked. They have now been reproduced from the checkpoint: 53 errors in 10,709 images, and validation macro-F1 came back **bit-identical** to the value stored in the checkpoint (0.9936894341462544). Re-running validated the class order against the development manifest, the parameter count (4,056,226) and the checkpoint SHA-256. Artifacts: `reports/model_comparison/locked_test_efficientnet_b0/`. Numbers are registered in `results/registry.json`.
+
+Two findings worth keeping with the table:
+
+- **Calibration is good in aggregate but the MCE is misleading.** Expected calibration error is 0.0022 on test, while the maximum calibration error is 0.53. That maximum comes from a single 15-bin cell containing one image (n = 1). Read ECE with the bin counts in `test/reliability_bins.csv`; do not quote MCE on its own.
+- **Abstention buys little on this split.** At 99% coverage test accuracy is 99.88%, and at 90% coverage it is 99.76%, against 99.51% at full coverage. The model is already well calibrated on controlled imagery, so a confidence threshold recovers a few tenths of a point rather than a different operating regime. This says nothing about field imagery, where the calibration is unknown.
 
 The test results apply to PlantVillage images. They do not establish performance on field photographs. This repository page reports PlantVillage results only.
 

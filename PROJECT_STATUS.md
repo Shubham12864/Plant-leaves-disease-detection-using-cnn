@@ -25,22 +25,27 @@ step produces the artifact the next one depends on.
 
 ## Current position
 
-**S1 — run the locked-test notebook.** Everything else waits on it.
+**S1 complete (2026-10-25).** The locked test split has been scored and the
+checkpoint's recorded score reproduced **bit-identically**.
+
+| Split | Images | Accuracy | 95% CI | Macro-F1 | 95% CI |
+|---|---:|---|---:|---:|---|
+| validation | 6,544 | 0.995416 | 0.9937–0.9969 | 0.993689 | 0.9911–0.9960 |
+| test | 10,709 | 0.995051 | 0.9937–0.9964 | 0.993142 | 0.9910–0.9951 |
+
+Test errors: 53 / 10,709. ECE 0.0022. All five README claims verified.
+Artifacts: `reports/model_comparison/locked_test_efficientnet_b0/`.
+Numbers: `results/registry.json`.
+
+**Next: S2 — decide the PlantDoc label map.**
 
 ```
-notebooks/04_Locked_Test_Evaluation.ipynb   (16 cells)
+python scripts/complete_label_mapping.py --check-output
 ```
 
-Attach two Kaggle inputs: the PlantVillage dataset, and the EfficientNet-B0
-checkpoint. Cell 2 auto-discovers both mount paths.
-
-Expected output after cell 4: `package import OK`
-Expected output after cell 6: `CHECKPOINT OK`, 4,056,226 parameters, 38 classes
-
-**Gate:** validation macro-F1 reproduces 0.99369 within 0.002, and
-`test/` contains `metrics.json`, `classification_report.csv`,
-`confusion_matrix.csv`. If validation differs by more than that, stop — the
-checkpoint and the recorded score disagree and no test number is quotable.
+Local, no GPU, about two minutes. Produces `data/label_mapping.csv` with all 28
+PlantDoc classes decided. Gate: every PlantVillage target exists in the
+manifest, nothing silently dropped, the three ambiguous rows carry their caveat.
 
 ---
 
@@ -57,6 +62,9 @@ checkpoint and the recorded score disagree and no test number is quotable.
 | PlantDoc development is 2,331 rows, all `train` — **no validation split** | `plantdoc_development.summary.json` |
 | Test images live under `data/raw/PlantVillage/test`, not `train` | checked against both manifests |
 | SmallCNN and ResNet18 checkpoints exist | `checkpoints/smallcnn`, `checkpoints/resnet18` |
+| EfficientNet-B0 validation score reproduces bit-identically | measured 0.9936894341462544 = recorded value, delta 0.0 |
+| EfficientNet-B0 test: 53 errors in 10,709 | `.../test/metrics.json`, registered in `results/registry.json` |
+| Cross-crop healthy confusions for B0 total 8 in 10,709 | `.../test/confusion_matrix.csv` — the audit's shortcut suspicion was drawn from SmallCNN and does not transfer |
 
 ## Known-weak areas (do not overclaim)
 
@@ -102,7 +110,7 @@ deleted before submission (roadmap S25).
 
 | Step | Action | Needs |
 |---|---|---|
-| S1 | Run notebook 04, send `p01_verification.zip` | Kaggle |
+| S1 | ~~Run notebook 04, verify the gate~~ **done** | — |
 | S2 | `python scripts/complete_label_mapping.py --check-output` | local, 2 min |
 | S3 | Fix `ARCHITECTURE.md:9,184`, `MEMORY.md:166`, `Literature-Survey-Evidence-Register.md:7` | local |
 | S4 | Commit and tag the baseline | local |

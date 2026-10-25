@@ -1,0 +1,45 @@
+{
+  "model": "efficientnet_b0",
+  "split": "test",
+  "dataset": "PlantVillage",
+  "images": 10709,
+  "accuracy": 0.9950508917732748,
+  "balanced_accuracy": 0.99312726000431,
+  "macro_precision": 0.9932798067623466,
+  "macro_recall": 0.99312726000431,
+  "macro_f1": 0.9931423173400302,
+  "weighted_f1": 0.9950567587101719,
+  "top3_accuracy": 0.9997198617984873,
+  "classes_with_zero_support": [],
+  "checkpoint": "/kaggle/input/datasets/shubhamkumar12864/efficientnet/efficientnet_b0_best.pt",
+  "checkpoint_dataset_fingerprint": null,
+  "inference_seconds": 402.67,
+  "inference_ms_per_image": 37.601,
+  "device": "cuda",
+  "ece": 0.0022053351888960265,
+  "mce": 0.5334234833717346,
+  "brier": 0.008120117709040642,
+  "mean_confidence": 0.9970542788505554,
+  "median_confidence": 0.9999954700469971,
+  "fraction_below_0_5": 9.337940050424876e-05,
+  "fraction_below_0_8": 0.005135867027733682,
+  "n_bins": 15,
+  "bootstrap": {
+    "accuracy": {
+      "point": 0.9950508917732748,
+      "ci95_low": 0.9936502007657111,
+      "ci95_high": 0.9963582033803343
+    },
+    "balanced_accuracy": {
+      "point": 0.99312726000431,
+      "ci95_low": 0.9904830321930501,
+      "ci95_high": 0.9952617575022424
+    },
+    "macro_f1": {
+      "point": 0.9931423173400302,
+      "ci95_low": 0.9910386595413224,
+      "ci95_high": 0.9950656944876187
+    },
+    "resamples": 2000
+  }
+}

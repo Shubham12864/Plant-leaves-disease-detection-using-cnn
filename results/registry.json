@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "description": "Single source of truth for every number quoted in a document. A value may not appear in a report, slide or form unless it is registered here with the artifact that produced it. Written by hand until scripts/build_registry.py exists (roadmap S24).",
+  "checkpoints": {
+    "efficientnet_b0_best": {
+      "path": "checkpoints/efficientnet_b0/efficientnet_b0_best.pt",
+      "sha256": "90e003cfbfb3549e07ac937a8289597a26190febb5d0b567f5848f049032c8fd",
+      "architecture": "efficientnet_b0",
+      "parameters": 4056226,
+      "classes": 38,
+      "epoch": 12,
+      "recorded_val_macro_f1": 0.9936894341462544,
+      "dataset_fingerprint": null,
+      "provenance": "checkpoints/efficientnet_b0/provenance.json"
+    }
+  },
+  "runs": [
+    {
+      "id": "p01_efficientnet_b0_test",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantVillage",
+      "split": "test",
+      "images": 10709,
+      "seed": null,
+      "device": "cuda",
+      "date": "2026-10-25",
+      "command": "kaggle notebooks/04_Locked_Test_Evaluation.ipynb -> scripts/evaluate_locked_test.py --split test --bootstrap 2000",
+      "artifact_dir": "reports/model_comparison/locked_test_efficientnet_b0/test",
+      "metrics": {
+        "accuracy": 0.9950508917732748,
+        "accuracy_ci95": [0.9936502007657111, 0.9963582033803343],
+        "balanced_accuracy": 0.99312726000431,
+        "balanced_accuracy_ci95": [0.9904830321930501, 0.9952617575022424],
+        "macro_precision": 0.9932798067623466,
+        "macro_recall": 0.99312726000431,
+        "macro_f1": 0.9931423173400302,
+        "macro_f1_ci95": [0.9910386595413224, 0.9950656944876187],
+        "weighted_f1": 0.9950567587101719,
+        "top3_accuracy": 0.9997198617984873,
+        "ece": 0.0022053351888960265,
+        "mce": 0.5334234833717346,
+        "brier": 0.008120117709040642,
+        "errors": 53,
+        "classes_with_zero_support": []
+      },
+      "caveats": [
+        "Single run; no seed variance.",
+        "MCE is dominated by one 15-bin cell containing a single image (n=1). Report ECE with the bin counts, not MCE alone.",
+        "paired pipeline latency of 37.6 ms/image is a DataLoader measurement, not a model benchmark."
+      ]
+    },
+    {
+      "id": "p01_efficientnet_b0_validation",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantVillage",
+      "split": "validation",
+      "images": 6544,
+      "seed": null,
+      "device": "cuda",
+      "date": "2026-10-25",
+      "command": "kaggle notebooks/04_Locked_Test_Evaluation.ipynb -> scripts/evaluate_locked_test.py --split validation --bootstrap 2000",
+      "artifact_dir": "reports/model_comparison/locked_test_efficientnet_b0/validation",
+      "metrics": {
+        "accuracy": 0.9954156479217604,
+        "accuracy_ci95": [0.9937347188264058, 0.9969437652811736],
+        "balanced_accuracy": 0.9945644695625,
+        "balanced_accuracy_ci95": [0.9923553160358276, 0.9965020600874578],
+        "macro_precision": 0.993142349862294,
+        "macro_recall": 0.9945644695625,
+        "macro_f1": 0.9936894341462544,
+        "macro_f1_ci95": [0.9911059409532308, 0.9959837481971243],
+        "weighted_f1": 0.995446498138878,
+        "top3_accuracy": 0.9998471882640587,
+        "ece": 0.0026181495058507026,
+        "mce": 0.5420992374420166,
+        "brier": 0.007923319935798645,
+        "classes_with_zero_support": []
+      },
+      "reproduction_check": {
+        "recorded_in_checkpoint": 0.9936894341462544,
+        "measured": 0.9936894341462544,
+        "absolute_delta": 0.0,
+        "verdict": "bit-identical"
+      }
+    }
+  ],
+  "document_claims": [
+    {
+      "claim": "EfficientNet-B0 validation accuracy 99.54%",
+      "value": 0.995416,
+      "run": "p01_efficientnet_b0_validation",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 validation macro-F1 99.37%",
+      "value": 0.993689,
+      "run": "p01_efficientnet_b0_validation",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 test accuracy 99.51%",
+      "value": 0.995051,
+      "run": "p01_efficientnet_b0_test",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 test macro-F1 99.31%",
+      "value": 0.993142,
+      "run": "p01_efficientnet_b0_test",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 test balanced accuracy 99.31%",
+      "value": 0.993127,
+      "run": "p01_efficientnet_b0_test",
+      "status": "verified"
+    }
+  ]
+}
