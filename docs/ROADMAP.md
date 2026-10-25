@@ -62,17 +62,28 @@ Added `src/plant_disease/models/convnext.py`, a branch in `models/__init__.py`, 
 `SmallCNN` is now inlined in `train_ddp.py` (needed because the engine runs standalone on Kaggle) with a comment pointing at the package copy, and the mean/std switch already keys off the architecture name.
 *Gate:* package and engine produce parameter-identical modules (398,662 params, same state-dict keys) so the duplicated definition cannot drift; 3 optimizer steps run on CPU. Verified — the parity check lives in `scripts/smoke_test_engine.py`.
 
-**S7. Pilot run — one epoch, four models** — **NEXT, needs Kaggle**
-`RUN_MODE = "pilot"` in `notebooks/01_Train_EfficientNet_B0_v2.ipynb`. One epoch per architecture at seed 42, writing `runs/pilot_runtime.csv` with wall-clock, epoch-1 validation score and parameter count, plus a projected sweep duration.
-*Gate:* four runs complete without OOM; per-architecture minutes recorded.
+**S7. Pilot run — one epoch, four models** — **DONE (2026-10-25)**
+One epoch per architecture at seed 42, 2x T4. No OOM at any batch size in `protocol.json`, so the protocol stands unchanged.
+
+| Architecture | batch/GPU | params | min/epoch | train img/s | epoch-1 macro-F1 |
+|---|---:|---:|---:|---:|---:|
+| SmallCNN | 128 | 398,662 | 0.67 | 914 | 0.008 |
+| ResNet18 | 64 | 11,196,006 | 0.78 | 786 | 0.028 |
+| EfficientNet-B0 | 64 | 4,056,226 | 2.45 | 250 | 0.084 |
+| ConvNeXt-Tiny | 32 | 27,849,350 | 3.15 | 194 | 0.060 |
+
+Epoch-1 scores are not results: with 10% warmup over 12 epochs the learning rate is still ramping. The pilot measures time and memory.
+
+*Gate:* passed — four architectures completed, no OOM. Artifacts in `reports/model_comparison/pilot/`.
+*Aberration worth noting:* EfficientNet-B0 runs at 250 img/s while the larger ResNet18 runs at 786. Depthwise-separable convolutions are bandwidth-bound on T4 and do not scale with parameter count, so this is expected rather than a bug — but it means "fewer parameters" does not predict wall-clock here.
 
 **S8. Freeze the protocol** — **DONE (run before S7, deliberately)**
 `configs/protocol.json`: image size, epochs, patience, seeds, eval batch, workers, augmentation, loss, EMA, scheduler, and per-architecture LR / batch / weight decay with a written justification for each deviation. The notebook parses it and builds every command from it.
 *Gate:* changing a value in one place changes the run; there are no per-run edits. Moved ahead of S7 so the pilot measures the settings the sweep will actually use, instead of measuring a different configuration.
 
-**S9. Twelve runs**
-3 seeds × 4 models through the frozen protocol. Resumable; run in whatever order finishes.
-*Gate:* 12 checkpoints, each carrying `dataset_fingerprint` and seed.
+**S9. Twelve runs** — **NEXT, needs Kaggle**
+3 seeds × 4 models through the frozen protocol, about 4.2 h as an upper bound (ignores early stopping). Run one architecture per session via `ONLY_ARCH` so a restart costs one architecture, not the sweep: `smallcnn` ~0.4 h, `resnet18` ~0.5 h, `efficientnet_b0` ~1.5 h, `convnext_tiny` ~1.9 h.
+*Gate:* 12 checkpoints, each carrying `dataset_fingerprint` and a seed, plus a per-architecture spread across seeds rather than a single number.
 
 **S10. Generate the comparison table**
 Four models × the five rows fixed above, with group-aware CIs.
@@ -171,7 +182,7 @@ Scope statement (one controlled source, one 236-image field set, no expert re-la
 | Stage | Steps | State |
 |---|---|---|
 | A — evidence | S1–S4 | **complete** (S1 sealed bit-identically, S2 28/28 mapped, S3 docs current, S4 tagged) |
-| B — fair comparison | S5–S10 | S5, S6, S8 **done**; S7 is next and needs Kaggle |
+| B — fair comparison | S5–S10 | S5, S6, S7, S8 **done**; S9 (12-run sweep) is next and needs Kaggle |
 | C — field gap | S11–S13 | blocked on S2 |
 | D — mechanism | S14–S19 | S18 is the trap; read it before training |
 | E — usefulness | S20–S22 | partly free from S1 |

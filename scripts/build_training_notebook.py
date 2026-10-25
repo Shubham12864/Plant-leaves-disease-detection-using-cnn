@@ -80,6 +80,10 @@ import torch, torchvision
 RUN_MODE = "pilot"        # "pilot" | "single" | "sweep"
 SEED = 42                 # used by "single" only
 ARCH = "efficientnet_b0"  # used by "single" only
+# sweep runs every architecture unless this is set. Set it to run one
+# architecture per session, which is the recommended way to survive restarts:
+# ONLY_ARCH = "convnext_tiny"
+ONLY_ARCH = None
 
 # ---- inputs -----------------------------------------------------------------
 DATASET_ROOT = Path("/kaggle/input/datasets/shubhamkumar12864/plantvillage")
@@ -234,11 +238,15 @@ RUN_MD = """## 5. Run
 
 Behaviour depends on `RUN_MODE` from cell 1.
 
-**pilot** — one epoch per architecture at seed 42. Writes `runs/pilot_runtime.csv` with wall-clock per architecture and the epoch-1 validation score. Use that table to decide whether to adjust `local_batch_size` in `protocol.json` before the sweep.
+**pilot** — one epoch per architecture at seed 42. Writes `runs/pilot_runtime.csv` with wall-clock per architecture and the epoch-1 validation score.
+
+Measured on 2026-10-25 (2x T4, batch per `protocol.json`): SmallCNN 0.67 min/epoch (914 img/s), ResNet18 0.78 (786), EfficientNet-B0 2.45 (250), ConvNeXt-Tiny 3.15 (194). No OOM at any batch size, so the protocol stands as written. Projected 12-run sweep: **4.2 h** as an upper bound, ignoring early stopping.
+
+Epoch-1 accuracy in that table is **not a result** — with 10% warmup over 12 epochs the learning rate is still ramping, so 6–21% top-1 is expected. The pilot measures time and memory only.
 
 **single** — `ARCH` at `SEED`, full epochs.
 
-**sweep** — every architecture x every seed. 12 runs. Expect this to take hours; a Kaggle session may need to be restarted, in which case re-run cells 1-3 and the run cell, and it continues from the last completed epoch because each run keeps a resumable `_last.pt`.
+**sweep** — every architecture x every seed. 12 runs, about 4 hours total. Set `ONLY_ARCH` to a single architecture to run it per session, which is the recommended plan: `smallcnn` (0.4 h), `resnet18` (0.5 h), `efficientnet_b0` (1.5 h), `convnext_tiny` (1.9 h). Each run keeps a resumable `_last.pt`, so a restarted session continues from the last completed epoch.
 """
 
 RESULTS_MD = """## 6. Results and download bundle
@@ -305,7 +313,7 @@ SMOKE_CODE = '''smoke_cmd = [
     "--nproc_per_node=2", str(SCRIPT),
     "--arch", "smallcnn", "--train-images", str(TRAIN_X_PATH), "--train-labels", str(TRAIN_Y_PATH),
     "--val-images", str(VAL_X_PATH), "--val-labels", str(VAL_Y_PATH),
-    "--classes-json", str(CLASSES_PATH), "--output-dir", str(OUTPUT_ROOT / "_smoke"),
+    "--classes-json", str(CLASSES_PATH), "--output-dir", str(WORKDIR / "_smoke"),
     "--local-batch-size", "16", "--eval-batch-size", "32", "--workers", "2",
     "--image-size", str(PROTOCOL["image_size"]), "--dry-run",
 ]
@@ -379,7 +387,11 @@ elif RUN_MODE == "single":
     launch(ARCH, SEED, PROTOCOL["epochs"], OUTPUT_ROOT / ARCH / f"seed{SEED}")
 
 elif RUN_MODE == "sweep":
-    for arch in PROTOCOL["architectures"]:
+    architectures = [ONLY_ARCH] if ONLY_ARCH else list(PROTOCOL["architectures"])
+    if ONLY_ARCH and ONLY_ARCH not in PROTOCOL["architectures"]:
+        raise ValueError(f"ONLY_ARCH {ONLY_ARCH!r} is not in protocol.json")
+    print(f"Sweeping {architectures} x seeds {PROTOCOL['seeds']} x {PROTOCOL['epochs']} epochs")
+    for arch in architectures:
         for seed in PROTOCOL["seeds"]:
             launch(arch, seed, PROTOCOL["epochs"], OUTPUT_ROOT / arch / f"seed{seed}")
 

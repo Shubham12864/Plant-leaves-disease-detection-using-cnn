@@ -25,42 +25,50 @@ step produces the artifact the next one depends on.
 
 ## Current position
 
-Stages A and the local part of Stage B are complete. The queue is stopped at
-**S7**, which needs GPU time on Kaggle.
+Stage A is closed and Stage B is through the pilot. The queue is stopped at
+**S9**, the 12-run sweep, which needs GPU time.
 
 | Step | State |
 |---|---|
-| S1 locked-test evaluation | **done** — validation macro-F1 reproduced bit-identically; 53 errors in 10,709 |
-| S2 PlantDoc label map | **done** — 28/28 classes decided, 3 with written caveats, 10 PlantVillage classes have no counterpart |
-| S3 stale documents | **done** — `ARCHITECTURE.md`, `MEMORY.md`, `Literature-Survey-Evidence-Register.md` no longer contradict the code |
+| S1 locked-test evaluation | **done** — bit-identical reproduction, 53 errors in 10,709 |
+| S2 PlantDoc label map | **done** — 28/28 decided, 3 caveated |
+| S3 stale documents | **done** |
 | S4 baseline commit | **done** — tag `baseline-p0.1` |
-| S5 ConvNeXt-Tiny | **done** — 27,849,350 parameters, package and engine agree |
-| S6 SmallCNN on the engine | **done** — parameter-identical to the package copy, parity asserted in the smoke test |
-| S8 protocol frozen | **done** — `configs/protocol.json`, run before S7 on purpose |
-| **S7 protocol pilot** | **NEXT — needs Kaggle GPU** |
+| S5 ConvNeXt-Tiny | **done** |
+| S6 SmallCNN on the engine | **done** |
+| S8 protocol frozen | **done** — `configs/protocol.json` |
+| S7 protocol pilot | **done** — no OOM, 4.2 h projected for the sweep |
+| **S9 12-run sweep** | **NEXT — needs Kaggle GPU** |
 
-### S7 — what to run
+### Measured pilot (2x T4, one epoch each)
 
-`notebooks/01_Train_EfficientNet_B0_v2.ipynb`, with `RUN_MODE = "pilot"` in cell 1.
+| Architecture | batch/GPU | min/epoch | train img/s |
+|---|---:|---:|---:|
+| SmallCNN | 128 | 0.67 | 914 |
+| ResNet18 | 64 | 0.78 | 786 |
+| EfficientNet-B0 | 64 | 2.45 | 250 |
+| ConvNeXt-Tiny | 32 | 3.15 | 194 |
 
-Attach the PlantVillage dataset only (no checkpoint needed). Cell 1 auto-discovers
-the mount, cell 2 builds the cache, cell 3 writes and validates the engine and
-protocol, cell 4 smoke-tests three optimizer steps, cell 5 runs **one epoch per
-architecture at seed 42**.
+Artifacts: `reports/model_comparison/pilot/`. Epoch-1 scores there are not
+results — the learning rate is still warming up.
 
-*Produces* `runs/pilot_runtime.csv`: wall-clock minutes, parameters, and the
-epoch-1 validation score for SmallCNN, ResNet18, EfficientNet-B0 and
-ConvNeXt-Tiny, plus a projected duration for the 12-run sweep.
+### S9 — what to run
 
-*Gate:* four architectures complete without OOM. If ConvNeXt-Tiny OOMs at
-`local_batch_size: 32`, drop it to 16 in `configs/protocol.json`, rebuild the
-notebook, and re-run — that is the only thing the pilot is for.
+`notebooks/01_Train_EfficientNet_B0_v2.ipynb`, `RUN_MODE = "sweep"`, and set
+`ONLY_ARCH` to one architecture per session:
 
-### After the pilot
+```
+ONLY_ARCH = "smallcnn"          # ~0.4 h
+ONLY_ARCH = "resnet18"          # ~0.5 h
+ONLY_ARCH = "efficientnet_b0"   # ~1.5 h
+ONLY_ARCH = "convnext_tiny"     # ~1.9 h
+```
 
-S9 — the 12-run sweep (`RUN_MODE = "sweep"`, 4 architectures x 3 seeds). Expect
-hours; the run cell resumes from the last completed epoch if a session restarts.
-Then S10 generates the comparison table from the artifacts.
+One architecture per session because a restart then costs one architecture
+rather than the whole sweep. Each run resumes from its own `_last.pt`.
+
+*Gate:* 12 checkpoints with `dataset_fingerprint` and seed, and a per-architecture
+spread across seeds instead of a single number.
 
 ## Verified facts (checked, not assumed)
 
