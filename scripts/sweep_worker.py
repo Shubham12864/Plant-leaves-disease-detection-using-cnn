@@ -36,8 +36,12 @@ ENGINE = HERE / "train_ddp.py"
 
 
 def build_command(arch, seed, cfg, protocol, paths, out_dir, mode, script, device, epochs):
-    command = [
-        sys.executable, str(script),
+    # Arguments only. The interpreter and the script path are added once, by the
+    # mode branch below: torchrun takes the script as its first positional
+    # argument, so leaving "python" in here made torchrun try to execute the
+    # interpreter binary as Python source ("source code cannot contain null
+    # bytes" / "ELF" in the traceback).
+    args = [
         "--arch", arch,
         "--train-images", str(paths["train_x"]), "--train-labels", str(paths["train_y"]),
         "--val-images", str(paths["val_x"]), "--val-labels", str(paths["val_y"]),
@@ -58,10 +62,11 @@ def build_command(arch, seed, cfg, protocol, paths, out_dir, mode, script, devic
         "--seed", str(seed),
     ]
     if mode == "ddp":
+        # torchrun's first positional argument must be the training script.
         return [sys.executable, "-m", "torch.distributed.run", "--standalone",
-                "--nnodes=1", "--nproc_per_node=2"] + command
+                "--nnodes=1", "--nproc_per_node=2", str(script)] + args
     # Single process on whichever GPU CUDA_VISIBLE_DEVICES exposes as 0.
-    return command + ["--no-dist", "--device", device]
+    return [sys.executable, str(script)] + args + ["--no-dist", "--device", device]
 
 
 def main() -> None:
@@ -82,6 +87,8 @@ def main() -> None:
                         help="single-gpu mode only; cpu exists for local tests")
     parser.add_argument("--epochs", type=int, default=None,
                         help="override protocol epochs; for fast local checks")
+    parser.add_argument("--verbose", action="store_true",
+                        help="echo each engine command before running it")
     args = parser.parse_args()
 
     protocol = json.loads(args.protocol.read_text(encoding="utf-8"))
@@ -107,6 +114,8 @@ def main() -> None:
         epochs = args.epochs if args.epochs is not None else protocol["epochs"]
         command = build_command(args.arch, seed, cfg, protocol, paths, out_dir,
                                 args.mode, args.engine, args.device, epochs)
+        if args.verbose:
+            print("  " + " ".join(command), flush=True)
         started = time.time()
         result = subprocess.run(command, env={**os.environ, "PYTHONUNBUFFERED": "1"}, check=False)
         minutes = (time.time() - started) / 60.0
@@ -114,6 +123,8 @@ def main() -> None:
         print(f"[{args.arch} seed {seed}] {status} in {minutes:.2f} min", flush=True)
         if result.returncode != 0:
             failures.append(seed)
+            # Echo the command so a failure is diagnosable from the log alone.
+            print("  command: " + " ".join(command), flush=True)
 
     if failures:
         raise SystemExit(f"[{args.arch}] seeds failed: {failures}")
