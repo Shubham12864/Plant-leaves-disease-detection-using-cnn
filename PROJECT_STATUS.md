@@ -25,8 +25,8 @@ step produces the artifact the next one depends on.
 
 ## Current position
 
-Stage A is closed and Stage B is through the pilot. The queue is stopped at
-**S9**, the 12-run sweep, which needs GPU time.
+Stage A is closed. Stage B is **blocked**: the sweep ran and came back invalid,
+so S9 must be re-run on a corrected protocol before S10 can build any table.
 
 | Step | State |
 |---|---|
@@ -36,9 +36,32 @@ Stage A is closed and Stage B is through the pilot. The queue is stopped at
 | S4 baseline commit | **done** — tag `baseline-p0.1` |
 | S5 ConvNeXt-Tiny | **done** |
 | S6 SmallCNN on the engine | **done** |
-| S8 protocol frozen | **done** — `configs/protocol.json` |
-| S7 protocol pilot | **done** — no OOM, 4.2 h projected for the sweep |
-| **S9 12-run sweep** | **NEXT — needs Kaggle GPU** |
+| S8 protocol frozen | **done** — `configs/protocol.json` v1 |
+| S7 protocol pilot | **done** — no OOM, 4.2 h projected |
+| S9 12-run sweep | **ran, INVALID** — see R12 |
+| **S9b protocol fix + 2-epoch gate** | **NEXT** |
+
+### Sweep v1 result: invalid
+
+Twelve runs, seeds 42/43/44, identical dataset fingerprint across all of them.
+Every architecture landed far below its established result:
+
+| Architecture | Established | Sweep best | Gap |
+|---|---|---|---|
+| EfficientNet-B0 | 0.9954 val | 0.7246 | −27.1 pp |
+| ResNet18 | 0.9615 val | 0.5839 | −37.8 pp |
+| SmallCNN | 0.9601 val | 0.2311 | −72.9 pp |
+| ConvNeXt-Tiny | none | 0.9509 | — |
+
+Measured cause: the backbone never fine-tuned. Distance to pristine ImageNet
+weights is 0.49% for the sweep's B0 against 1.96% for the verified reference.
+Protocol v1 differs from the script that produced the reference in weight decay
+(0.05 vs 1e-4), global batch (128 vs 32), LR schedule (warmup+cosine vs
+constant) and label smoothing / class weights (present vs absent).
+
+**No number from sweep v1 may be quoted except as evidence of the defect.**
+Full evidence: `reports/model_comparison/SWEEP_V1_INVALID.md`. Defects R12/R13 in
+`docs/KNOWN_ISSUES.md`.
 
 ### Measured pilot (2x T4, one epoch each)
 
