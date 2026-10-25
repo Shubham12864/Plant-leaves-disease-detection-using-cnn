@@ -33,6 +33,8 @@ Severity: **S1** = an evaluator or reviewer can catch a false or unsupported cla
 | D24 | S3 | **Storage is redundant.** PlantVillage is stored in `data/raw` and again under `kaggle_upload/`; PlantDoc raw (1.99 GB) is unused by any current script; a local `.venv-smoke` adds ~2.5 GB. | Directory sizes | 5.5 |
 | D25 | S3 | **Required project documents do not exist.** No `PROJECT_STATUS.md`, `DATASET_CARD.md`, `MODEL_CARD.md`, `EXPERIMENT_LOG.md`. | Absent at repo root | 5.3 |
 | D26 | S3 | **No results registry**, so tables are hand-typed and can silently diverge from artifacts. | No `results/` directory | 1.4 |
+| D28 | S2 | **Leaf-level leakage protection covers 75% of the test split, not 100%.** 2,676 of 10,709 test images (25.0%) carry `fallback_<id>` group IDs because the upstream leaf map did not match them, so each got a per-image ID and the "zero group overlap" audit does not constrain them. In principle one could be a second photograph of a leaf that also appears in training. Exact SHA-256 and path overlap are both verified zero, and the audit's perceptual-hash probe found one credible cross-split near-duplicate group in 54,015 images, so the practical risk is small. The correct claim is "no exact duplication and no identifiable leaf overlap", never "no leakage". |
+verified 2026-10-25 from the manifests: `sha256` overlap 0, `relative_path` overlap 0, `group_id` overlap 0, test fallback 2,676 / 10,709 | 1.5, 6.3 |
 | D27 | S3 | **EfficientNet-B0 checkpoint carries no `dataset_fingerprint`**, because the pilot script did not write one. Provenance is limited to what the file records plus the class-order check. | `checkpoints/efficientnet_b0/provenance.json` `metadata_absent` | 0.7 |
 
 ---

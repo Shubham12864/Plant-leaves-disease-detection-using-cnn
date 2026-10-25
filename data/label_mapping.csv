@@ -1,0 +1,29 @@
+plantdoc_label,plantvillage_label,relationship,status,review_note,plantdoc_train_images,plantdoc_test_images
+Apple Scab Leaf,Apple___Apple_scab,same disease,confirmed,Venturia inaequalis scab on apple foliage; both datasets name the disease.,83,10
+Apple leaf,Apple___healthy,healthy class,confirmed,Healthy reference imagery; no lesion present by construction.,82,9
+Apple rust leaf,Apple___Cedar_apple_rust,synonym,confirmed,Gymnosporangium cedar-apple rust; PlantDoc drops the alternate host.,79,10
+Bell_pepper leaf,"Pepper,_bell___healthy",healthy class,confirmed,Healthy bell pepper foliage.,53,8
+Bell_pepper leaf spot,"Pepper,_bell___Bacterial_spot",likely synonym,confirmed_with_caveat,"PlantDoc does not name the pathogen. Bacterial spot (Xanthomonas) is the matching PlantVillage class, but a viral or fungal spot would be mislabelled. Report per-class recall with this caveat attached.",62,9
+Blueberry leaf,Blueberry___healthy,healthy class,confirmed,Healthy highbush blueberry.,106,11
+Cherry leaf,Cherry_(including_sour)___healthy,healthy class,confirmed,Healthy cherry foliage; PlantVillage does not separate sweet and sour here.,47,10
+Corn Gray leaf spot,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,same disease,confirmed,Cercospora zeae-maydis; PlantVillage concatenates the two names.,64,4
+Corn leaf blight,Corn_(maize)___Northern_Leaf_Blight,assumed synonym,confirmed_with_caveat,Ambiguous: 'leaf blight' could be northern (Exserohilum turcicum) or southern (Bipolaris maydis) leaf blight. PlantVillage only has northern. Assumed northern; state the assumption wherever this class is reported.,180,12
+Corn rust leaf,Corn_(maize)___Common_rust_,synonym,confirmed,Puccinia sorghi common rust.,106,10
+Peach leaf,Peach___healthy,healthy class,confirmed,Healthy peach foliage.,103,9
+Potato leaf early blight,Potato___Early_blight,same disease,confirmed,Alternaria solani.,109,8
+Potato leaf late blight,Potato___Late_blight,same disease,confirmed,Phytophthora infestans.,97,8
+Raspberry leaf,Raspberry___healthy,healthy class,confirmed,Healthy raspberry foliage.,112,7
+Soyabean leaf,Soybean___healthy,healthy class,confirmed,PlantDoc spells it 'Soyabean'; the class is healthy soybean foliage.,57,8
+Squash Powdery mildew leaf,Squash___Powdery_mildew,same disease,confirmed,Powdery mildew on cucurbit foliage.,124,6
+Strawberry leaf,Strawberry___healthy,healthy class,confirmed,Healthy strawberry foliage.,88,8
+Tomato Early blight leaf,Tomato___Early_blight,same disease,confirmed,Alternaria solani on tomato.,79,9
+Tomato Septoria leaf spot,Tomato___Septoria_leaf_spot,same disease,confirmed,Septoria lycopersici.,140,11
+Tomato leaf,Tomato___healthy,healthy class,confirmed,Healthy tomato foliage.,55,8
+Tomato leaf bacterial spot,Tomato___Bacterial_spot,same disease,confirmed,Xanthomonas bacterial spot/speck on tomato.,101,9
+Tomato leaf late blight,Tomato___Late_blight,same disease,confirmed,Phytophthora infestans on tomato.,101,10
+Tomato leaf mosaic virus,Tomato___Tomato_mosaic_virus,same disease,confirmed,Tomato mosaic virus.,44,10
+Tomato leaf yellow virus,Tomato___Tomato_Yellow_Leaf_Curl_Virus,synonym,confirmed,PlantDoc's 'yellow virus' is tomato yellow leaf curl virus.,70,6
+Tomato mold leaf,Tomato___Leaf_Mold,synonym,confirmed,Passalora fulva leaf mould.,85,6
+Tomato two spotted spider mites leaf,Tomato___Spider_mites Two-spotted_spider_mite,same disease,confirmed_with_caveat,"Tetranychus urticae damage. Only 2 training images in PlantDoc, so this class cannot support a per-class claim; report it as anecdotal and keep it out of macro averages or flag it.",2,0
+grape leaf,Grape___healthy,healthy class,confirmed,Healthy grape foliage.,57,12
+grape leaf black rot,Grape___Black_rot,same disease,confirmed,Guignardia bidwellii black rot; the audit flagged this as unmapped despite the PlantVillage class existing.,56,8
