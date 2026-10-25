@@ -1,3 +1,14 @@
+---
+title: Project Status — Plant Leaf Disease Detection Using CNN (BT40)
+type: project-status
+status: Phase II baseline trained; later project work remains
+tags:
+  - capstone
+  - plant-disease
+  - computer-vision
+  - research
+---
+
 # Project status — start here
 
 Read this file first. It is the handoff for any new session, and it says what is
@@ -6,7 +17,6 @@ verified, what is in progress, and where the plan lives.
 Last updated: 2026-10-25.
 
 ---
-
 ## Documents that own each question
 
 | Question | File |
@@ -18,11 +28,7 @@ Last updated: 2026-10-25.
 | How do I run something on Kaggle? | `notebooks/KAGGLE_NOTEBOOKS_GUIDE.md` |
 | What did the old audit find? | `WORKSPACE-ANALYSIS.md` (historical, superseded by KNOWN_ISSUES) |
 
-Do not start work without reading `docs/ROADMAP.md`. The sequence matters: each
-step produces the artifact the next one depends on.
-
 ---
-
 ## Current position
 
 Stage A is closed. Stage B is **blocked**: the sweep ran and came back invalid,
@@ -53,7 +59,7 @@ Every architecture landed far below its established result:
 | SmallCNN | 0.9601 val | 0.2311 | −72.9 pp |
 | ConvNeXt-Tiny | none | 0.9509 | — |
 
-Measured cause: the backbone never fine-tuned. Distance to pristine ImageNet
+**Measured cause**: the backbone never fine-tuned. Distance to pristine ImageNet
 weights is 0.49% for the sweep's B0 against 1.96% for the verified reference.
 Protocol v1 differs from the script that produced the reference in weight decay
 (0.05 vs 1e-4), global batch (128 vs 32), LR schedule (warmup+cosine vs
@@ -66,7 +72,7 @@ Full evidence: `reports/model_comparison/SWEEP_V1_INVALID.md`. Defects R12/R13 i
 ### Measured pilot (2x T4, one epoch each)
 
 | Architecture | batch/GPU | min/epoch | train img/s |
-|---|---:|---:|---:|
+|---|---|---|---|
 | SmallCNN | 128 | 0.67 | 914 |
 | ResNet18 | 64 | 0.78 | 786 |
 | EfficientNet-B0 | 64 | 2.45 | 250 |
@@ -93,6 +99,7 @@ rather than the whole sweep. Each run resumes from its own `_last.pt`.
 *Gate:* 12 checkpoints with `dataset_fingerprint` and seed, and a per-architecture
 spread across seeds instead of a single number.
 
+---
 ## Verified facts (checked, not assumed)
 
 | Fact | Evidence |
@@ -122,10 +129,7 @@ spread across seeds instead of a single number.
 - PlantDoc accuracy is **not** comparable to PlantVillage accuracy: 28 classes vs
   38, and 236 test images ⇒ roughly ±6.4 pp.
 - `balanced_accuracy` and `macro_recall` are the same quantity, not two metrics.
-- Macro-F1 computed on a class subset collapses (measured: 99.6% accuracy
-  alongside 10.5% macro-F1 on 256 rows). Always report zero-support classes.
-
----
+- Macro-F1 on a class subset is meaningless without listing zero-support classes.
 
 ## Compute policy
 
@@ -136,12 +140,9 @@ There is a `.venv-smoke/` in the repo used only for `py_compile` and
 `scripts/smoke_test_engine.py`. It is not for producing results and should be
 deleted before submission (roadmap S25).
 
----
-
 ## Tooling notes
 
-- `computer_use` (cua-driver) is installed and enabled. It is only loaded in a
-  session that started *after* it was enabled.
+- `computer_use` (cua-driver) is installed and enabled.
 - `scripts/smoke_test_engine.py` is the regression test for training +
   evaluation. It passes. Run it after touching `train_ddp.py` or
   `evaluate_locked_test.py`.
@@ -149,8 +150,6 @@ deleted before submission (roadmap S25).
   `notebooks/01_Train_EfficientNet_B0_v2.ipynb` are **generated**. Edit
   `scripts/build_eval_notebook.py` / `scripts/build_training_notebook.py` and
   regenerate; never hand-edit the notebook's embedded cells.
-
----
 
 ## Immediate queue
 
@@ -162,9 +161,8 @@ deleted before submission (roadmap S25).
 | S10 | comparison table from artifacts | local |
 
 Stage B order was adjusted: S8 (freeze the protocol) runs before S7 (pilot) so
-the pilot measures the settings the sweep will actually use.
-
----
+the pilot measures the settings the sweep will actually use, instead of measuring
+a different configuration.
 
 ## Hard rules
 

@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parents[1]
 DEV = REPO / "data" / "manifests" / "plantvillage_development.csv"
 IMAGES = REPO / "data" / "raw" / "PlantVillage"
 SIZE = 128

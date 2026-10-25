@@ -100,3 +100,39 @@ Pilot measured 2.45 min/epoch for EfficientNet-B0; the sweep measured 7.52.
 SmallCNN 0.67 -> 3.01, ConvNeXt 3.15 -> 14.16. Total 5.6 h against a 4.2 h
 projection. Not visible in the artifacts; needs a session log to decide between
 data-loader throughput and `/kaggle/temp` read speed.
+
+## R14 — Blocked shuffle made batches near single-class (ROOT CAUSE of R12)
+
+**Status:** fixed in protocol v2 (`shuffle_mode: random`), pending gate confirmation.
+
+`block_shuffled_indices` permutes 2048-image blocks and shuffles inside each
+block. It was added to stop the pilot's page-fault pathology, but the train
+manifest is written in class order, so a block of 2048 consecutive rows spans
+only a handful of classes. Measured with `scripts/check_batch_purity.py` on the
+36,762-row development split:
+
+| shuffle | batch | single-class batches | classes per batch (median) |
+|---|---|---|---|
+| blocked (2048) | 16 | 12.1% | **3** |
+| blocked (2048) | 64 | 10.8% | 3 |
+| random | 16 | 0% | **12** |
+| random | 64 | 0% | 26 |
+
+Three classes per batch is a BatchNorm problem: normalisation statistics come
+from three classes instead of the whole distribution. It explains the exact v1
+sweep pattern, which nothing else did:
+
+| architecture | norm | v1 result |
+|---|---|---|
+| ConvNeXt-Tiny | LayerNorm (batch-independent) | **0.95** |
+| EfficientNet-B0 | BatchNorm | 0.68 |
+| ResNet18 | BatchNorm | 0.58 |
+| SmallCNN | BatchNorm | 0.23 |
+
+It also explains why the 380-image subset check on Kaggle trained normally
+(0.54 by epoch 3): 380 images fit inside a single 2048 block, so the subset was
+shuffled effectively at random. The pipeline was never broken — the full-dataset
+ordering was.
+
+The original run that reached 0.9826 in epoch 1 used an ordinary shuffled
+DataLoader, which is what v2 now does.
