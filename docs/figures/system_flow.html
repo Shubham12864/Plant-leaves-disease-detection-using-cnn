@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BT40 system flow</title>
+<style>
+  body { margin: 0; padding: 0; font-family: var(--font-body, system-ui); color: var(--foreground); background: transparent; }
+  h2 { font-size: 15px; font-weight: 600; margin: 0 0 4px; color: var(--foreground); }
+  p.note { font-size: 12px; margin: 0 0 14px; color: var(--muted-foreground); }
+  section { margin-bottom: 28px; }
+  .mermaid { display: flex; justify-content: flex-start; }
+  #err { font-size: 12px; color: var(--foreground); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<section>
+  <h2>1. Two jobs: learn once, answer forever</h2>
+  <p class="note">Top row already ran on Kaggle. Bottom row is what the frontend triggers on every scan.</p>
+  <pre class="mermaid">
+flowchart LR
+    subgraph TRAIN["TRAINING, once on Kaggle, finished"]
+        D["43,306 PlantVillage photos<br/>36,762 train / 6,544 validation"]
+        P["Preprocess<br/>resize 224, normalise"]
+        M["EfficientNet-B0<br/>4.06 M parameters"]
+        V["Best epoch on validation<br/>macro F1 0.9937"]
+        C["efficientnet_b0_best.pt<br/>16 MB, 38 classes"]
+        D --> P --> M --> V --> C
+    end
+
+    subgraph SERVE["SERVING, every scan"]
+        I["Leaf photo from the browser"]
+        Q["Same preprocess<br/>mean and std from the checkpoint"]
+        F["Forward pass<br/>38 raw scores"]
+        S["Softmax<br/>probabilities, keep top 3"]
+        G["Backward pass<br/>Grad-CAM on last conv layer"]
+        J["JSON response"]
+        U["Browser paints<br/>label, bars, heat map"]
+        I --> Q --> F
+        F --> S --> J
+        F --> G --> J
+        J --> U
+    end
+
+    C -.->|"loaded once at server startup"| F
+  </pre>
+</section>
+
+<section>
+  <h2>2. One request, end to end</h2>
+  <p class="note">The browser never holds a model. It holds a drop zone and a canvas.</p>
+  <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant B as Browser
+    participant A as FastAPI backend
+    participant M as PyTorch model
+    participant H as Grad-CAM hooks
+
+    B->>A: POST /api/predict with the image file
+    A->>A: resize 224, to tensor, normalise with checkpoint mean and std
+    A->>M: forward pass
+    M-->>A: 38 logits
+    A->>A: softmax, pick top 1 and top 3, compare against threshold 0.70
+    A->>M: backward pass on the winning class score only
+    H-->>A: activations and gradients from last conv layer, 7x7
+    A->>A: weight channels by mean gradient, ReLU, upsample 224, blend over photo
+    A-->>B: JSON with label, top 3, heat map PNG, timings, warnings
+    B->>B: paint result card, probability bars, heat map slider
+  </pre>
+</section>
+
+<section>
+  <h2>3. What the project holds today</h2>
+  <p class="note">Verified against the repository on 2026-10-25.</p>
+  <pre class="mermaid">
+mindmap
+  root((BT40 leaf disease))
+    Data
+      38 PlantVillage classes
+      43,306 development rows
+      10,709 locked test rows
+      PlantDoc 2,331 dev rows
+      frozen splits with sha256
+    Models on disk
+      EfficientNet-B0 16 MB
+      ResNet18 43 MB
+      SmallCNN 1.6 MB
+      ConvNeXt code only
+    Results
+      validation macro F1 0.9937
+      test macro F1 0.9931 CI 0.9910 to 0.9951
+      ECE 0.0022 calibrated
+      38x38 confusion matrix
+    Code
+      src 493 lines
+      scripts 1600 lines
+      Grad-CAM implemented
+      smoke test passing
+    Missing
+      frontend
+      PlantDoc label map
+      second seed
+      advisory layer
+  </pre>
+</section>
+
+<div id="err"></div>
+
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+const probe = document.createElement('span');
+probe.style.color = 'var(--foreground, #e6e6e6)';
+document.body.appendChild(probe);
+const fg = getComputedStyle(probe).color;
+probe.remove();
+const m = fg.match(/\d+/g);
+const lum = m && m.length >= 3 ? (Number(m[0]) * 0.299 + Number(m[1]) * 0.587 + Number(m[2]) * 0.114) : 20;
+const light = lum > 140;
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: light ? 'neutral' : 'dark',
+  securityLevel: 'loose',
+  flowchart: { curve: 'basis', useMaxWidth: true, htmlLabels: true },
+  themeVariables: light
+    ? {
+        fontFamily: 'Geist, system-ui, sans-serif',
+        fontSize: '13px',
+        background: '#ffffff',
+        primaryColor: '#ffffff',
+        primaryTextColor: '#1a1a1a',
+        primaryBorderColor: '#c8c8c8',
+        secondaryColor: '#f2f2f2',
+        tertiaryColor: '#fafafa',
+        lineColor: '#6b6b6b',
+        textColor: '#1a1a1a',
+        actorBkg: '#ffffff',
+        actorBorder: '#c8c8c8',
+        actorTextColor: '#1a1a1a',
+        signalColor: '#4a4a4a',
+        signalTextColor: '#1a1a1a',
+        labelBoxBkgColor: '#f2f2f2',
+        labelTextColor: '#1a1a1a',
+        noteBkgColor: '#f2f2f2',
+        noteTextColor: '#1a1a1a'
+      }
+    : {
+        fontFamily: 'Geist, system-ui, sans-serif',
+        fontSize: '13px',
+        background: 'transparent',
+        primaryColor: '#1F1F1F',
+        primaryTextColor: '#e6e6e6',
+        primaryBorderColor: '#3a3a3a',
+        secondaryColor: '#272727',
+        tertiaryColor: '#181818',
+        lineColor: '#9b9b9b',
+        textColor: '#e6e6e6',
+        actorBkg: '#1F1F1F',
+        actorBorder: '#3a3a3a',
+        actorTextColor: '#e6e6e6',
+        signalColor: '#c8c8c8',
+        signalTextColor: '#e6e6e6',
+        labelBoxBkgColor: '#272727',
+        labelTextColor: '#e6e6e6',
+        noteBkgColor: '#272727',
+        noteTextColor: '#e6e6e6'
+      }
+});
+
+try {
+  await mermaid.run({ querySelector: '.mermaid' });
+} catch (e) {
+  document.getElementById('err').textContent = 'Mermaid render error: ' + (e && e.message ? e.message : e);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan a leaf · Leafread</title>
+<meta name="description" content="Photograph or upload one leaf, then read the prediction, the three candidates it weighed and the Grad-CAM heat map that shows which pixels decided it.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M23 9c0 8-5 13-11 13-2 0-3-1-3-3 0-6 5-10 14-10z' fill='%23CBE06B'/%3E%3Cpath d='M9 24c3-6 7-9 12-11' stroke='%23000' stroke-width='1.4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/app-pages.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <nav class="pill" aria-label="Primary">
+    <a class="brand" href="index.html">
+      <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M27 6c0 12-7 19-16 19-2.6 0-4-1.4-4-4C7 12 14 6 27 6z" fill="currentColor" opacity="0.9"/>
+        <path d="M8 27c4-9 10-14 17-17" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span>Leafread</span>
+    </a>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="scan.html" aria-current="page">Scan</a>
+      <a href="upload.html">Batch</a>
+      <a href="index.html#model">Model card</a>
+    </div>
+    <button class="burger" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<div class="menu" id="menu" hidden>
+  <nav class="menu-inner" aria-label="Menu">
+    <a href="index.html" style="--i:1">Overview</a>
+    <a href="scan.html" style="--i:2">Scan</a>
+    <a href="upload.html" style="--i:3">Batch</a>
+    <a href="index.html#model" style="--i:4">Model card</a>
+  </nav>
+</div>
+
+<main id="main" class="shell wrap">
+
+  <div class="pagehead">
+    <a class="back" href="index.html"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Overview</a>
+    <h1 class="page-title">Scan a leaf</h1>
+    <p class="lede-sm">One photo at a time. The service answers with a prediction, the three candidates it weighed, and the heat map that shows which pixels decided it.</p>
+    <p class="badge demo" id="modeBadge">demo mode · recorded checkpoint output</p>
+  </div>
+
+  <div class="app-grid">
+
+    <!-- viewer -->
+    <section class="panel-card">
+      <div class="panel-bar">
+        <div class="toolbar">
+          <button class="btn-ghost btn-sm" id="pickBtn" type="button">Choose a photo</button>
+          <button class="btn-ghost btn-sm" id="camBtn" type="button">Use camera</button>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <div class="control">
+          <span class="control-label mono">threshold</span>
+          <div class="chips" role="group" aria-label="Confidence threshold">
+            <button class="chip is-on" data-threshold="0.7" aria-pressed="true">0.70</button>
+            <button class="chip" data-threshold="0.8" aria-pressed="false">0.80</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body single">
+        <div class="viewer">
+          <div class="frame" id="frame">
+            <div class="dropstate" id="dropstate" role="button" tabindex="0" aria-label="Choose a leaf photo">
+              <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M27 6c0 12-7 19-16 19-2.6 0-4-1.4-4-4C7 12 14 6 27 6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M8 27c4-9 10-14 17-17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <p class="drop-title">Drop a leaf photo here</p>
+              <p class="muted small">JPG, PNG or WEBP up to 10 MB</p>
+              <p class="muted small">Or run a recorded test image:</p>
+              <div class="chips" role="group" aria-label="Recorded test image">
+                <button class="chip is-on" data-case="confident" aria-pressed="true" type="button">Confident</button>
+                <button class="chip" data-case="hard" aria-pressed="false" type="button">Hard</button>
+              </div>
+            </div>
+
+            <div class="shot" id="shot" hidden>
+              <img id="shotBase" alt="">
+              <img id="shotHeat" alt="" aria-hidden="true">
+            </div>
+          </div>
+
+          <div class="cmp-wrap">
+            <div class="compare-row" id="compareRow" hidden>
+              <input type="range" id="alpha" min="0" max="100" value="55" step="1"
+                     aria-label="Compare the leaf photo with the Grad-CAM heat map">
+              <div class="compare-legend mono"><span>photo</span><span>heat map</span></div>
+            </div>
+          </div>
+
+          <div class="cam" id="camPane" hidden>
+            <video id="camVideo" playsinline muted></video>
+            <div class="cam-bar">
+              <button class="btn-primary" id="snapBtn" type="button">Capture</button>
+              <button class="btn-ghost" id="camCancel" type="button">Cancel</button>
+            </div>
+            <p class="cam-note">Camera needs a secure context: localhost or https. On a plain file the browser refuses and that is reported here.</p>
+          </div>
+
+          <ul class="stages" id="stages" hidden>
+            <li class="stage" data-stage="0"><span class="stage-dot"></span>decoding the image</li>
+            <li class="stage" data-stage="1"><span class="stage-dot"></span>running the model</li>
+            <li class="stage" data-stage="2"><span class="stage-dot"></span>drawing the heat map</li>
+          </ul>
+          <div class="progress" id="progress" hidden><i></i></div>
+
+          <p class="notice" id="notice" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- result -->
+    <aside class="panel-card result-card result" id="result" aria-live="polite"></aside>
+
+  </div>
+
+  <section id="recent" hidden style="margin-top: var(--s-500);">
+    <h2 class="section-title">This session</h2>
+    <div class="thumbstrip" id="strip"></div>
+  </section>
+
+</main>
+
+<footer class="foot wrap">
+  <div class="foot-grid">
+    <div>
+      <p class="brand-foot">Leafread</p>
+      <p class="muted small">Plant leaf disease detection, project BT40, IILM University.</p>
+    </div>
+    <nav aria-label="Pages">
+      <a href="index.html">Overview</a>
+      <a href="upload.html">Batch upload</a>
+      <a href="index.html#limits">Where it fails</a>
+    </nav>
+  </div>
+  <p class="muted small">Static demo, no upload, no treatment advice.</p>
+</footer>
+
+<script src="js/demo-data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/scan.js"></script>
+</body>
+</html>

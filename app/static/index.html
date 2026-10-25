@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leafread: a first read on a leaf, before you walk the field</title>
+<meta name="description" content="EfficientNet-B0 trained on 36,762 leaf photographs across 38 classes. Drop one photo to see the prediction, the two alternatives it weighed, and the pixels that decided it.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Leafread: a first read on a leaf">
+<meta property="og:description" content="38 classes, 4,056,226 parameters, validation macro F1 0.9937. Every prediction comes with a Grad-CAM heat map.">
+<meta property="og:image" content="assets/confident-gradcam.png">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M23 9c0 8-5 13-11 13-2 0-3-1-3-3 0-6 5-10 14-10z' fill='%23CBE06B'/%3E%3Cpath d='M9 24c3-6 7-9 12-11' stroke='%23000' stroke-width='1.4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <nav class="pill" aria-label="Primary">
+    <a class="brand" href="#top">
+      <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M27 6c0 12-7 19-16 19-2.6 0-4-1.4-4-4C7 12 14 6 27 6z" fill="currentColor" opacity="0.9"/>
+        <path d="M8 27c4-9 10-14 17-17" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span>Leafread</span>
+    </a>
+    <div class="navlinks">
+      <a href="#scanner" aria-current="page">Overview</a>
+      <a href="scan.html">Scan</a>
+      <a href="upload.html">Batch</a>
+      <a href="#limits">Where it fails</a>
+      <a href="#model">Model card</a>
+    </div>
+    <button class="burger" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<div class="menu" id="menu" hidden>
+  <nav class="menu-inner" aria-label="Menu">
+    <a href="#scanner" style="--i:1">Scanner</a>
+    <a href="#how" style="--i:2">How it works</a>
+    <a href="#limits" style="--i:3">Where it fails</a>
+    <a href="#model" style="--i:4">Model card</a>
+  </nav>
+</div>
+
+<main id="main">
+
+  <!-- ── hero ─────────────────────────────────────────────────────────── -->
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow mono">Plant leaf disease detection · project BT40</p>
+      <h1>A first read on a leaf,<br>in under a second.</h1>
+      <p class="lede">EfficientNet-B0 trained on 36,762 leaf photographs across 38 classes. Drop one photo to get the prediction, the two alternatives it weighed, and the pixels that decided it.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="scan.html">Upload a leaf photo</a>
+      </div>
+      <p class="proof mono">38 classes · 43,306 development images<br>validation macro F1 0.9937 · single seed</p>
+    </div>
+
+    <figure class="hero-visual">
+      <div class="peek">
+        <img src="assets/confident.jpg" width="512" height="512" alt="Held out test photograph of a tomato leaf with early blight lesions.">
+        <img class="peek-heat" src="assets/confident-gradcam.png" width="512" height="512" alt="The same leaf with the Grad-CAM heat map, warm colours sitting on the lesions.">
+      </div>
+      <figcaption class="mono">Photo and heat map, both from the held out test split.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── scanner ──────────────────────────────────────────────────────── -->
+  <section class="wrap" id="scanner">
+    <div class="section-head reveal">
+      <h2>Scan one leaf</h2>
+      <p class="muted">Static demo. There is no backend yet, so the two cases are real checkpoint output on held out test images, frozen at build time. Your own file never leaves the page.</p>
+    </div>
+
+    <div class="panel reveal">
+      <div class="panel-bar">
+        <div class="control">
+          <span class="control-label mono">demo case</span>
+          <div class="chips" role="group" aria-label="Demo case">
+            <button class="chip is-on" data-case="confident" aria-pressed="true">Confident</button>
+            <button class="chip" data-case="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="control">
+          <span class="control-label mono">threshold</span>
+          <div class="chips" role="group" aria-label="Confidence threshold">
+            <button class="chip is-on" data-threshold="0.7" aria-pressed="true">0.70</button>
+            <button class="chip" data-threshold="0.8" aria-pressed="false">0.80</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div class="viewer">
+          <div class="frame" id="frame">
+            <div class="dropstate" id="dropstate" role="button" tabindex="0" aria-label="Choose a leaf photo">
+              <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M27 6c0 12-7 19-16 19-2.6 0-4-1.4-4-4C7 12 14 6 27 6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M8 27c4-9 10-14 17-17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <p class="drop-title">Drop a leaf photo here</p>
+              <p class="muted small">or click to choose a file · JPG, PNG or WEBP up to 10 MB</p>
+              <input type="file" id="file" accept="image/*" hidden>
+            </div>
+
+            <div class="shot" id="shot" hidden>
+              <img id="shotBase" alt="">
+              <img id="shotHeat" alt="" aria-hidden="true">
+            </div>
+          </div>
+
+          <div class="compare-row" id="compareRow" hidden>
+            <input type="range" id="alpha" min="0" max="100" value="0" step="1"
+                   aria-label="Compare the leaf photo with the Grad-CAM heat map">
+            <div class="compare-legend mono"><span>photo</span><span>heat map</span></div>
+          </div>
+
+          <p class="notice" id="notice" hidden></p>
+        </div>
+
+        <aside class="result" id="result" aria-live="polite"></aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── how it works ─────────────────────────────────────────────────── -->
+  <section class="wrap" id="how">
+    <div class="section-head reveal">
+      <h2>Two passes per photo</h2>
+      <p class="muted">The first pass answers. The second pass explains. Both run on a frozen checkpoint, never on your training data.</p>
+    </div>
+    <ol class="steps">
+      <li class="step reveal">
+        <span class="step-num mono">01</span>
+        <h3>Resize and normalise</h3>
+        <p>The photo becomes a 224 by 224 tensor and is normalised with the mean and standard deviation stored inside the checkpoint, so the demo cannot drift from the evaluation scripts.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-num mono">02</span>
+        <h3>Forward pass</h3>
+        <p>Convolutions and pooling collapse the leaf into 38 logits, then softmax turns them into probabilities. The top three come back with the gap between them.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-num mono">03</span>
+        <h3>Backward pass</h3>
+        <p>Grad-CAM backpropagates only the winning class score to the last convolution layer, weights each channel by its average gradient, and paints the result over the photo.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── tagline reveal ───────────────────────────────────────────────── -->
+  <section class="tagline wrap" aria-label="Core idea">
+    <p class="tagline-text" data-words>It shows you the pixels behind the answer.</p>
+  </section>
+
+  <!-- ── limits ───────────────────────────────────────────────────────── -->
+  <section class="wrap" id="limits">
+    <div class="section-head reveal">
+      <h2>Where this holds up, and where it does not</h2>
+      <p class="muted">Written down here rather than discovered in front of a guide.</p>
+    </div>
+
+    <div class="limits">
+      <article class="card reveal">
+        <h3>Holds up</h3>
+        <ul>
+          <li>One leaf, filling most of the frame</li>
+          <li>Even light, plain background, like the PlantVillage photographs it learned from</li>
+          <li>One of the 38 classes it was trained on</li>
+          <li>Visible lesions that look like the published examples</li>
+        </ul>
+      </article>
+      <article class="card reveal">
+        <h3>Do not trust it for</h3>
+        <ul>
+          <li>Field photos with soil, hands or background clutter</li>
+          <li>Diseases outside the 38 classes, which still get a confident wrong answer</li>
+          <li>Several conditions in one frame, or several leaves</li>
+          <li>Early stage lesions, motion blur, or heavy shadow</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="finding reveal">
+      <span class="finding-mark mono">finding</span>
+      <p>On the SmallCNN test split, <span class="mono">Soybean___healthy</span> was predicted as <span class="mono">Pepper,_bell___healthy</span> in 20 cases. Two different crops, both labelled healthy. That pattern is a background shortcut until the heat map proves otherwise, which is why the heat map is part of this page and not an appendix.</p>
+    </div>
+  </section>
+
+  <!-- ── faq ──────────────────────────────────────────────────────────── -->
+  <section class="wrap" id="faq">
+    <div class="section-head reveal">
+      <h2>Questions people actually ask</h2>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>What does the percentage mean?</summary>
+        <p>A softmax probability over 38 classes, under the crop and condition shown. It is not a diagnosis and it is not calibrated to a clinician's confidence.</p>
+      </details>
+      <details>
+        <summary>Why show three answers instead of one?</summary>
+        <p>A dominant top one and a near tie are different situations. The hard case on this page ends 72.3 to 26.8 between two tomato diseases, and that near tie is the useful signal.</p>
+      </details>
+      <details>
+        <summary>Why a heat map?</summary>
+        <p>So you can see whether the model looked at the leaf or at the background. Warm colour on a lesion is consistent with using the symptom. Warm colour on the pot or the frame edge is evidence of a shortcut.</p>
+      </details>
+      <details>
+        <summary>Does it work on my phone camera photo?</summary>
+        <p>Partly. It was trained on controlled lab photographs, so field photos are harder. The measured numbers on this page come from held out PlantVillage images, not from farm photographs.</p>
+      </details>
+      <details>
+        <summary>What is the accuracy, exactly?</summary>
+        <p>Macro F1 0.9937 on 6,544 validation images and 0.9931 on 10,709 locked test images, both from a single seed. The test split was scored once as a reporting pass, after the model was already chosen.</p>
+      </details>
+      <details>
+        <summary>Can it tell me what to spray?</summary>
+        <p>No. Treatment advice is not in this build. A prediction is a reason to look closer or ask an extension service, not a prescription.</p>
+      </details>
+      <details>
+        <summary>Where do these numbers come from?</summary>
+        <p>The checkpoint itself, its frozen manifests and the evaluation scripts in this repository. Every value on this page was generated by <span class="mono">scripts/make_demo_assets.py</span>.</p>
+      </details>
+      <details>
+        <summary>Does anything get uploaded?</summary>
+        <p>No. This page is static, there is no backend, and the two cases ship as files. A photo you drop stays in your browser.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── model card ───────────────────────────────────────────────────── -->
+  <section class="wrap" id="model">
+    <div class="section-head reveal">
+      <h2>Model card</h2>
+      <p class="muted">Read from the checkpoint at build time, so this block cannot disagree with the weights.</p>
+    </div>
+    <dl class="modelcard mono reveal" id="modelcard"></dl>
+  </section>
+
+</main>
+
+<footer class="foot wrap">
+  <div class="foot-grid">
+    <div>
+      <p class="brand-foot">Leafread</p>
+      <p class="muted small">A capstone demonstration for plant leaf disease detection, project BT40, IILM University.</p>
+    </div>
+    <nav aria-label="Repository documents">
+      <a href="../../docs/FRONTEND_PLAN.md">Frontend plan</a>
+      <a href="../../docs/CHECKPOINTS.md">Checkpoints</a>
+      <a href="../../docs/KNOWN_ISSUES.md">Known issues</a>
+    </nav>
+  </div>
+  <p class="muted small">Static demo, no backend, no upload, no treatment advice.</p>
+</footer>
+
+<script src="js/demo-data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

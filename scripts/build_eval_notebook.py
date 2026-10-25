@@ -98,18 +98,49 @@ def autodiscover_dataset_root(preferred: Path) -> Path:
     return preferred
 
 
+def _mount_report() -> str:
+    """What Kaggle actually mounted, for the run log and for failures.
+
+    The 2026-10-25 run died with a bare "Checkpoint not attached at ..." and no
+    evidence about the mount, which is not diagnosable from the notebook.
+    """
+    base = KAGGLE_INPUT
+    if not base.is_dir():
+        return f"{base} does not exist, so this is not a Kaggle kernel"
+    tops = sorted(p.name for p in base.iterdir())
+    pts = sorted(str(p) for p in base.rglob("*.pt"))
+    return f"top level of {base}: {tops}; every .pt under it: {pts}"
+
+
 def autodiscover_checkpoint(preferred: Path) -> Path:
-    """Find the attached checkpoint, preferring the requested one."""
+    """Find the attached checkpoint, tolerating Kaggle naming and nesting.
+
+    Kaggle nests each attachment under /kaggle/input/<slug>/, and an upload that
+    already existed locally as "efficientnet_b0_best (1).pt" keeps its space and
+    parentheses. The previous version accepted only an exact filename or a single
+    .pt found anywhere, so either case fell through to the default path and the
+    run failed later on a missing file.
+    """
     if preferred.is_file():
         return preferred
     base = KAGGLE_INPUT
-    if base.is_dir():
-        hits = sorted(base.rglob("*.pt"))
-        exact = [h for h in hits if h.name == preferred.name]
-        if exact:
-            return exact[0]
-        if len(hits) == 1:
-            return hits[0]
+    if not base.is_dir():
+        return preferred
+    hits = sorted(p for p in base.rglob("*.pt") if p.is_file())
+    if not hits:
+        return preferred
+    exact = [h for h in hits if h.name == preferred.name]
+    if exact:
+        return exact[0]
+    stem = preferred.stem
+    loose = [h for h in hits if h.stem == stem or h.stem.startswith(stem)]
+    if loose:
+        return loose[0]
+    by_role = [h for h in hits if "efficientnet" in h.name.lower() and "b0" in h.name.lower()]
+    if len(by_role) == 1:
+        return by_role[0]
+    if len(hits) == 1:
+        return hits[0]
     return preferred
 
 
