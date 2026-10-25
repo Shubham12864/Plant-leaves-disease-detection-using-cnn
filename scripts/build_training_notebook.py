@@ -400,8 +400,26 @@ else:
 print("\\nDone.")
 '''
 
-RESULTS_CODE = '''records = []
-for metrics_path in sorted(OUTPUT_ROOT.rglob("validation_metrics.json")):
+RESULTS_CODE = '''# Runs live in two shapes: runs/pilot/<arch>/ for the 1-epoch pilot, and
+# runs/<arch>/seed<N>/ for the real sweep. Mixing them in one table would put a
+# 1-epoch score next to a 12-epoch score and quietly inflate the spread, so this
+# cell reads only the family that the current RUN_MODE produced.
+all_paths = sorted(OUTPUT_ROOT.rglob("validation_metrics.json"))
+
+
+def _parts(path):
+    return path.relative_to(OUTPUT_ROOT).parts
+
+
+pilot_paths = [p for p in all_paths if "pilot" in _parts(p)]
+sweep_paths = [p for p in all_paths if "pilot" not in _parts(p) and "_smoke" not in _parts(p)]
+chosen = pilot_paths if RUN_MODE == "pilot" else sweep_paths
+print(f"reporting {len(chosen)} run(s) "
+      f"({'pilot' if RUN_MODE == 'pilot' else 'sweep'} family; "
+      f"{len(pilot_paths)} pilot and {len(sweep_paths)} sweep files on disk)")
+
+records = []
+for metrics_path in chosen:
     run_dir = metrics_path.parent
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
     records.append({
@@ -420,7 +438,9 @@ for metrics_path in sorted(OUTPUT_ROOT.rglob("validation_metrics.json")):
     })
 
 if not records:
-    raise FileNotFoundError("No validation_metrics.json found under runs/. Did the run cell finish?")
+    raise FileNotFoundError(
+        f"No validation_metrics.json for RUN_MODE={RUN_MODE!r} under runs/. Did the run cell finish?"
+    )
 
 comparison = pd.DataFrame(records).sort_values(["architecture", "run"]).reset_index(drop=True)
 comparison.to_csv(OUTPUT_ROOT / "comparison.csv", index=False)
@@ -449,7 +469,8 @@ if len(comparison) > 1:
     plt.show()
     plt.close(fig)
 
-zip_path = shutil.make_archive("/kaggle/working/training_runs", "zip", root_dir=OUTPUT_ROOT)
+label = "pilot" if RUN_MODE == "pilot" else (ONLY_ARCH or "all")
+zip_path = shutil.make_archive(f"/kaggle/working/training_runs_{RUN_MODE}_{label}", "zip", root_dir=OUTPUT_ROOT)
 print(f"\\nDownload from the Kaggle Output panel: {zip_path}")
 print("Train minutes per run:")
 print(comparison[["architecture", "run", "train_minutes", "val_macro_f1"]].to_string(index=False))
