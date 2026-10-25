@@ -177,7 +177,39 @@ def main() -> None:
                 "--lr", "1e-3", "--ema-decay", "0", "--warmup-fraction", "0.1",
             ]
 
-        print("=== 1. full 2-epoch DDP run on CPU ===")
+        print("=== 0a. package and engine agree on every architecture ===")
+        # train_ddp.py instantiates models itself because it must run standalone on
+        # Kaggle, so the two definitions could drift. Compare parameter counts and
+        # state-dict keys, which is what a checkpoint contract actually depends on.
+        import importlib.util
+        sys.path.insert(0, str(ROOT / "src"))
+        from plant_disease.models import MODEL_NAMES, build_model as package_build
+        spec = importlib.util.spec_from_file_location("train_ddp_under_test", ENGINE)
+        engine_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(engine_module)
+        if set(engine_module.ARCHES) != set(MODEL_NAMES):
+            raise SystemExit(f"architecture lists disagree: {engine_module.ARCHES} vs {MODEL_NAMES}")
+        for arch in MODEL_NAMES:
+            from_package = package_build(arch, len(CLASSES), pretrained=False)
+            from_engine = engine_module.build_model(arch, len(CLASSES), pretrained=False)
+            package_params = sum(p.numel() for p in from_package.parameters())
+            engine_params = sum(p.numel() for p in from_engine.parameters())
+            if package_params != engine_params:
+                raise SystemExit(f"{arch}: package has {package_params:,} params, engine has {engine_params:,}")
+            if set(from_package.state_dict()) != set(from_engine.state_dict()):
+                raise SystemExit(f"{arch}: state-dict keys differ between package and engine")
+            print(f"  ok {arch:16s} {package_params:>10,} params, keys identical")
+        del from_package, from_engine
+
+        print("\n=== 0b. every architecture reaches the optimizer ===")
+        for arch in ("smallcnn", "resnet18", "efficientnet_b0", "convnext_tiny"):
+            dry = engine_command(data["val_y"])
+            dry[dry.index("resnet18")] = arch
+            dry.append("--dry-run")
+            run(dry, env=env)
+            print(f"  ok {arch} ran 3 optimizer steps")
+
+        print("\n=== 1. full 2-epoch DDP run on CPU ===")
         run(engine_command(data["val_y"]), env=env)
 
         print("\n=== 2. checkpoint contract ===")

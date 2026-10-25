@@ -94,7 +94,7 @@ IMAGENET_STD = (0.229, 0.224, 0.225)
 SMALLCNN_MEAN = (0.5, 0.5, 0.5)
 SMALLCNN_STD = (0.5, 0.5, 0.5)
 
-ARCHES = ("efficientnet_b0", "resnet18")
+ARCHES = ("smallcnn", "resnet18", "efficientnet_b0", "convnext_tiny")
 
 
 # --------------------------------------------------------------------------- #
@@ -123,7 +123,40 @@ class CachedImages(Dataset):
         return image, int(self.labels[index])
 
 
+class SmallCNN(nn.Module):
+    """Four-stage CNN baseline.
+
+    Defined here as well as in src/plant_disease/models/smallcnn.py because this
+    file has to run standalone inside Kaggle, where the package is not installed.
+    scripts/smoke_test_engine.py asserts the two definitions are parameter-
+    identical, so they cannot drift apart silently.
+    """
+
+    def __init__(self, num_classes: int):
+        super().__init__()
+        blocks = []
+        channels = 3
+        for output_channels in (32, 64, 128, 256):
+            blocks.extend([
+                nn.Conv2d(channels, output_channels, 3, padding=1, bias=False),
+                nn.BatchNorm2d(output_channels),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(2),
+            ])
+            channels = output_channels
+        self.features = nn.Sequential(*blocks)
+        self.head = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1), nn.Flatten(), nn.Dropout(0.30), nn.Linear(256, num_classes)
+        )
+
+    def forward(self, images):
+        return self.head(self.features(images))
+
+
 def build_model(arch: str, num_classes: int, pretrained: bool) -> nn.Module:
+    if arch == "smallcnn":
+        # Random initialisation by design; there is no pretrained SmallCNN.
+        return SmallCNN(num_classes)
     if models is None:  # pragma: no cover
         raise RuntimeError(f"torchvision import failed: {_TV_IMPORT_ERROR}")
     if arch == "efficientnet_b0":
@@ -134,6 +167,10 @@ def build_model(arch: str, num_classes: int, pretrained: bool) -> nn.Module:
         weights = models.ResNet18_Weights.DEFAULT if pretrained else None
         model = models.resnet18(weights=weights)
         model.fc = nn.Linear(model.fc.in_features, num_classes)
+    elif arch == "convnext_tiny":
+        weights = models.ConvNeXt_Tiny_Weights.DEFAULT if pretrained else None
+        model = models.convnext_tiny(weights=weights)
+        model.classifier[2] = nn.Linear(model.classifier[2].in_features, num_classes)
     else:
         raise ValueError(f"Unsupported arch {arch!r}; choose from {ARCHES}")
     return model

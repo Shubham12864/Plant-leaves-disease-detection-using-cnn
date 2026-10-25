@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "note": "One protocol for every architecture. Changing a value here changes every run; there are no per-run edits. The single sanctioned deviation is the learning rate and batch size for smallcnn, which trains from scratch.",
+  "image_size": 224,
+  "epochs": 12,
+  "patience": 3,
+  "seeds": [42, 43, 44],
+  "eval_batch_size": 128,
+  "workers": 4,
+  "shuffle_mode": "blocked",
+  "rotation_deg": 12.0,
+  "grad_clip": 5.0,
+  "warmup_fraction": 0.10,
+  "label_smoothing": 0.05,
+  "class_weight_alpha": 0.5,
+  "ema_decay": 0.999,
+  "selection_metric": "val_macro_f1",
+  "architectures": {
+    "smallcnn": {
+      "pretrained": false,
+      "local_batch_size": 128,
+      "lr": 0.001,
+      "weight_decay": 0.01,
+      "why": "trains from scratch, so it needs a higher learning rate and tolerates a larger batch; this is the only sanctioned deviation from the shared protocol"
+    },
+    "resnet18": {
+      "pretrained": true,
+      "local_batch_size": 64,
+      "lr": 0.0003,
+      "weight_decay": 0.05,
+      "why": "ImageNet fine-tune; LR matches the value recorded in the existing checkpoint's resume_config so old and new runs stay comparable"
+    },
+    "efficientnet_b0": {
+      "pretrained": true,
+      "local_batch_size": 64,
+      "lr": 0.0003,
+      "weight_decay": 0.05,
+      "why": "ImageNet fine-tune; the reference model for H1-H4"
+    },
+    "convnext_tiny": {
+      "pretrained": true,
+      "local_batch_size": 32,
+      "lr": 0.0002,
+      "weight_decay": 0.05,
+      "why": "28M parameters, roughly 4x EfficientNet-B0's activation memory, so half the per-GPU batch"
+    }
+  },
+  "notes": {
+    "deviation_policy": "Any difference not listed in 'why' is a defect, not a tuning choice.",
+    "augmentation": "Random horizontal flip, rotation up to rotation_deg, brightness 0.88-1.12, per-channel gain 0.92-1.08, all applied on the GPU inside the training engine. Identical for every architecture.",
+    "normalisation": "smallcnn uses mean=std=0.5; the pretrained models use ImageNet statistics. This is fixed by the architecture, not a choice.",
+    "batch_note": "local_batch_size is per GPU; global batch = local_batch_size x 2.",
+    "pilot_note": "The pilot run uses 1 epoch per architecture to measure wall-clock and confirm no OOM at these batch sizes before committing to 12 runs."
+  }
+}

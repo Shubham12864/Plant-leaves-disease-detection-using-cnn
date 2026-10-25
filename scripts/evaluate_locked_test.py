@@ -65,7 +65,7 @@ from plant_disease.calibration import (  # noqa: E402
     summarise as calibration_summary,
     to_markdown_table,
 )
-from plant_disease.models import build_model  # noqa: E402
+from plant_disease.models import MODEL_NAMES, build_model  # noqa: E402
 
 MANIFESTS = {
     "train": "plantvillage_train.csv",
@@ -199,8 +199,11 @@ def main() -> None:
     if not classes:
         raise ValueError("Checkpoint has no ordered class list; refusing to guess a class order.")
     architecture = checkpoint.get("architecture")
-    if architecture not in ("smallcnn", "resnet18", "efficientnet_b0"):
-        raise ValueError(f"Unsupported or missing architecture in checkpoint: {architecture!r}")
+    if architecture not in MODEL_NAMES:
+        raise ValueError(
+            f"Unsupported or missing architecture in checkpoint: {architecture!r}. "
+            f"Supported: {', '.join(MODEL_NAMES)}"
+        )
 
     image_size = int(checkpoint.get("image_size", 224))
     mean = tuple(checkpoint.get("normalization_mean", (0.485, 0.456, 0.406)))

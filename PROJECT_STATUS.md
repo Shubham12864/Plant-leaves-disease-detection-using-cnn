@@ -25,29 +25,42 @@ step produces the artifact the next one depends on.
 
 ## Current position
 
-**S1 complete (2026-10-25).** The locked test split has been scored and the
-checkpoint's recorded score reproduced **bit-identically**.
+Stages A and the local part of Stage B are complete. The queue is stopped at
+**S7**, which needs GPU time on Kaggle.
 
-| Split | Images | Accuracy | 95% CI | Macro-F1 | 95% CI |
-|---|---:|---|---:|---:|---|
-| validation | 6,544 | 0.995416 | 0.9937–0.9969 | 0.993689 | 0.9911–0.9960 |
-| test | 10,709 | 0.995051 | 0.9937–0.9964 | 0.993142 | 0.9910–0.9951 |
+| Step | State |
+|---|---|
+| S1 locked-test evaluation | **done** — validation macro-F1 reproduced bit-identically; 53 errors in 10,709 |
+| S2 PlantDoc label map | **done** — 28/28 classes decided, 3 with written caveats, 10 PlantVillage classes have no counterpart |
+| S3 stale documents | **done** — `ARCHITECTURE.md`, `MEMORY.md`, `Literature-Survey-Evidence-Register.md` no longer contradict the code |
+| S4 baseline commit | **done** — tag `baseline-p0.1` |
+| S5 ConvNeXt-Tiny | **done** — 27,849,350 parameters, package and engine agree |
+| S6 SmallCNN on the engine | **done** — parameter-identical to the package copy, parity asserted in the smoke test |
+| S8 protocol frozen | **done** — `configs/protocol.json`, run before S7 on purpose |
+| **S7 protocol pilot** | **NEXT — needs Kaggle GPU** |
 
-Test errors: 53 / 10,709. ECE 0.0022. All five README claims verified.
-Artifacts: `reports/model_comparison/locked_test_efficientnet_b0/`.
-Numbers: `results/registry.json`.
+### S7 — what to run
 
-**Next: S2 — decide the PlantDoc label map.**
+`notebooks/01_Train_EfficientNet_B0_v2.ipynb`, with `RUN_MODE = "pilot"` in cell 1.
 
-```
-python scripts/complete_label_mapping.py --check-output
-```
+Attach the PlantVillage dataset only (no checkpoint needed). Cell 1 auto-discovers
+the mount, cell 2 builds the cache, cell 3 writes and validates the engine and
+protocol, cell 4 smoke-tests three optimizer steps, cell 5 runs **one epoch per
+architecture at seed 42**.
 
-Local, no GPU, about two minutes. Produces `data/label_mapping.csv` with all 28
-PlantDoc classes decided. Gate: every PlantVillage target exists in the
-manifest, nothing silently dropped, the three ambiguous rows carry their caveat.
+*Produces* `runs/pilot_runtime.csv`: wall-clock minutes, parameters, and the
+epoch-1 validation score for SmallCNN, ResNet18, EfficientNet-B0 and
+ConvNeXt-Tiny, plus a projected duration for the 12-run sweep.
 
----
+*Gate:* four architectures complete without OOM. If ConvNeXt-Tiny OOMs at
+`local_batch_size: 32`, drop it to 16 in `configs/protocol.json`, rebuild the
+notebook, and re-run — that is the only thing the pilot is for.
+
+### After the pilot
+
+S9 — the 12-run sweep (`RUN_MODE = "sweep"`, 4 architectures x 3 seeds). Expect
+hours; the run cell resumes from the last completed epoch if a session restarts.
+Then S10 generates the comparison table from the artifacts.
 
 ## Verified facts (checked, not assumed)
 
@@ -65,6 +78,8 @@ manifest, nothing silently dropped, the three ambiguous rows carry their caveat.
 | EfficientNet-B0 validation score reproduces bit-identically | measured 0.9936894341462544 = recorded value, delta 0.0 |
 | EfficientNet-B0 test: 53 errors in 10,709 | `.../test/metrics.json`, registered in `results/registry.json` |
 | Cross-crop healthy confusions for B0 total 8 in 10,709 | `.../test/confusion_matrix.csv` — the audit's shortcut suspicion was drawn from SmallCNN and does not transfer |
+| Four architectures train through one engine | parameter counts agree between `src/plant_disease/models` and `scripts/train_ddp.py`: 398,662 / 11,196,006 / 4,056,226 / 27,849,350 |
+| `smallcnn` inline definition cannot drift | parity between the engine's inline class and the package class is asserted in `scripts/smoke_test_engine.py` |
 
 ## Known-weak areas (do not overclaim)
 
@@ -110,13 +125,13 @@ deleted before submission (roadmap S25).
 
 | Step | Action | Needs |
 |---|---|---|
-| S1 | ~~Run notebook 04, verify the gate~~ **done** | — |
-| S2 | `python scripts/complete_label_mapping.py --check-output` | local, 2 min |
-| S3 | Fix `ARCHITECTURE.md:9,184`, `MEMORY.md:166`, `Literature-Survey-Evidence-Register.md:7` | local |
-| S4 | Commit and tag the baseline | local |
+| S1–S6, S8 | **done** | — |
+| **S7** | `RUN_MODE="pilot"` in notebook 01_v2, one epoch x four architectures | Kaggle GPU, ~15 min |
+| S9 | `RUN_MODE="sweep"`, 12 runs | Kaggle GPU, hours |
+| S10 | comparison table from artifacts | local |
 
-After S1 passes, Stage B begins with S5 (add ConvNeXt-Tiny as the fourth
-architecture), then S6, S7, S8, S9 (12 runs), S10.
+Stage B order was adjusted: S8 (freeze the protocol) runs before S7 (pilot) so
+the pilot measures the settings the sweep will actually use.
 
 ---
 

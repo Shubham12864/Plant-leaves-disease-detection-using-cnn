@@ -54,21 +54,21 @@ Commit everything, tag it. The working tree becomes the reference point for ever
 
 The current comparison varies learning rate, batch size, augmentation and parallelism between models. Any of those can move PlantVillage accuracy by more than a point, so "same-split comparison" is the most it can honestly claim. This stage fixes that.
 
-**S5. Add ConvNeXt-Tiny as a fourth architecture**
-One module in `src/plant_disease/models/`, one branch in `models/__init__.py`, one entry in `train_ddp.py`'s `ARCHES` and `build_model`, one entry in the evaluator's allow-list.
-*Gate:* `strict=True` load into `convnext_tiny(38)` works; both generated notebooks rebuild byte-identical.
+**S5. Add ConvNeXt-Tiny as a fourth architecture** — **DONE**
+Added `src/plant_disease/models/convnext.py`, a branch in `models/__init__.py`, entries in `train_ddp.py`'s `ARCHES` and `build_model`, and the evaluator allow-list now derives from `MODEL_NAMES` instead of a hardcoded tuple.
+*Gate:* package and engine agree on 27,849,350 parameters and identical state-dict keys; forward pass returns `(2, 38)`; both notebooks rebuild byte-identical. Verified.
 
-**S6. Put SmallCNN on the engine**
-It currently exists only in the old baseline notebook, so it cannot be retrained or compared fairly.
-*Gate:* trains through `train_ddp.py`; normalisation (0.5/0.5) picked up correctly.
+**S6. Put SmallCNN on the engine** — **DONE**
+`SmallCNN` is now inlined in `train_ddp.py` (needed because the engine runs standalone on Kaggle) with a comment pointing at the package copy, and the mean/std switch already keys off the architecture name.
+*Gate:* package and engine produce parameter-identical modules (398,662 params, same state-dict keys) so the duplicated definition cannot drift; 3 optimizer steps run on CPU. Verified — the parity check lives in `scripts/smoke_test_engine.py`.
 
-**S7. Pilot run — one epoch, four models**
-Cheap reality check before committing GPU hours. Measures real wall-clock and confirms nothing OOMs at the chosen batch size.
-*Gate:* four runs complete; per-model minutes recorded in `reports/model_comparison/runtime.csv`.
+**S7. Pilot run — one epoch, four models** — **NEXT, needs Kaggle**
+`RUN_MODE = "pilot"` in `notebooks/01_Train_EfficientNet_B0_v2.ipynb`. One epoch per architecture at seed 42, writing `runs/pilot_runtime.csv` with wall-clock, epoch-1 validation score and parameter count, plus a projected sweep duration.
+*Gate:* four runs complete without OOM; per-architecture minutes recorded.
 
-**S8. Freeze the protocol**
-`configs/protocol.yaml`: LR per architecture, global batch, epochs, augmentation list, loss, EMA, scheduler. Every run reads this file.
-*Gate:* changing a value in one place changes the run; no per-run edits.
+**S8. Freeze the protocol** — **DONE (run before S7, deliberately)**
+`configs/protocol.json`: image size, epochs, patience, seeds, eval batch, workers, augmentation, loss, EMA, scheduler, and per-architecture LR / batch / weight decay with a written justification for each deviation. The notebook parses it and builds every command from it.
+*Gate:* changing a value in one place changes the run; there are no per-run edits. Moved ahead of S7 so the pilot measures the settings the sweep will actually use, instead of measuring a different configuration.
 
 **S9. Twelve runs**
 3 seeds × 4 models through the frozen protocol. Resumable; run in whatever order finishes.
@@ -170,8 +170,8 @@ Scope statement (one controlled source, one 236-image field set, no expert re-la
 
 | Stage | Steps | State |
 |---|---|---|
-| A — evidence | S1–S4 | S1 running, S2–S4 ready |
-| B — fair comparison | S5–S10 | next |
+| A — evidence | S1–S4 | **complete** (S1 sealed bit-identically, S2 28/28 mapped, S3 docs current, S4 tagged) |
+| B — fair comparison | S5–S10 | S5, S6, S8 **done**; S7 is next and needs Kaggle |
 | C — field gap | S11–S13 | blocked on S2 |
 | D — mechanism | S14–S19 | S18 is the trap; read it before training |
 | E — usefulness | S20–S22 | partly free from S1 |

@@ -25,6 +25,7 @@ EMBEDDED = [
     ("/kaggle/working/src/plant_disease/models/efficientnet_b0.py", "src/plant_disease/models/efficientnet_b0.py"),
     ("/kaggle/working/src/plant_disease/models/resnet18.py", "src/plant_disease/models/resnet18.py"),
     ("/kaggle/working/src/plant_disease/models/smallcnn.py", "src/plant_disease/models/smallcnn.py"),
+    ("/kaggle/working/src/plant_disease/models/convnext.py", "src/plant_disease/models/convnext.py"),
     ("/kaggle/working/evaluate_locked_test.py", "scripts/evaluate_locked_test.py"),
 ]
 
