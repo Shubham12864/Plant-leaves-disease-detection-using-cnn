@@ -374,6 +374,144 @@
         "leaf mask is a colour heuristic",
         "one checkpoint"
       ]
+    },
+    {
+      "id": "s19_baseline_seed42",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 42,
+      "condition": "baseline",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/baseline/seed42",
+      "metrics": {
+        "val_macro_f1": 0.986805,
+        "val_accuracy": 0.991748,
+        "field_macro_f1": 0.233101,
+        "field_accuracy": 0.237288
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
+    },
+    {
+      "id": "s19_baseline_seed43",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 43,
+      "condition": "baseline",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/baseline/seed43",
+      "metrics": {
+        "val_macro_f1": 0.988823,
+        "val_accuracy": 0.992207,
+        "field_macro_f1": 0.213041,
+        "field_accuracy": 0.220339
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
+    },
+    {
+      "id": "s19_baseline_seed44",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 44,
+      "condition": "baseline",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/baseline/seed44",
+      "metrics": {
+        "val_macro_f1": 0.989341,
+        "val_accuracy": 0.993735,
+        "field_macro_f1": 0.223468,
+        "field_accuracy": 0.220339
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
+    },
+    {
+      "id": "s19_composite_seed42",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 42,
+      "condition": "composite",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/composite/seed42",
+      "metrics": {
+        "val_macro_f1": 0.977566,
+        "val_accuracy": 0.984566,
+        "field_macro_f1": 0.228718,
+        "field_accuracy": 0.262712
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
+    },
+    {
+      "id": "s19_composite_seed43",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 43,
+      "condition": "composite",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/composite/seed43",
+      "metrics": {
+        "val_macro_f1": 0.982796,
+        "val_accuracy": 0.987469,
+        "field_macro_f1": 0.245067,
+        "field_accuracy": 0.262712
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
+    },
+    {
+      "id": "s19_composite_seed44",
+      "model": "efficientnet_b0",
+      "group": "s19_background_augmentation",
+      "seed": 44,
+      "condition": "composite",
+      "dataset": "PlantVillage+PlantDoc",
+      "device": "cuda:2xT4",
+      "date": "2026-10-26",
+      "artifact_dir": "reports/s19/composite/seed44",
+      "metrics": {
+        "val_macro_f1": 0.978479,
+        "val_accuracy": 0.98426,
+        "field_macro_f1": 0.233047,
+        "field_accuracy": 0.237288
+      },
+      "caveats": [
+        "one seed of three",
+        "PlantDoc 236 images, 27 classes scored"
+      ],
+      "split": "validation+test",
+      "images": 6780
     }
   ],
   "document_claims": [
@@ -543,6 +681,21 @@
       "run": "swap_s16_b0_plantvillage",
       "status": "verified",
       "caveat": "298 PlantVillage validation images, one checkpoint"
+    },
+    {
+      "claim": "Background augmentation does not close the field gap (+1.24 pp, CI spans zero)",
+      "value": {
+        "baseline_field_f1": 0.2232,
+        "composite_field_f1": 0.2356,
+        "diff": 0.0124,
+        "ci95": [
+          -0.0332,
+          0.058
+        ]
+      },
+      "run": "s19_composite_seed42",
+      "status": "verified",
+      "caveat": "means of 3 seeds per condition; field eval re-run locally; PlantDoc 236 images"
     }
   ],
   "sweeps": {
@@ -886,10 +1039,10 @@
       "artifact": "swap_s16_b0_plantvillage / occlusion_b0_plantvillage"
     },
     "H3": {
-      "verdict": "blocked",
-      "evidence": "reports/mechanism/MECHANISM_RESULTS.md",
-      "statement": "S18 failed: no licence-clean background corpus disjoint from PlantDoc exists in the repository, so the augmentation experiment cannot start without contaminating the field evaluation.",
-      "artifact": null
+      "verdict": "not supported",
+      "evidence": "reports/mechanism/S19_BACKGROUND_AUGMENTATION_RESULTS.md",
+      "statement": "Background augmentation moves field macro-F1 by +1.24 points (95% CI -3.32 to +5.80, 2 of 3 seeds positive, sign test p=0.50) while costing 0.87 points in-domain. It recovers 1.6% of the 76.5-point gap, so there is no detectable effect.",
+      "artifact": "s19_baseline_* and s19_composite_* runs, six checkpoints"
     },
     "H4": {
       "verdict": "confirmed",

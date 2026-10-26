@@ -86,7 +86,7 @@ def build(reg: dict) -> dict[str, str]:
     # 4. Registered runs
     rows = []
     for run in reg.get("runs", []):
-        rows.append([run["id"], run["model"], run["dataset"], run["split"],
+        rows.append([run["id"], run["model"], run["dataset"], run.get("split", "-"),
                      run.get("images"), run.get("date", "")])
     if rows:
         files["runs.md"] = (

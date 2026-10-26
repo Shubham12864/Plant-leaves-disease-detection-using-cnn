@@ -122,3 +122,16 @@ cause of the 4.4 pp gap has not been isolated.
 **Consequence:** the 96.01% figure must not be quoted against the v2 numbers.
 Either re-run the phase-2 configuration through the current engine, or drop the
 old figure and report only the v2 result.
+
+## S19 field evaluation failed on Kaggle (fixed)
+
+`evaluate_plantdoc.py` computes `ROOT = Path(__file__).resolve().parents[1]`. The
+notebook writes scripts to `/kaggle/working/`, so `ROOT` resolved to `/kaggle` and
+the `sys.path` insert pointed at `/kaggle/src`, which does not exist. Every run
+died with `ModuleNotFoundError: No module named 'plant_disease'` and the field half
+of the table came back empty.
+
+Fixed by passing `PYTHONPATH=/kaggle/working/src` in every subprocess environment.
+The training half was unaffected, and the field evaluation was re-run locally from
+the returned checkpoints, so no result was lost.
+

@@ -1,0 +1,18 @@
+{
+  "baseline_field_f1": 0.223203,
+  "composite_field_f1": 0.235611,
+  "paired_diff": 0.012408,
+  "ci95": [
+    -0.033227,
+    0.058042
+  ],
+  "per_seed": {
+    "baseline_42": 0.233101,
+    "baseline_43": 0.213041,
+    "baseline_44": 0.223468,
+    "composite_42": 0.228718,
+    "composite_43": 0.245067,
+    "composite_44": 0.233047
+  },
+  "val_cost": -0.008709
+}

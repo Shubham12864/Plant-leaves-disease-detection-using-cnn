@@ -1,0 +1,38 @@
+[
+  {
+    "family": "baseline",
+    "seed": 42,
+    "sha256": "6bc883979a636ff1354d44af50f01c00fb26a382b2bf58de45993177945cf22e",
+    "bytes": 16531279
+  },
+  {
+    "family": "baseline",
+    "seed": 43,
+    "sha256": "145ff339c475acfed99c41a4c71092236a0b450d4b84c5131e74c1a3c843bcf8",
+    "bytes": 16531279
+  },
+  {
+    "family": "baseline",
+    "seed": 44,
+    "sha256": "1792d919d7b51a2018ecc6321ffc1cff13bc9f8960950ce02b9e23b5d985a893",
+    "bytes": 16531279
+  },
+  {
+    "family": "composite",
+    "seed": 42,
+    "sha256": "32850f5ba3e8681cbc2fe0ce3d67eaf237272042f6d5f68c0558bdb412c0c0d4",
+    "bytes": 16531279
+  },
+  {
+    "family": "composite",
+    "seed": 43,
+    "sha256": "02638ce65b76867e61df4218118f03b7c68d98113e4304544487189d4e135034",
+    "bytes": 16531279
+  },
+  {
+    "family": "composite",
+    "seed": 44,
+    "sha256": "8dd9af5d182d51a9fb660d2131c6d0baf98bb5a3bc8d5dea589d1c99770a9f61",
+    "bytes": 16531279
+  }
+]

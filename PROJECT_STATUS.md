@@ -50,7 +50,7 @@ one blocked experiment (S19) and one outstanding manual step (S16 labels).
 |---|---|---|
 | **H1** field accuracy is far below nominal | **confirmed** | 0.9928 → 0.2085 (5 seeds); 27/27 classes worse; lab gaps understate field gaps 19 to 28× |
 | **H2** gap is partly background dependence | **partially supported, now precise** | leaf swap moves the prediction 50.3%, background swap 21.8% vs 2.6% chance: joint use of leaf and scene, leaf dominant |
-| **H3** augmentation recovers part | **blocked (S18)** | no licence-clean background corpus disjoint from PlantDoc |
+| **H3** augmentation recovers part | **not supported** | 6 runs, 3 seeds/condition: field macro-F1 +1.24 pp, CI [-3.32, +5.80], 2/3 seeds positive, sign test p=0.50; in-domain cost -0.87 pp; 1.6% of the gap recovered |
 | **H4** nominal accuracy doesn't bound deployable | **confirmed** | ECE 0.0026 → 0.5808; abstention gains 0.8 pp at 90% coverage |
 
 ### The four numbers that carry the project

@@ -98,7 +98,20 @@ segmentation model, and the roadmap's 50 hand-labelled saliency maps are not don
 
 ---
 
-## H3 — Augmentation recovers part of the gap
+## H3
+
+**Verdict: not supported.** Six runs, three seeds per condition. Background
+augmentation moved field macro-F1 by +1.24 points with a 95% interval of −3.32 to
++5.80 and one seed going backwards, while costing 0.87 points in the lab. It
+recovered 1.6% of the 76.5-point gap.
+
+The direction was as predicted and the magnitude settles it. Background is used
+enough to matter but not enough that randomising it during training transfers. The
+gap is therefore not background overfitting that augmentation can repair; it is
+leaf appearance that differs between curated and field photographs.
+
+Full result: `reports/mechanism/S19_BACKGROUND_AUGMENTATION_RESULTS.md`.
+ — Augmentation recovers part of the gap
 
 **Verdict: not tested. Blocked, and the blocker is recorded rather than worked
 around.**

@@ -297,7 +297,7 @@ disjoint_out = DERIVED / "disjointness.json"
 check = subprocess.run([sys.executable, str(DISJOINT_SCRIPT),
                         "--backgrounds", str(BACKGROUND_ROOT),
                         "--out", str(disjoint_out)],
-                       env={**os.environ, "PYTHONUNBUFFERED": "1"})
+                       env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONPATH": str(WORKDIR / "src")})
 
 # Read the verdict from the report, never from the exit code alone. A non-zero exit
 # used to be treated as overlap, which also fired when the script was simply absent
@@ -437,7 +437,7 @@ print("GATE: baseline seed 42, 2 epochs, must reach "
       f"{GATE_ACCURACY} before six runs are committed")
 gate = subprocess.run(worker("efficientnet_b0", [SEEDS[0]], 2, GATE_ROOT,
                              ARMS["baseline"]["train_images"]),
-                      env={**os.environ, "PYTHONUNBUFFERED": "1"})
+                      env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONPATH": str(WORKDIR / "src")})
 gate_history = pd.read_csv(GATE_ROOT / "efficientnet_b0" / f"seed{SEEDS[0]}"
                            / "training_history.csv")
 accuracy = float(gate_history["val_accuracy"].iloc[-1])
@@ -453,7 +453,7 @@ if GATE_PASSED:
         print(f"\\n===== {arm} : {len(SEEDS)} seeds =====", flush=True)
         result = subprocess.run(worker("efficientnet_b0", SEEDS, EPOCHS, spec["root"],
                                        spec["train_images"]),
-                                env={**os.environ, "PYTHONUNBUFFERED": "1"})
+                                env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONPATH": str(WORKDIR / "src")})
         if result.returncode != 0:
             print(f"  {arm} arm returned {result.returncode}, continuing so partial results survive")
     print(f"\\ntraining finished in {(time.time() - STARTED_AT)/3600:.2f} h")

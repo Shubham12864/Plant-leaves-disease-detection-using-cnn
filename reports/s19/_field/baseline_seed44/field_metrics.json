@@ -1,0 +1,23 @@
+{
+  "checkpoint": "C:\\Users\\Shubham\\Downloads\\s19x\\baseline\\efficientnet_b0\\seed44\\efficientnet_b0_best.pt",
+  "architecture": "efficientnet_b0",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.22033898305084745,
+  "accuracy_ci95": [
+    0.1694915254237288,
+    0.2754237288135593
+  ],
+  "ci_width_pp": 10.59,
+  "macro_f1": 0.22346776313214145,
+  "macro_recall": 0.22290363957030623,
+  "weighted_f1": 0.22614479697344375,
+  "mean_confidence": 0.7462999820709229,
+  "out_of_mapping_rate": 0.2754237288135593,
+  "out_of_mapping_count": 65,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

@@ -1,0 +1,28 @@
+crop,support,correct,recall
+apple leaf,9,7,0.7777777777777778
+apple rust leaf,10,0,0.0
+apple scab leaf,10,1,0.1
+bell pepper leaf,8,6,0.75
+bell pepper leaf spot,9,1,0.1111111111111111
+blueberry leaf,11,5,0.45454545454545453
+cherry leaf,10,0,0.0
+corn gray leaf spot,4,2,0.5
+corn leaf blight,12,3,0.25
+corn rust leaf,10,1,0.1
+grape leaf,12,8,0.6666666666666666
+grape leaf black rot,8,1,0.125
+peach leaf,9,3,0.3333333333333333
+potato leaf early blight,8,3,0.375
+potato leaf late blight,8,0,0.0
+raspberry leaf,7,2,0.2857142857142857
+soyabean leaf,8,0,0.0
+squash powdery mildew leaf,6,2,0.3333333333333333
+strawberry leaf,8,0,0.0
+tomato early blight leaf,9,2,0.2222222222222222
+tomato leaf,8,0,0.0
+tomato leaf bacterial spot,9,0,0.0
+tomato leaf late blight,10,9,0.9
+tomato leaf mosaic virus,10,0,0.0
+tomato leaf yellow virus,6,3,0.5
+tomato mold leaf,6,0,0.0
+tomato septoria leaf spot,11,3,0.2727272727272727
