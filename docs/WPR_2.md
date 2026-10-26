@@ -2,7 +2,7 @@
 
 **Project ID:** BT40
 **Project title:** Plant Leaf Disease Detection Using CNN
-**Student:** Shubham Kumar
+**Team:** Shubham Kumar, Ujjwal Pratap Singh, Vivek Kumar Prajapati, Shubham Kumar
 **Guide:** Dr. Harendra Singh
 **Week commencing:** [fill in]
 

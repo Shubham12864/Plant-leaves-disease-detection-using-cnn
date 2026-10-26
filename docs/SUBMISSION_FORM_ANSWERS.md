@@ -1,8 +1,18 @@
 # Capstone Phase III and Mid-Term submission: form answers
 
-Project ID **BT40**. Paste-ready text for the nine sections of the Google Form.
-Every number here is registered in `results/registry.json` with the artifact that
-produced it, so any claim can be traced back to a file.
+Project ID **BT40**.
+
+**Team:** Shubham Kumar `<enrolment>`, Ujjwal Pratap Singh `<enrolment>`, Vivek Kumar Prajapati `<enrolment>`, Shubham Kumar `<enrolment>`
+
+Paste-ready text for the nine sections of the Google Form. Every number here is
+registered in `results/registry.json` with the artifact that produced it, so any
+claim can be traced back to a file.
+
+> **Two members are named Shubham Kumar.** Both are listed above, in the order
+> given. The form will need enrolment numbers to tell them apart, and those are
+> not recorded anywhere in this repository, so they are left as `<enrolment>`
+> rather than guessed. Do not merge the two entries when typing the form.
+
 
 **Verify before submitting, because these are not mine to know:**
 
@@ -308,9 +318,19 @@ a single-dataset validity study to a publishable claim. Out-of-distribution
 detection as a replacement for the confidence threshold that was measured and
 found ineffective.
 
+One point of consistency with the approved abstract is worth stating here rather
+than leaving for a reader to find. The abstract commits to "a confidence threshold
+will flag uncertain cases". That mechanism was implemented and measured. On field
+data it gained 0.8 percentage points at 90% coverage, so the expectation was not
+confirmed, and it is reported as a negative finding rather than as a delivered
+feature.
+
 Remaining work is decision work and writing, not compute: fill the labelling
-sheet, settle the background corpus question, and revise two sentences of the
-approved abstract where the field evidence no longer supports them.
+sheet, settle the background corpus question, and agree the abstract wording with
+the guide where the field evidence no longer supports it.
+
+**Files:** `PROJECT_STATUS.md`, `docs/ROADMAP.md`,
+`reports/paper/RESULTS_BY_HYPOTHESIS.md`, `docs/ABSTRACT_VS_EVIDENCE.md`.
 
 **Evidence:** `PROJECT_STATUS.md`, `docs/ROADMAP.md`,
 `reports/paper/RESULTS_BY_HYPOTHESIS.md`.
