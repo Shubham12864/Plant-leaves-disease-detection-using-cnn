@@ -29,13 +29,22 @@
       "artifact_dir": "reports/model_comparison/locked_test_efficientnet_b0/test",
       "metrics": {
         "accuracy": 0.9950508917732748,
-        "accuracy_ci95": [0.9936502007657111, 0.9963582033803343],
+        "accuracy_ci95": [
+          0.9936502007657111,
+          0.9963582033803343
+        ],
         "balanced_accuracy": 0.99312726000431,
-        "balanced_accuracy_ci95": [0.9904830321930501, 0.9952617575022424],
+        "balanced_accuracy_ci95": [
+          0.9904830321930501,
+          0.9952617575022424
+        ],
         "macro_precision": 0.9932798067623466,
         "macro_recall": 0.99312726000431,
         "macro_f1": 0.9931423173400302,
-        "macro_f1_ci95": [0.9910386595413224, 0.9950656944876187],
+        "macro_f1_ci95": [
+          0.9910386595413224,
+          0.9950656944876187
+        ],
         "weighted_f1": 0.9950567587101719,
         "top3_accuracy": 0.9997198617984873,
         "ece": 0.0022053351888960265,
@@ -64,13 +73,22 @@
       "artifact_dir": "reports/model_comparison/locked_test_efficientnet_b0/validation",
       "metrics": {
         "accuracy": 0.9954156479217604,
-        "accuracy_ci95": [0.9937347188264058, 0.9969437652811736],
+        "accuracy_ci95": [
+          0.9937347188264058,
+          0.9969437652811736
+        ],
         "balanced_accuracy": 0.9945644695625,
-        "balanced_accuracy_ci95": [0.9923553160358276, 0.9965020600874578],
+        "balanced_accuracy_ci95": [
+          0.9923553160358276,
+          0.9965020600874578
+        ],
         "macro_precision": 0.993142349862294,
         "macro_recall": 0.9945644695625,
         "macro_f1": 0.9936894341462544,
-        "macro_f1_ci95": [0.9911059409532308, 0.9959837481971243],
+        "macro_f1_ci95": [
+          0.9911059409532308,
+          0.9959837481971243
+        ],
         "weighted_f1": 0.995446498138878,
         "top3_accuracy": 0.9998471882640587,
         "ece": 0.0026181495058507026,
@@ -116,6 +134,269 @@
       "value": 0.993127,
       "run": "p01_efficientnet_b0_test",
       "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 validation macro-F1 across 5 seeds (protocol v2)",
+      "value": 0.989459,
+      "run": "sweep_v2_overnight/efficientnet_b0",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 and ConvNeXt-Tiny are statistically indistinguishable on PlantVillage validation",
+      "value": -5.4e-05,
+      "run": "sweep_v2_overnight",
+      "status": "verified",
+      "caveat": "difference is far smaller than the seed spread of either architecture"
+    },
+    {
+      "claim": "ResNet18 trails the reference by 0.49 pp macro-F1",
+      "value": 0.004863,
+      "run": "sweep_v2_overnight",
+      "status": "verified"
+    },
+    {
+      "claim": "SmallCNN trails the reference by 7.35 pp macro-F1",
+      "value": 0.073465,
+      "run": "sweep_v2_overnight",
+      "status": "verified"
     }
-  ]
+  ],
+  "sweeps": {
+    "sweep_v2_overnight": {
+      "protocol": "configs/protocol_v2.json (v2: random shuffle, constant LR, no smoothing, no class weights)",
+      "protocol_rationale": "Restores the settings that produced the reference checkpoint. v1 was measured invalid: reports/model_comparison/SWEEP_V1_INVALID.md.",
+      "dataset": "PlantVillage",
+      "split": "validation",
+      "validation_images": 6544,
+      "dataset_fingerprint": "01c1fe7339df27010e6da92466f3bf8af82f4eaca50f36983328d22b0b669608",
+      "date": "2026-10-26",
+      "artifact": "overnight_runs.zip (2.12 GB, 93 files, 14 completed runs)",
+      "notebook": "notebooks/08_Overnight_Sweep.ipynb",
+      "gate": {
+        "description": "2-epoch EfficientNet-B0 seed 42 check; released the sweep only after passing 0.95",
+        "epoch1_val_accuracy": 0.98685819,
+        "minutes_per_epoch": 2.151,
+        "status": "passed"
+      },
+      "architectures": {
+        "smallcnn": {
+          "seeds": [
+            42,
+            43,
+            44
+          ],
+          "n_runs": 3,
+          "val_macro_f1_mean": 0.915994,
+          "val_macro_f1_sd": 0.008651,
+          "val_macro_f1_ci95": [
+            0.894501,
+            0.937486
+          ],
+          "val_macro_f1_min": 0.906101,
+          "val_macro_f1_max": 0.922143,
+          "val_accuracy_mean": 0.94239,
+          "val_ece_mean": 0.009001,
+          "best_epochs": [
+            11,
+            12,
+            11
+          ],
+          "runs": [
+            {
+              "seed": 42,
+              "val_accuracy": 0.93841687,
+              "val_macro_f1": 0.90610113,
+              "val_ece": 0.01043001,
+              "best_epoch": 11,
+              "train_minutes": 33.09
+            },
+            {
+              "seed": 43,
+              "val_accuracy": 0.94468215,
+              "val_macro_f1": 0.92214287,
+              "val_ece": 0.00566239,
+              "best_epoch": 12,
+              "train_minutes": 32.97
+            },
+            {
+              "seed": 44,
+              "val_accuracy": 0.9440709,
+              "val_macro_f1": 0.91973719,
+              "val_ece": 0.01091151,
+              "best_epoch": 11,
+              "train_minutes": 33.06
+            }
+          ]
+        },
+        "resnet18": {
+          "seeds": [
+            42,
+            43,
+            44
+          ],
+          "n_runs": 3,
+          "val_macro_f1_mean": 0.984596,
+          "val_macro_f1_sd": 0.001657,
+          "val_macro_f1_ci95": [
+            0.980479,
+            0.988713
+          ],
+          "val_macro_f1_min": 0.983219,
+          "val_macro_f1_max": 0.986435,
+          "val_accuracy_mean": 0.988386,
+          "val_ece_mean": 0.003269,
+          "best_epochs": [
+            8,
+            6,
+            8
+          ],
+          "runs": [
+            {
+              "seed": 42,
+              "val_accuracy": 0.987011,
+              "val_macro_f1": 0.98321882,
+              "val_ece": 0.00383597,
+              "best_epoch": 8,
+              "train_minutes": 49.95
+            },
+            {
+              "seed": 43,
+              "val_accuracy": 0.98792787,
+              "val_macro_f1": 0.98413394,
+              "val_ece": 0.00320936,
+              "best_epoch": 6,
+              "train_minutes": 33.54
+            },
+            {
+              "seed": 44,
+              "val_accuracy": 0.99022005,
+              "val_macro_f1": 0.98643526,
+              "val_ece": 0.00276096,
+              "best_epoch": 8,
+              "train_minutes": 49.12
+            }
+          ]
+        },
+        "convnext_tiny": {
+          "seeds": [
+            42,
+            43,
+            44
+          ],
+          "n_runs": 3,
+          "val_macro_f1_mean": 0.989513,
+          "val_macro_f1_sd": 0.000282,
+          "val_macro_f1_ci95": [
+            0.988812,
+            0.990213
+          ],
+          "val_macro_f1_min": 0.989243,
+          "val_macro_f1_max": 0.989805,
+          "val_accuracy_mean": 0.992716,
+          "val_ece_mean": 0.002892,
+          "best_epochs": [
+            5,
+            2,
+            3
+          ],
+          "runs": [
+            {
+              "seed": 42,
+              "val_accuracy": 0.99312347,
+              "val_macro_f1": 0.98980535,
+              "val_ece": 0.00327951,
+              "best_epoch": 5,
+              "train_minutes": 84.56
+            },
+            {
+              "seed": 43,
+              "val_accuracy": 0.99251222,
+              "val_macro_f1": 0.98924285,
+              "val_ece": 0.00298511,
+              "best_epoch": 2,
+              "train_minutes": 36.2
+            },
+            {
+              "seed": 44,
+              "val_accuracy": 0.99251222,
+              "val_macro_f1": 0.98948948,
+              "val_ece": 0.00241182,
+              "best_epoch": 3,
+              "train_minutes": 50.12
+            }
+          ]
+        },
+        "efficientnet_b0": {
+          "seeds": [
+            42,
+            43,
+            44,
+            45,
+            46
+          ],
+          "n_runs": 5,
+          "val_macro_f1_mean": 0.989459,
+          "val_macro_f1_sd": 0.00171,
+          "val_macro_f1_ci95": [
+            0.987336,
+            0.991582
+          ],
+          "val_macro_f1_min": 0.986802,
+          "val_macro_f1_max": 0.990808,
+          "val_accuracy_mean": 0.992818,
+          "val_ece_mean": 0.002095,
+          "best_epochs": [
+            4,
+            5,
+            10,
+            8,
+            7
+          ],
+          "runs": [
+            {
+              "seed": 42,
+              "val_accuracy": 0.99174817,
+              "val_macro_f1": 0.98680177,
+              "val_ece": 0.00289526,
+              "best_epoch": 4,
+              "train_minutes": 46.5
+            },
+            {
+              "seed": 43,
+              "val_accuracy": 0.99205379,
+              "val_macro_f1": 0.98867891,
+              "val_ece": 0.00129383,
+              "best_epoch": 5,
+              "train_minutes": 57.06
+            },
+            {
+              "seed": 44,
+              "val_accuracy": 0.99419315,
+              "val_macro_f1": 0.99080838,
+              "val_ece": 0.00193317,
+              "best_epoch": 10,
+              "train_minutes": 116.35
+            },
+            {
+              "seed": 45,
+              "val_accuracy": 0.99251222,
+              "val_macro_f1": 0.99038168,
+              "val_ece": 0.00246976,
+              "best_epoch": 8,
+              "train_minutes": 100.83
+            },
+            {
+              "seed": 46,
+              "val_accuracy": 0.99358191,
+              "val_macro_f1": 0.99062384,
+              "val_ece": 0.00188427,
+              "best_epoch": 7,
+              "train_minutes": 85.77
+            }
+          ]
+        }
+      },
+      "excluded": "the _gate run is a 2-epoch check and is not part of any comparison"
+    }
+  }
 }

@@ -109,3 +109,16 @@ data-loader throughput and `/kaggle/temp` read speed.
 ---
 *This defect register is the authoritative source for project weaknesses in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, `EXPERIMENT_LOG.md`, and `MODEL_CARD.md`. Updated whenever defects are resolved or new ones discovered.*
 *Generated: 2026-10-25*
+
+## R15 — SmallCNN replicates at 91.60%, not the recorded 96.01% (OPEN)
+
+Three protocol-v2 seeds give 0.9061 / 0.9221 / 0.9197 macro-F1, tightly
+agreed and therefore a stable result rather than noise. The phase-2 baseline
+recorded 96.01% validation accuracy for SmallCNN in
+`reports/phase2_baseline/experiment_config.json`. The configurations differ (that
+run used DataParallel, 70.2 min wall, and no documented shuffling), but the exact
+cause of the 4.4 pp gap has not been isolated.
+
+**Consequence:** the 96.01% figure must not be quoted against the v2 numbers.
+Either re-run the phase-2 configuration through the current engine, or drop the
+old figure and report only the v2 result.

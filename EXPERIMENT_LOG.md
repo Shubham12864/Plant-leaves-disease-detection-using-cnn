@@ -265,3 +265,30 @@
 *This experiment log is the authoritative source for run provenance in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, `MODEL_CARD.md`, and `DATASET_CARD.md`. Updated whenever new runs are executed, checkpoints re-trained, or evaluation protocols change.*
 
 *Generated: 2026-10-25*
+
+## 2026-10-26 — sweep v2, overnight, 14 runs
+
+**Notebook:** `notebooks/08_Overnight_Sweep.ipynb` · **Protocol:** `configs/protocol_v2.json`
+**Archive:** `overnight_runs.zip` (2.12 GB) · **Hardware:** Kaggle 2× Tesla T4
+
+Gate released the sweep: EfficientNet-B0 seed 42 reached 0.9836 validation
+accuracy after one epoch (original run: 0.9826), 2.15 min/epoch.
+
+| architecture | n | macro-F1 mean | sd | 95% CI | coupling |
+|---|---:|---:|---:|---|---|
+| convnext_tiny | 3 | 0.98951 | 0.00028 | 0.98881 – 0.99021 | random shuffle, constant LR |
+| efficientnet_b0 | 5 | 0.98946 | 0.00171 | 0.98734 – 0.99158 | random shuffle, constant LR |
+| resnet18 | 3 | 0.98460 | 0.00166 | 0.98048 – 0.98871 | random shuffle, constant LR |
+| smallcnn | 3 | 0.91599 | 0.00865 | 0.89450 – 0.93749 | random shuffle, constant LR, lr 1e-3 |
+
+- 14/14 runs completed; `_overnight_log.json` has no failed, timeout or error entry.
+- All runs share dataset fingerprint `01c1fe7339df2701…`.
+- Learning rate flat at 1.0e-04 (SmallCNN 1.0e-03) in every history, as protocol v2 requires.
+- Reference and ConvNeXt differ by 0.00005; the B0 seed spread is 0.00171, so the
+  two are indistinguishable. ResNet18 is 0.49 pp behind, SmallCNN 7.35 pp behind.
+- Disclosures: reference mean is 0.42 pp below the published 0.99369 because runs
+  early-stop (best epochs 4–10); SmallCNN replicates at 91.60%, not the 96.01%
+  recorded in phase 2 — unresolved.
+
+Full analysis: `reports/model_comparison/SWEEP_V2_RESULTS.md`. Registered in
+`results/registry.json` under `sweeps.sweep_v2_overnight`.

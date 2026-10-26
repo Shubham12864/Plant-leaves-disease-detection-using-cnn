@@ -31,43 +31,42 @@ Last updated: 2026-10-25.
 ---
 ## Current position
 
-Stage A is closed. Stage B is **blocked**: the sweep ran and came back invalid,
-so S9 must be re-run on a corrected protocol before S10 can build any table.
+Stage A is closed and **Stage B is closed**: the twelve-run sweep completed,
+plus two extra reference seeds, with no run failures. Next is Stage C, the field
+gap on PlantDoc, which is the actual contribution.
 
 | Step | State |
 |---|---|
-| S1 locked-test evaluation | **done** — bit-identical reproduction, 53 errors in 10,709 |
+| S1 locked-test evaluation | **done** — bit-identical, 53 errors in 10,709 |
 | S2 PlantDoc label map | **done** — 28/28 decided, 3 caveated |
 | S3 stale documents | **done** |
 | S4 baseline commit | **done** — tag `baseline-p0.1` |
 | S5 ConvNeXt-Tiny | **done** |
 | S6 SmallCNN on the engine | **done** |
-| S8 protocol frozen | **done** — `configs/protocol.json` v1 |
-| S7 protocol pilot | **done** — no OOM, 4.2 h projected |
-| S9 12-run sweep | **ran, INVALID** — see R12 |
-| **S9b protocol fix + 2-epoch gate** | **NEXT** |
+| S7 protocol pilot | **done** |
+| S8 protocol frozen | **done** — but v1 was invalid; v2 is the live one |
+| S9 sweep v1 | **ran, invalid** — R12/R14, kept as evidence only |
+| S9b gate | **passed** — 0.9836 at epoch 1 |
+| S9c sweep v2 | **done** — 14 runs, 0 failures |
+| S10 comparison table | **done** — `reports/model_comparison/SWEEP_V2_RESULTS.md` |
+| **S11 PlantDoc field evaluation** | **NEXT** |
 
-### Sweep v1 result: invalid
+### Sweep v2 results (PlantVillage validation, 6,544 images)
 
-Twelve runs, seeds 42/43/44, identical dataset fingerprint across all of them.
-Every architecture landed far below its established result:
+| Architecture | n | macro-F1 mean | sd | 95% CI |
+|---|---:|---:|---:|---|
+| ConvNeXt-Tiny | 3 | 0.98951 | 0.00028 | 0.98881 – 0.99021 |
+| EfficientNet-B0 | 5 | 0.98946 | 0.00171 | 0.98734 – 0.99158 |
+| ResNet18 | 3 | 0.98460 | 0.00166 | 0.98048 – 0.98871 |
+| SmallCNN | 3 | 0.91599 | 0.00865 | 0.89450 – 0.93749 |
 
-| Architecture | Established | Sweep best | Gap |
-|---|---|---|---|
-| EfficientNet-B0 | 0.9954 val | 0.7246 | −27.1 pp |
-| ResNet18 | 0.9615 val | 0.5839 | −37.8 pp |
-| SmallCNN | 0.9601 val | 0.2311 | −72.9 pp |
-| ConvNeXt-Tiny | none | 0.9509 | — |
+Reference and ConvNeXt differ by 0.00005, thirty-four times smaller than the B0
+seed spread: **the top two are statistically indistinguishable.**
 
-**Measured cause**: the backbone never fine-tuned. Distance to pristine ImageNet
-weights is 0.49% for the sweep's B0 against 1.96% for the verified reference.
-Protocol v1 differs from the script that produced the reference in weight decay
-(0.05 vs 1e-4), global batch (128 vs 32), LR schedule (warmup+cosine vs
-constant) and label smoothing / class weights (present vs absent).
-
-**No number from sweep v1 may be quoted except as evidence of the defect.**
-Full evidence: `reports/model_comparison/SWEEP_V1_INVALID.md`. Defects R12/R13 in
-`docs/KNOWN_ISSUES.md`.
+Two disclosures travel with these numbers: the reference mean is 0.42 pp below
+the published 0.99369 because runs early-stop, and SmallCNN replicates at 91.60%
+rather than the previously recorded 96.01%. Both are detailed in
+`reports/model_comparison/SWEEP_V2_RESULTS.md`.
 
 ### Measured pilot (2x T4, one epoch each)
 
