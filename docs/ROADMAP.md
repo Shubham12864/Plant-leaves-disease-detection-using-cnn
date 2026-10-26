@@ -181,13 +181,22 @@ Scope statement (one controlled source, one 236-image field set, no expert re-la
 
 | Stage | Steps | State |
 |---|---|---|
-| A — evidence | S1–S4 | **complete** (S1 sealed bit-identically, S2 28/28 mapped, S3 docs current, S4 tagged) |
-| B — fair comparison | S5–S10 | S5, S6, S7, S8 **done**; S9 (12-run sweep) is next and needs Kaggle |
-| C — field gap | S11–S13 | blocked on S2 |
-| D — mechanism | S14–S19 | S18 is the trap; read it before training |
-| E — usefulness | S20–S22 | partly free from S1 |
-| F — lock down | S23–S25 | — |
-| G — write | S26–S28 | — |
+| A — evidence | S1–S4 | **complete** |
+| B — fair comparison | S5–S10 | **complete** — 14 runs, 0 failures, spread reported |
+| C — field gap | S11–S13 | **complete — H1 confirmed (−81.9 pp)** |
+| D — mechanism | S14–S19 | S14, S15 complete; S16 instrument ready, labels outstanding; S17 H2 **partial**; **S18 blocked**; S19 not started |
+| E — usefulness | S20–S22 | **complete — H4 confirmed** |
+| F — lock down | S23–S25 | **complete** — 17 tests, registry check, run_all |
+| G — write | S26–S28 | **complete as drafts** — `reports/paper/` |
+
+Remaining work is not computational:
+
+1. Fill `reports/mechanism/gradcam_b0_plantdoc/labelling_sheet.csv` (S16).
+2. Decide the H3 route: obtain a licence-clean background corpus (S18) or drop H3
+   from the abstract with a stated reason.
+3. Decide the confidence-threshold wording in the approved abstract.
+4. Render the dissertation against the university template, which has not been
+   supplied to this repository.
 
 ## Gates that must not be crossed
 
