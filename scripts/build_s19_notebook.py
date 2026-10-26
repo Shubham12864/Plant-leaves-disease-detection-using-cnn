@@ -602,7 +602,11 @@ def build() -> dict:
            "**Expected output:** the GPU names, the image counts, and the estimated runtime.\n\n"
            "**If it stops here:** read the error. It names the exact path or setting that is missing."),
         code(SETUP),
-        md("## 2. Disjointness gate\n\n"
+        md("## 2. Scripts and protocol\n\n"
+           "Writes the eight scripts this notebook runs, compiles each one, and asserts that protocol "
+           "v2 is unchanged. If this cell does not print `all scripts compile`, stop."),
+        files_cell,
+        md("## 3. Disjointness gate\n\n"
            "Hashes every background image and compares it against the 53,999 hashes already "
            "recorded in the PlantDoc and PlantVillage manifests.\n\n"
            "This is the check that makes H3 legitimate. If one background came from PlantDoc, the "
@@ -611,13 +615,13 @@ def build() -> dict:
            "**Expected output:** `PASS: no byte-identical overlap`, then the limitation note that "
            "exact hashing will not catch a re-encoded near-duplicate."),
         code(DISJOINT_CODE),
-        md("## 3a. Clean caches\n\n"
+        md("## 4a. Clean caches\n\n"
            "Decodes every image once into a uint8 memory map. The validation cache is built here and "
            "is **never** composited, so the PlantVillage score stays comparable to the baseline.\n\n"
            "**Expected output:** `clean caches ready`. Takes about 5 minutes the first time and is "
            "reused afterwards."),
         code(CACHE_CODE),
-        md("## 3b. Leaf masks and the composite cache\n\n"
+        md("## 4b. Leaf masks and the composite cache\n\n"
            "Two steps. First, segment the leaf from the backdrop in every training image using "
            "corner colour plus greenness. Second, paste each leaf onto a random field background.\n\n"
            "Images whose mask covers less than 25% or more than 90% of the frame are not trusted and "
@@ -626,10 +630,6 @@ def build() -> dict:
            "two check images in `/kaggle/temp/derived/` you can open to confirm the leaves survive "
            "and the backgrounds actually changed."),
         code(COMPOSITE_CODE),
-        md("## 4. Scripts and protocol\n\n"
-           "Writes the eight scripts this notebook runs, compiles each one, and asserts that protocol "
-           "v2 is unchanged. If this cell does not print `all scripts compile`, stop."),
-        files_cell,
         md("## 5. Gate, then six runs\n\n"
            "The gate trains baseline seed 42 for two epochs and requires 0.95 validation accuracy. It "
            "writes into its own directory, so it cannot interfere with the six real runs.\n\n"
@@ -705,6 +705,31 @@ def main() -> None:
     for target, source in EMBEDDED:
         if embedded.get(target) != (ROOT / source).read_text(encoding="utf-8"):
             raise SystemExit(f"embedded copy of {source} does not match")
+
+    # Ordering guard. A cell that runs one of the written scripts must come after
+    # the cell that writes it. Getting this wrong made the notebook fail on the
+    # first real run, with an error that wrongly blamed the dataset.
+    files_index = None
+    for index, cell in enumerate(reloaded["cells"]):
+        if cell["cell_type"] == "code" and "FILES = {" in "".join(cell["source"]):
+            files_index = index
+            break
+    if files_index is None:
+        raise SystemExit("no cell writes the script files")
+    runner_names = ("MASK_SCRIPT", "COMPOSITE_SCRIPT", "DISJOINT_SCRIPT",
+                    "EVAL_SCRIPT", "BOOTSTRAP_SCRIPT", "WORKER")
+    for index, cell in enumerate(reloaded["cells"]):
+        if cell["cell_type"] != "code" or index == files_index:
+            continue
+        text = "".join(cell["source"])
+        if "subprocess.run" not in text:
+            continue
+        for name in runner_names:
+            if "str(" + name + ")" in text and index < files_index:
+                raise SystemExit(
+                    f"cell {index} runs {name} but the scripts are only written in cell "
+                    f"{files_index}. Move the writing cell earlier."
+                )
 
     print(f"Wrote {NOTEBOOK.relative_to(ROOT)} ({len(reloaded['cells'])} cells, all compile)")
     print(f"Verified {len(embedded)} embedded files byte for byte.")
