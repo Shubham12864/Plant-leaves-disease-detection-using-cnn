@@ -28,52 +28,157 @@ EMBEDDED = [
     ("/kaggle/working/paired_bootstrap.py", "scripts/paired_bootstrap.py"),
 ]
 
-HEADER = """# S19: background augmentation, paired comparison
+HEADER = """# S19 — background augmentation, paired comparison (H3)
 
-The treatment arm for H3. Does replacing the laboratory backdrop with field
-backgrounds reduce the drop from PlantVillage to PlantDoc?
+This notebook answers the last open question in the project: **if you train the
+model on leaves sitting in real field backgrounds instead of laboratory backdrops,
+does the accuracy loss on field images get smaller?**
 
-## Design
+Everything else in the project is finished. H1 is confirmed (field accuracy is 78
+points below laboratory accuracy), H2 is partly supported (removing the background
+costs 56.5 points in the lab), H4 is confirmed (a confidence threshold does not
+rescue a usable subset). H3 is the only hypothesis with no result, because it needs
+a training experiment rather than an evaluation.
 
-Six runs, three paired seeds. Everything is held constant except one thing.
+## What it produces
 
-| arm | training images | everything else |
+Six trained models and one comparison table.
+
+| arm | what the model trains on | everything else |
 |---|---|---|
-| baseline | the existing clean cache | protocol v2, unchanged |
-| composite | same leaves on random field backgrounds | protocol v2, unchanged |
+| **baseline** | the same PlantVillage images as always | protocol v2, untouched |
+| **composite** | the same leaves, pasted onto random field backgrounds | protocol v2, untouched |
 
-Validation is **never** composited, so the PlantVillage score stays comparable to
-the baseline. PlantDoc is untouched in both arms.
+Three paired seeds each. Same architecture, same learning rate, same epochs, same
+evaluator, same 236 field images. The only thing that differs is what is behind the
+leaf.
 
-The pairwise comparison is done with `paired_bootstrap.py`, which resamples the
-same field images for both models, so a seed that happens to see an easy 236
-images cannot flatter the treatment.
+The comparison is **paired**: for every field image, both models either get it
+right or wrong, and the test resamples the same images for both. That stops a seed
+that happened to see easy field images from flattering the treatment.
 
-## What this can and cannot show
+## What you need before pressing Run All
 
-Backgrounds come from DeepWeeds (CC BY 4.0), which is a different continent and a
-different set of species from both PlantVillage and PlantDoc. Disjointness is
-checked by hash before any training starts, and the notebook stops if that check
-fails.
+| requirement | how to set it |
+|---|---|
+| Accelerator | **GPU T4 x2** (Settings, right panel) |
+| Dataset 1 | the PlantVillage dataset already used by notebooks 06 to 08 |
+| Dataset 2 | **DeepWeeds**, Kaggle slug `imsparsh/deepweeds` |
+| Internet | not needed |
+| Run mode | **Save Version, then Save and Run All** so it survives the browser closing |
 
-Two limits are built into the method and belong in the report:
+If DeepWeeds is not attached, cell 1 stops with a message and nothing else runs.
+That is deliberate: without a licence-clean background corpus there is no
+experiment, and training on PlantDoc imagery instead would corrupt the field
+evaluation that produced the headline result.
 
-**One random background per image, fixed for the run.** Re-sampling every epoch
-would be stronger augmentation but needs the training engine to hold a background
-pool and per-image masks during the loop. With a fixed random assignment the
-background-to-class mapping is already broken, since each class receives random
-backdrops. What is lost is per-image background diversity.
+## How long it takes
 
-**Segmentation is a heuristic.** Corner-colour plus greenness fails on close-up
-leaf textures, where the frame is almost entirely leaf. Masks outside a
-foreground fraction of 0.25 to 0.90 are not trusted, and those images pass through
+About 2.5 hours for six runs. If you want a fast smoke version first, set
+`SEEDS = [42]` in cell 1: one pair of runs, roughly 50 minutes, enough to see
+whether the direction of the effect is even interesting.
+
+The notebook prints progress as it goes. You can close the browser once the commit
+starts.
+
+## What can go wrong, and what the notebook does about it
+
+| failure | handling |
+|---|---|
+| DeepWeeds missing | cell 1 stops immediately, before any time is spent |
+| a background image came from PlantDoc | the hash check in cell 2 aborts before training |
+| the recipe cannot learn | the gate in cell 5 stops it in about 5 minutes |
+| one arm crashes | the other arm still runs, so partial results survive |
+| the session dies | finished seeds are skipped on restart |
+| evaluation fails for one seed | that pair is skipped, the rest still compare |
+| everything fails | the final cell still writes a bundle with whatever exists |
+
+## Honest limits of the method
+
+These belong in the report next to the result, not in a footnote.
+
+**One random background per image, fixed for the run.** Re-sampling the background
+every epoch would be stronger augmentation, but it needs the training engine to
+carry a background pool and masks through the loop. With a fixed random assignment
+the background-to-class mapping is already destroyed, because every class receives
+random backdrops. What is given up is per-image background variety.
+
+**The leaf mask is a heuristic.** Corner-colour plus greenness fails on close-up
+leaf textures where the frame is almost entirely leaf. Masks covering less than 25%
+or more than 90% of the frame are not trusted, and those images pass through
 unaltered rather than being composited wrongly. On the validation split that was
 2.7% of images.
 
-## Cost
+**DeepWeeds is Australian rangeland.** Different continent, different species,
+different cameras from both PlantVillage and PlantDoc. That is what makes it safe
+to use, and it also means the backgrounds are not the same kind of field as
+PlantDoc's, so a positive result would be a lower bound on what real in-domain
+backgrounds could do.
+"""
 
-Roughly 2.5 hours of T4 time for six runs. Set `SEEDS = [42]` for a one-pair
-smoke version at about 50 minutes.
+BEFORE_YOU_START = """## Before you press Run All
+
+Work through this list once. Every item on it has cost this project time before.
+
+1. **Accelerator set to GPU T4 x2** in the right-hand Settings panel. Cell 1 checks
+   this and stops if only one GPU is present.
+2. **PlantVillage attached.** Cell 1 checks for the development manifest and finds
+   the dataset root automatically if the path has changed.
+3. **DeepWeeds attached** at `/kaggle/input/deepweeds`. Cell 1 stops if it is
+   missing, and tells you the slug to add.
+4. **Run All, not one cell at a time.** Cells 3 to 7 depend on values defined
+   earlier; the notebook is written for a top-to-bottom run.
+5. **Save Version, then Save and Run All** if you want it to continue after you
+   close the tab. An interactive session dies with the browser.
+
+You can safely re-run this notebook. Finished seeds are skipped, the caches are
+reused, and the composited images are not rebuilt if they already exist.
+"""
+
+TROUBLESHOOTING = """## If something goes wrong
+
+**"Background corpus not attached"** in cell 1. Add the DeepWeeds dataset from the
+right-hand panel, using the slug `imsparsh/deepweeds`, then Run All again.
+
+**"DISJOINTNESS FAILED"** in cell 2. A background image is byte-identical to a
+PlantDoc or PlantVillage image. Do not work around this. Check
+`/kaggle/temp/derived/disjointness.json` for which file collided, and either remove
+that file from the corpus or use a different corpus. Training on it would put the
+evaluation set into the training data.
+
+**"GATE FAILED"** in cell 5. The baseline arm could not reach 0.95 validation
+accuracy in two epochs, which means the recipe is not reproducing the reference
+behaviour (the original reached 0.9836 in epoch 1). Nothing long will run. Send me
+the gate history printed above the error and I will diagnose it. Do not raise the
+gate threshold and do not re-run hoping for a different outcome.
+
+**A run shows `[FAIL]` or `[TIMEOUT]`** in cell 5. That seed is skipped and the
+loop continues. The other seeds still run. Note which one failed and send the
+bundle; one missing seed is not fatal.
+
+**Field evaluation prints `missing checkpoint`** in cell 6. That arm's training did
+not finish. The remaining pairs still compare.
+
+**"no paired seed completed"** in cell 7. Both arms are needed for a pair. Check
+that cell 5 printed results for both `baseline` and `composite`.
+
+**Runtime is longer than expected.** Three seeds per arm is six runs. Set
+`SEEDS = [42]` at the top of cell 1 and re-run; finished work is not repeated.
+"""
+
+SEND_BACK = """## What to send back
+
+When the run finishes, the last cell prints the bundle path and size. Download
+`/kaggle/working/s19_results.zip` from the Output panel on the right and send it
+over.
+
+The bundle contains, for each arm and seed, the checkpoint, the training history,
+the validation metrics and the field predictions, plus one `paired/seed<N>.json`
+per comparison with the confidence intervals.
+
+With that in hand I can register the H3 verdict, update every document that
+currently says "blocked", and fold the result into the results section. Until then
+H3 stays marked as not tested, which is what the submission already says.
 """
 
 SETUP = '''from pathlib import Path
@@ -277,12 +382,20 @@ ARMS = {
     "composite": {"train_images": COMPOSITE_X,      "root": OUTPUT_ROOT / "composite"},
 }
 
+# The gate trains into its own directory. If it wrote into the baseline arm, it
+# would leave a validation_metrics.json behind, the worker skips seeds that
+# already have one, and baseline seed 42 would never train the full 12 epochs.
+# The comparison would then be 2-epoch baseline against 12-epoch treatment.
+GATE_ROOT = OUTPUT_ROOT / "_gate"
+if GATE_ROOT.exists():
+    shutil.rmtree(GATE_ROOT)
+
 print("GATE: baseline seed 42, 2 epochs, must reach "
       f"{GATE_ACCURACY} before six runs are committed")
-gate = subprocess.run(worker("efficientnet_b0", [SEEDS[0]], 2, ARMS["baseline"]["root"],
+gate = subprocess.run(worker("efficientnet_b0", [SEEDS[0]], 2, GATE_ROOT,
                              ARMS["baseline"]["train_images"]),
                       env={**os.environ, "PYTHONUNBUFFERED": "1"})
-gate_history = pd.read_csv(ARMS["baseline"]["root"] / "efficientnet_b0" / f"seed{SEEDS[0]}"
+gate_history = pd.read_csv(GATE_ROOT / "efficientnet_b0" / f"seed{SEEDS[0]}"
                            / "training_history.csv")
 accuracy = float(gate_history["val_accuracy"].iloc[-1])
 print(gate_history[["epoch", "train_loss", "val_accuracy", "lr"]].to_string(index=False))
@@ -386,6 +499,33 @@ else:
         print(f"\\nBundle: {zip_path} ({Path(zip_path).stat().st_size/1e6:.0f} MB)")
 '''
 
+FINAL_CODE = '''# Always ship something. If the gate failed or a run crashed, this is the evidence.
+manifest = {}
+for path in sorted(OUTPUT_ROOT.rglob("*")):
+    if path.is_file():
+        manifest[str(path.relative_to(OUTPUT_ROOT))] = round(path.stat().st_size / 1e6, 2)
+(OUTPUT_ROOT / "artifact_manifest.json").write_text(json.dumps({
+    "files": manifest,
+    "total_files": len(manifest),
+    "session_hours": round((time.time() - STARTED_AT) / 3600, 2),
+    "gate_passed": bool(GATE_PASSED),
+    "seeds": SEEDS,
+    "epochs": EPOCHS,
+}, indent=2), encoding="utf-8")
+
+print(f"{len(manifest)} artifacts in the run directory")
+for name in list(manifest)[:15]:
+    print(f"  {name}")
+if len(manifest) > 15:
+    print(f"  ... and {len(manifest) - 15} more")
+
+bundle = shutil.make_archive("/kaggle/working/s19_results", "zip", root_dir=OUTPUT_ROOT)
+print("Bundle: " + bundle + f"  ({Path(bundle).stat().st_size/1e6:.0f} MB)")
+print("Download it from the Output panel on the right.")
+if not GATE_PASSED:
+    print("Note: the gate did not pass, so this bundle contains gate evidence, not results.")
+'''
+
 NEXT_MD = """## Reading the result
 
 A positive result means the composite arm's drop is smaller and the confidence
@@ -433,22 +573,70 @@ def build() -> dict:
 
     cells = [
         md(HEADER),
-        md("## 1. Setup and preflight\n\nFails early and loudly if the GPUs, the dataset or the background corpus are missing."),
+        md(BEFORE_YOU_START),
+        md("## 1. Setup and preflight\n\n"
+           "Sets the seeds and epoch count, finds the dataset, and checks the three things that "
+           "make the run possible: two GPUs, the PlantVillage manifest, and the background corpus.\n\n"
+           "**Expected output:** the GPU names, the image counts, and the estimated runtime.\n\n"
+           "**If it stops here:** read the error. It names the exact path or setting that is missing."),
         code(SETUP),
-        md("## 2. Disjointness gate\n\nA hash check, not an assertion. If any background is byte-identical to a PlantDoc or PlantVillage image, training never starts."),
+        md("## 2. Disjointness gate\n\n"
+           "Hashes every background image and compares it against the 53,999 hashes already "
+           "recorded in the PlantDoc and PlantVillage manifests.\n\n"
+           "This is the check that makes H3 legitimate. If one background came from PlantDoc, the "
+           "field evaluation would be seeing training data and the 78-point gap would be void. "
+           "\"They are different datasets\" is not evidence; a hash comparison is.\n\n"
+           "**Expected output:** `PASS: no byte-identical overlap`, then the limitation note that "
+           "exact hashing will not catch a re-encoded near-duplicate."),
         code(DISJOINT_CODE),
-        md("## 3. Caches: clean, masks, composite\n\nThe validation cache is built once and never composited."),
+        md("## 3a. Clean caches\n\n"
+           "Decodes every image once into a uint8 memory map. The validation cache is built here and "
+           "is **never** composited, so the PlantVillage score stays comparable to the baseline.\n\n"
+           "**Expected output:** `clean caches ready`. Takes about 5 minutes the first time and is "
+           "reused afterwards."),
         code(CACHE_CODE),
+        md("## 3b. Leaf masks and the composite cache\n\n"
+           "Two steps. First, segment the leaf from the backdrop in every training image using "
+           "corner colour plus greenness. Second, paste each leaf onto a random field background.\n\n"
+           "Images whose mask covers less than 25% or more than 90% of the frame are not trusted and "
+           "pass through unchanged, because that is where the heuristic fails.\n\n"
+           "**Expected output:** how many images were composited and how many passed through, plus "
+           "two check images in `/kaggle/temp/derived/` you can open to confirm the leaves survive "
+           "and the backgrounds actually changed."),
         code(COMPOSITE_CODE),
-        md("## 4. Scripts and protocol"),
+        md("## 4. Scripts and protocol\n\n"
+           "Writes the eight scripts this notebook runs, compiles each one, and asserts that protocol "
+           "v2 is unchanged. If this cell does not print `all scripts compile`, stop."),
         files_cell,
-        md("## 5. Gate, then six runs\n\nBaseline and composite arms, same seeds, same protocol. A failure in one arm does not stop the other, so partial results survive."),
+        md("## 5. Gate, then six runs\n\n"
+           "The gate trains baseline seed 42 for two epochs and requires 0.95 validation accuracy. It "
+           "writes into its own directory, so it cannot interfere with the six real runs.\n\n"
+           "If the gate passes, both arms train three seeds each. A failure in one arm does not stop "
+           "the other.\n\n"
+           "**Expected output:** the gate history, then a line per completed run. Each run is about "
+           "25 minutes."),
         code(TRAIN_CODE),
-        md("## 6. Field evaluation"),
+        md("## 6. Field evaluation\n\n"
+           "Scores every trained checkpoint on PlantDoc: 236 images, 27 mapped classes, never seen "
+           "during training.\n\n"
+           "**Expected output:** one line per checkpoint with its field accuracy. Baseline should land "
+           "near 0.21 to 0.25, consistent with the 0.2085 five-seed mean already on record."),
         code(EVAL_CODE),
-        md("## 7. Paired comparison"),
+        md("## 7. Paired comparison\n\n"
+           "For each seed, compares the two arms on the same field images with a paired bootstrap, "
+           "5,000 rounds. Reports the difference in field accuracy **and** the difference in the drop "
+           "from PlantVillage, because a model can look better in the field while being worse in the "
+           "lab.\n\n"
+           "**Expected output:** a table, then one verdict per seed. The verdict is the H3 answer: "
+           "supported if the confidence interval on the drop improvement excludes zero."),
         code(COMPARE_CODE),
+        md("## 8. Bundle\n\n"
+           "Runs whatever happened above. Writes an artifact manifest and zips the run directory, so "
+           "a failed gate or a crashed arm still leaves something to diagnose from."),
+        code(FINAL_CODE),
         md(NEXT_MD),
+        md(TROUBLESHOOTING),
+        md(SEND_BACK),
     ]
     return {
         "cells": cells,
