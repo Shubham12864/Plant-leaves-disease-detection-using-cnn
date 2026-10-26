@@ -1,0 +1,23 @@
+{
+  "checkpoint": "C:\\Users\\Shubham\\Downloads\\Capstone project\\checkpoints\\sweep\\resnet18\\seed42\\resnet18_best.pt",
+  "architecture": "resnet18",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.15254237288135594,
+  "accuracy_ci95": [
+    0.11016949152542373,
+    0.19915254237288135
+  ],
+  "ci_width_pp": 8.9,
+  "macro_f1": 0.13659437468796576,
+  "macro_recall": 0.14893779060445725,
+  "weighted_f1": 0.1464736721623607,
+  "mean_confidence": 0.7497566938400269,
+  "out_of_mapping_rate": 0.1652542372881356,
+  "out_of_mapping_count": 39,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

@@ -308,6 +308,43 @@
       "caveats": [
         "automated proxy over a heuristic mask; S16 human labelling outstanding"
       ]
+    },
+    {
+      "id": "field_all_seeds",
+      "model": "all four architectures",
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/evaluate_field_all_seeds.py --bundle overnight_runs.zip",
+      "artifact_dir": "reports/field_gap/all_seeds",
+      "metrics": {
+        "convnext_tiny": {
+          "accuracy_mean": 0.300847,
+          "sd": 0.038136,
+          "n": 3
+        },
+        "efficientnet_b0": {
+          "accuracy_mean": 0.208474,
+          "sd": 0.02957,
+          "n": 5
+        },
+        "resnet18": {
+          "accuracy_mean": 0.161017,
+          "sd": 0.026462,
+          "n": 3
+        },
+        "smallcnn": {
+          "accuracy_mean": 0.043785,
+          "sd": 0.010664,
+          "n": 3
+        }
+      },
+      "caveats": [
+        "236 images per checkpoint",
+        "supersedes the single-checkpoint field numbers as the headline"
+      ]
     }
   ],
   "document_claims": [
@@ -436,16 +473,6 @@
       "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
     },
     {
-      "claim": "The architecture ranking reverses between PlantVillage and PlantDoc",
-      "value": {
-        "plantvillage_gap_convnext_vs_b0": 5e-05,
-        "plantdoc_gap_pp": 8.9
-      },
-      "run": "sweep_v2_overnight",
-      "status": "verified",
-      "caveat": "field side uses one checkpoint per architecture"
-    },
-    {
       "claim": "At 90% coverage, abstention gains 0.8 pp for the reference model on PlantDoc",
       "value": {
         "full_coverage": 0.1737,
@@ -463,6 +490,18 @@
       "run": "occlusion_b0_plantvillage",
       "status": "verified",
       "caveat": "HSV leaf mask heuristic; 400 images"
+    },
+    {
+      "claim": "Lab ranking order is preserved in the field, but lab gaps understate field gaps by 19 to 28 times",
+      "value": {
+        "convnext_minus_b0_field_pp": 9.24,
+        "convnext_minus_b0_lab_pp": 0.0,
+        "convnext_minus_smallcnn_field_pp": 25.71,
+        "convnext_minus_smallcnn_lab_pp": 7.35
+      },
+      "run": "field_all_seeds",
+      "status": "verified",
+      "caveat": "supersedes an earlier claim that the ranking reverses; that claim compared checkpoints from different protocols and was wrong"
     }
   ],
   "sweeps": {
@@ -734,7 +773,63 @@
       "classes_total": 27,
       "median_per_class_drop": 0.850806
     },
-    "artifact": "reports/field_gap/FIELD_GAP_RESULTS.md"
+    "artifact": "reports/field_gap/FIELD_GAP_RESULTS.md",
+    "plantdoc_all_seeds": {
+      "convnext_tiny": {
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "n": 3,
+        "accuracy_mean": 0.300847,
+        "accuracy_sd": 0.038136,
+        "accuracy_min": 0.262712,
+        "accuracy_max": 0.338983,
+        "best_seed": 43
+      },
+      "efficientnet_b0": {
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "n": 5,
+        "accuracy_mean": 0.208474,
+        "accuracy_sd": 0.02957,
+        "accuracy_min": 0.161017,
+        "accuracy_max": 0.241525,
+        "best_seed": 42
+      },
+      "resnet18": {
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "n": 3,
+        "accuracy_mean": 0.161017,
+        "accuracy_sd": 0.026462,
+        "accuracy_min": 0.139831,
+        "accuracy_max": 0.190678,
+        "best_seed": 43
+      },
+      "smallcnn": {
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "n": 3,
+        "accuracy_mean": 0.043785,
+        "accuracy_sd": 0.010664,
+        "accuracy_min": 0.033898,
+        "accuracy_max": 0.055085,
+        "best_seed": 42
+      }
+    }
   },
   "hypotheses": {
     "H1": {

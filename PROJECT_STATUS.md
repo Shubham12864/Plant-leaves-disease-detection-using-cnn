@@ -48,7 +48,7 @@ one blocked experiment (S19) and one outstanding manual step (S16 labels).
 
 | H | Verdict | Core evidence |
 |---|---|---|
-| **H1** field accuracy is far below nominal | **confirmed** | 0.9928 → 0.1737; 27/27 classes worse; ranking reverses |
+| **H1** field accuracy is far below nominal | **confirmed** | 0.9928 → 0.2085 (5 seeds); 27/27 classes worse; lab gaps understate field gaps 19 to 28× |
 | **H2** gap is partly background dependence | **partially supported** | background neutralisation costs 56.5 pp in the lab; Grad-CAM enrichment only 1.20× |
 | **H3** augmentation recovers part | **blocked (S18)** | no licence-clean background corpus disjoint from PlantDoc |
 | **H4** nominal accuracy doesn't bound deployable | **confirmed** | ECE 0.0026 → 0.5808; abstention gains 0.8 pp at 90% coverage |
@@ -57,13 +57,19 @@ one blocked experiment (S19) and one outstanding manual step (S16 labels).
 
 | | PlantVillage | PlantDoc |
 |---|---:|---:|
-| reference accuracy | 0.9928 | 0.1737 (95% CI 0.127–0.225) |
+| reference accuracy | 0.9928 | 0.2085 (5-seed mean; published checkpoint 0.1737) |
 | reference ECE | 0.0026 | 0.5808 |
-| best field model | — | ConvNeXt-Tiny 0.2627 |
+| best field model | — | ConvNeXt-Tiny 0.3008 |
 | best field ECE | — | ConvNeXt-Tiny 0.4440 |
 
-Architecture ranking reverses: ConvNeXt and B0 are tied on PlantVillage
-(difference 0.00005, spread 0.0017) but 8.9 pp apart in the field.
+Field numbers across **all fourteen checkpoints** (closes the one-checkpoint
+caveat): ConvNeXt-Tiny 0.3008 (3 seeds, sd 0.038), EfficientNet-B0 0.2085 (5, sd
+0.030), ResNet18 0.1610 (3, sd 0.027), SmallCNN 0.0438 (3, sd 0.011).
+
+Lab order is preserved in the field; lab gaps are not. Models tied in the lab
+(0.00005) are 9.2 pp apart in the field, and SmallCNN's 7.4 pp lab deficit becomes
+25.7 pp. An earlier claim that the ranking *reverses* was wrong: it compared
+checkpoints from different protocols. Corrected in `USEFULNESS_RESULTS.md`.
 
 ### Open items
 

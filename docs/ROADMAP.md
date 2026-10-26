@@ -183,7 +183,7 @@ Scope statement (one controlled source, one 236-image field set, no expert re-la
 |---|---|---|
 | A — evidence | S1–S4 | **complete** |
 | B — fair comparison | S5–S10 | **complete** — 14 runs, 0 failures, spread reported |
-| C — field gap | S11–S13 | **complete — H1 confirmed (−81.9 pp)** |
+| C — field gap | S11–S13 | **complete — H1 confirmed (−78.4 pp over 5 seeds)** |
 | D — mechanism | S14–S19 | S14, S15 complete; S16 instrument ready, labels outstanding; S17 H2 **partial**; **S18 blocked**; S19 not started |
 | E — usefulness | S20–S22 | **complete — H4 confirmed** |
 | F — lock down | S23–S25 | **complete** — 17 tests, registry check, run_all |

@@ -16,7 +16,7 @@ per-class table is indicative, not decisive.
 
 **No expert re-labelling.** PlantDoc labels were used as published. The literature
 documents label noise in PlantDoc; this project does not estimate that share, so
-part of the 81.9 pp gap may be annotation rather than model failure. The report
+part of the 78-point gap may be annotation rather than model failure. The report
 does not attribute the whole gap to the model.
 
 **No field images were ever trained on.** That is the project's strength and its
@@ -35,11 +35,18 @@ class diversity and broke BatchNorm. The archive is retained, the numbers are
 marked invalid, and no invalid number appears in a results table. Evidence:
 `reports/model_comparison/SWEEP_V1_INVALID.md`, defects R12 and R14.
 
-**One checkpoint per architecture on the field side.** The PlantVillage comparison
-uses 3–5 seeds. The field numbers use one checkpoint each, so the field ranking
-carries no seed variance. The 8.9 pp ConvNeXt-vs-B0 field gap is larger than the
-lab seed spread, but it is a single-checkpoint observation and should be replicated
-before it is treated as an architectural property.
+**Field numbers now cover all fourteen checkpoints.** The single-checkpoint caveat
+is closed: every sweep checkpoint was scored on PlantDoc
+(`reports/field_gap/all_seeds/field_all_seeds.json`). ConvNeXt-Tiny leads by 9.2
+pp with an sd of 0.038 across 3 seeds, against EfficientNet-B0 at 0.2085 with sd
+0.030 across 5. The gap is roughly 2.9 pooled standard deviations, so it survives,
+but 236 field images remain the binding limit.
+
+**A published claim was corrected.** An earlier version of the results said the
+architecture ranking reverses in the field. Scoring all fourteen checkpoints
+falsified that: the order is identical in both domains and only the gaps change.
+The wrong claim came from comparing checkpoints trained under different protocols.
+It is corrected here and in the underlying reports.
 
 **A probe was rebuilt after it was found to be confounded.** The first occlusion
 probe erased leaf along with background and collapsed both domains to near zero.

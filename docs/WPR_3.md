@@ -33,14 +33,16 @@ reference model's own seed spread, so architecture does not decide the outcome o
 this benchmark.
 
 The field result is the one that matters. On PlantDoc test, 236 images, the
-reference model falls from 0.9928 accuracy to 0.1737, a drop of 81.9 points, and
-every one of the 27 mapped classes gets worse. Calibration collapses from 0.0026
-to 0.5808. In the highest confidence band the model is right 29% of the time while
-reporting 98.6% confidence.
+reference model falls from 0.9928 accuracy to 0.2085 averaged over five seeds, a
+drop of 78.4 points, and for the published checkpoint every one of the 27 mapped
+classes gets worse. Calibration collapses from 0.0026 to 0.5808. In the highest
+confidence band the model is right 29% of the time while reporting 98.6%
+confidence.
 
-Two things a practitioner would try both fail. Selecting the best model on the lab
-benchmark picks the third best in the field, because ConvNeXt-Tiny and
-EfficientNet-B0 are tied in the lab and 8.9 points apart in the field. Rejecting
+Selecting the best model on the lab benchmark happens to be right, but for no
+justifiable reason: ConvNeXt-Tiny and EfficientNet-B0 are tied in the lab to
+within 0.00005 and are 9.2 points apart in the field. The lab ranking got the
+order right and the scale wrong. Rejecting
 the least confident images gains 0.8 points at 90% coverage, so a confidence
 threshold does not recover a usable subset.
 

@@ -16,31 +16,36 @@ model ranking does not transfer either.**
 
 | | PlantVillage validation (6,544) | PlantDoc test (236) |
 |---|---:|---:|
-| accuracy | 0.9928 | **0.1737** (95% CI 0.1271–0.2246) |
-| macro-F1 | 0.9895 | 0.1798 |
-| mean per-class recall | 0.9939 | 0.1746 |
+| accuracy, 5-seed mean | 0.9928 | **0.2085** |
+| accuracy, published checkpoint | 0.9954 | 0.1737 (95% CI 0.1271–0.2246) |
+| macro-F1, published checkpoint | 0.9895 | 0.1798 |
 
-The drop is **81.9 percentage points**, nine times the width of the confidence
-interval on the field estimate.
+The drop is **78.4 percentage points** on the seed-matched comparison, or 81.9 for
+the published single checkpoint, which sits 3.5 points below the mean of its own
+architecture. Either way it is many times the width of the confidence interval on
+the field estimate.
 
 It is not carried by a few classes. **All 27 mapped classes fell**; median drop
 0.851; eight classes went from recall 1.000 to 0.000. The best field class is
 Grape healthy at 0.583.
 
-Architecture ranking reverses between domains:
+Scoring all fourteen sweep checkpoints on the field set gives the sharper
+version of this. The order is the same in both domains; the distances are not.
 
-| model | PlantVillage macro-F1 | field accuracy |
-|---|---:|---:|
-| ConvNeXt-Tiny | 0.98951 | **0.2627** |
-| ResNet18 | 0.98460 | 0.1822 |
-| EfficientNet-B0 | 0.98946 | 0.1737 |
-| SmallCNN | 0.91599 | 0.0678 |
+| model | PlantVillage macro-F1 | field accuracy | seeds |
+|---|---:|---:|---:|
+| ConvNeXt-Tiny | 0.98951 | **0.3008** | 3 |
+| EfficientNet-B0 | 0.98946 | 0.2085 | 5 |
+| ResNet18 | 0.98460 | 0.1610 | 3 |
+| SmallCNN | 0.91599 | 0.0438 | 3 |
 
-ConvNeXt-Tiny and EfficientNet-B0 differ by **0.00005** macro-F1 on the lab
-benchmark — thirty-four times smaller than the seed spread within B0 alone — and
-by **8.9 percentage points** in the field. A team that selected its model on
-PlantVillage would have chosen the third-best model for field use and would have
-had no way to know.
+ConvNeXt-Tiny and EfficientNet-B0 are **statistically tied in the laboratory**,
+differing by 0.00005 macro-F1 against a seed spread of 0.0017. In the field they
+are **9.2 points apart**. SmallCNN is 7.4 points behind in the lab and 25.7
+points behind in the field.
+
+The laboratory ranking was right about order and useless as a scale. Nothing in
+the lab numbers indicated that a 0.00005 difference would become 9.2 points.
 
 *Figure: `figures/plantdoc_confusion.png`.*
 

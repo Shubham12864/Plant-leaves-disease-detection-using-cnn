@@ -1,0 +1,23 @@
+{
+  "checkpoint": "C:\\Users\\Shubham\\Downloads\\Capstone project\\checkpoints\\sweep\\smallcnn\\seed43\\smallcnn_best.pt",
+  "architecture": "smallcnn",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.0423728813559322,
+  "accuracy_ci95": [
+    0.0211864406779661,
+    0.07203389830508475
+  ],
+  "ci_width_pp": 5.08,
+  "macro_f1": 0.030453937395203606,
+  "macro_recall": 0.0450029394473839,
+  "weighted_f1": 0.02923896101571314,
+  "mean_confidence": 0.8894166946411133,
+  "out_of_mapping_rate": 0.17796610169491525,
+  "out_of_mapping_count": 42,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

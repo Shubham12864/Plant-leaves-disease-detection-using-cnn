@@ -191,15 +191,21 @@ times smaller than the reference model's own seed spread. On this benchmark the
 architecture does not decide the outcome.
 
 Field transfer on PlantDoc test (236 images, 27 mapped classes): accuracy falls
-from 0.9928 to 0.1737 with a 95% interval of 0.1271 to 0.2246, a drop of 81.9
-percentage points. All 27 mapped classes fell, median drop 0.851. Expected
-calibration error rises from 0.0026 to 0.5808. In the top confidence band, 65
+from 0.9928 to 0.2085 averaged over five protocol-v2 seeds, a drop of 78.4
+percentage points. The published single checkpoint scores 0.1737 with a 95%
+interval of 0.1271 to 0.2246; it sits 3.5 points below the mean of its own
+architecture and is reported separately rather than as the headline. For the
+published checkpoint all 27 mapped classes fell, median drop 0.851, and expected
+calibration error rose from 0.0026 to 0.5808. In the top confidence band, 65
 images above 0.95 confidence, accuracy is 29.2%. A confidence threshold gains 0.8
 points at 90% coverage, so abstention does not recover a usable subset.
 
-The architecture ranking reverses in the field: ConvNeXt-Tiny reaches 0.2627,
-ResNet18 0.1822, EfficientNet-B0 0.1737, SmallCNN 0.0678. The models tied on the
-lab benchmark are 8.9 points apart in the field.
+Scoring all fourteen checkpoints on the field set shows the lab ranking order is
+preserved but the lab gaps are not: ConvNeXt-Tiny 0.3008 (3 seeds, sd 0.038),
+EfficientNet-B0 0.2085 (5 seeds, sd 0.030), ResNet18 0.1610 (3 seeds, sd 0.027),
+SmallCNN 0.0438 (3 seeds, sd 0.011). The two models tied on the lab benchmark are
+9.2 percentage points apart in the field, and the model that trails by 7.4 points
+in the lab trails by 25.7 in the field.
 
 Mechanism: replacing the background while keeping the leaf costs 56.5 points on
 PlantVillage (0.9975 to 0.4325) and changes 56.8% of predictions, which is direct
@@ -267,7 +273,7 @@ images caught it, and the probe was rebuilt around a leaf mask.
 
 Open limitations. The field evaluation rests on 236 images from a single source,
 with four to twelve images per class, so per-class field numbers are indicative.
-Part of the 81.9-point gap is likely PlantDoc annotation noise, which this work
+Part of the 78-point gap is likely PlantDoc annotation noise, which this work
 does not estimate. The field results use one checkpoint per architecture, so the
 8.9-point ConvNeXt lead carries no seed variance and should be replicated before
 it is treated as an architectural property. The background augmentation

@@ -19,29 +19,59 @@ SmallCNN is the extreme: **86.2% mean confidence, 6.8% accuracy.** It is more
 confident than any other model while being far less accurate than any other
 model. That is the relationship inverted, not merely degraded.
 
-## The ranking reverses in the field
+## The lab ranking survives. The lab gaps do not.
 
-This is the most consequential result in Stage E, and it was not visible from
-PlantVillage:
+**Correction.** An earlier version of this section claimed the architecture
+ranking reverses between domains. That was wrong, and the error came from
+comparing checkpoints trained under different protocols: the published
+EfficientNet-B0 (0.1737 in the field) against a ConvNeXt-Tiny from the v2 sweep.
+Scoring all fourteen sweep checkpoints on PlantDoc, which is what
+`reports/field_gap/all_seeds/field_all_seeds.json` contains, gives a different
+and more useful answer.
 
-| | PlantVillage rank | field rank |
-|---|---|---|
-| ConvNeXt-Tiny | 1st (0.98951, tied with B0) | **1st, 26.3%** |
-| ResNet18 | 3rd (0.98460) | 2nd, 18.2% |
-| EfficientNet-B0 | 2nd (0.98946, tied with CNN) | 3rd, 17.4% |
-| SmallCNN | 4th (0.91599) | 4th, 6.8% |
+| model | PlantVillage macro-F1 | field accuracy (n seeds) | sd | drop |
+|---|---:|---:|---:|---:|
+| ConvNeXt-Tiny | 0.98951 | **0.3008** (3) | 0.0381 | −69.2 pp |
+| EfficientNet-B0 | 0.98946 | 0.2085 (5) | 0.0296 | −78.4 pp |
+| ResNet18 | 0.98460 | 0.1610 (3) | 0.0265 | −82.7 pp |
+| SmallCNN | 0.91599 | 0.0438 (3) | 0.0107 | −89.9 pp |
 
-On PlantVillage, ConvNeXt-Tiny and EfficientNet-B0 differ by **0.00005**
-macro-F1 — thirty-four times smaller than the seed spread. In the field they
-differ by **8.9 percentage points**, which is comparable to the width of one
-model's own confidence interval.
+The order is identical in both domains: ConvNeXt-Tiny, EfficientNet-B0,
+ResNet18, SmallCNN. What changes is the distance between them.
 
-**Laboratory accuracy did not predict field accuracy.** The model that was
-statistically tied for best on the lab benchmark is the best in the field by a
-margin larger than the uncertainty on either measurement.
+| comparison | lab gap | field gap | ratio |
+|---|---:|---:|---:|
+| ConvNeXt vs EfficientNet-B0 | 0.00 pp | **9.24 pp** | undefined |
+| ConvNeXt vs ResNet18 | 0.49 pp | 13.98 pp | 28× |
+| ConvNeXt vs SmallCNN | 7.35 pp | 25.71 pp | 3.5× |
 
-This is H1 stated at full strength: not only does the reported number overstate
-field performance, it does not even rank the candidates correctly.
+Two models that are **statistically tied in the laboratory are 9.2 points apart
+in the field.** A model 7.4 points behind in the laboratory is 25.7 points behind
+in the field. The lab ranking was not misleading about order; it was worthless as
+a scale.
+
+That is a cleaner claim than the one it replaces, and it is the one the data
+supports.
+
+### The published checkpoint was an unlucky draw
+
+The Stage C headline used the published EfficientNet-B0 checkpoint, which reaches
+0.1737 in the field. The five protocol-v2 seeds average 0.2085, with a range of
+0.1610 to 0.2415. So the published checkpoint sits 3.5 points below the mean of
+its own architecture and is not representative.
+
+Both are reported. The −81.9 pp headline in `FIELD_GAP_RESULTS.md` is the
+published checkpoint; the −78.4 pp figure above is the protocol-v2 five-seed
+mean. All downstream H1 statements now use the seed-matched figure.
+
+### Consequence for model selection
+
+This weakens the practical warning but sharpens the scientific one. A team that
+picked ConvNeXt-Tiny on the lab benchmark would have picked correctly. A team
+that picked it because it was 0.00005 ahead would have had no justification,
+since that advantage is noise, and yet it would have gained 9.2 points in the
+field. Laboratory ranking happened to be right here; nothing in the laboratory
+numbers told anyone it would be.
 
 ## S21 — abstention curves
 

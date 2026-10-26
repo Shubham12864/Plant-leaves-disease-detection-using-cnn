@@ -363,6 +363,11 @@ confidence is anti-correlated with correctness (50% coverage lowers accuracy to
 on PlantVillage and by 8.9 pp accuracy on PlantDoc. Lab accuracy does not rank
 candidates correctly for field use.
 
+> SUPERSEDED later the same day: scoring all fourteen checkpoints showed the order
+> is preserved and only the gaps change. See "Correction — the ranking does not
+> reverse" below. The paragraph is kept as written to record what was believed at
+> the time.
+
 ### F — lock down
 
 - `tests/` 17 tests: split integrity, locked-test disjointness, checkpoint contract
@@ -377,3 +382,30 @@ candidates correctly for field use.
 Two test failures found real drift: resnet18 had been recorded as 11,689,512
 params (the ImageNet 1000-class model) when the 38-class checkpoint is 11,196,006,
 and `classification_metrics()` does not take `num_classes`. Both corrected.
+
+### Correction — the ranking does not reverse
+
+Scoring all fourteen sweep checkpoints on PlantDoc
+(`reports/field_gap/all_seeds/field_all_seeds.json`) falsified a claim made earlier
+the same day.
+
+| model | PV macro-F1 | field accuracy | seeds | sd |
+|---|---|---:|---:|---:|
+| ConvNeXt-Tiny | 0.98951 | 0.3008 | 3 | 0.0381 |
+| EfficientNet-B0 | 0.98946 | 0.2085 | 5 | 0.0296 |
+| ResNet18 | 0.98460 | 0.1610 | 3 | 0.0265 |
+| SmallCNN | 0.91599 | 0.0438 | 3 | 0.0107 |
+
+The ranking order is identical in both domains. The earlier "ranking reverses"
+claim compared the published EfficientNet-B0 checkpoint (0.1737) against a
+ConvNeXt-Tiny from the v2 sweep, which mixed training protocols.
+
+What survives and is stronger: lab gaps understate field gaps. ConvNeXt and B0 are
+0.00005 apart in the lab and 9.24 pp apart in the field; SmallCNN's 7.35 pp lab
+deficit becomes 25.71 pp. The published B0 checkpoint sits 3.5 pp below the
+five-seed mean of its own architecture, so the Stage C headline of −81.9 pp is
+replaced by −78.4 pp for the seed-matched comparison.
+
+Corrected in `reports/field_gap/USEFULNESS_RESULTS.md`,
+`reports/paper/RESULTS_BY_HYPOTHESIS.md`, `PROJECT_STATUS.md`,
+`docs/SUBMISSION_FORM_ANSWERS.md` and `results/registry.json`.
