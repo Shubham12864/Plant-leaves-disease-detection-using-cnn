@@ -1,0 +1,8 @@
+{
+  "tiles": 50,
+  "contact_sheet": "C:\\Users\\Shubham\\Downloads\\Capstone project\\reports\\mechanism\\s16\\contact_sheet.png",
+  "sheet_csv": "C:\\Users\\Shubham\\Downloads\\Capstone project\\reports\\mechanism\\s16\\labelling_sheet.csv",
+  "rule_to_state": "look at where the hottest colour concentrates: if it is on leaf tissue write leaf, if it sits mostly on soil, sky, hand or other background write background",
+  "automated_proxy_mean": 0.735,
+  "human_labels_recorded": 0
+}
