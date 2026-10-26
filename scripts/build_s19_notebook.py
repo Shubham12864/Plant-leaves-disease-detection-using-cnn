@@ -241,11 +241,33 @@ print("GPUs:", [torch.cuda.get_device_name(i) for i in range(2)])
 
 if not TRAIN_MANIFEST.is_file():
     raise FileNotFoundError(f"PlantVillage not attached: expected {TRAIN_MANIFEST}")
+def find_backgrounds(preferred):
+    """DeepWeeds is attached as a Kaggle dataset and the folder name depends on
+    which copy was added, so search for it instead of assuming the path."""
+    if preferred.is_dir() and next(preferred.rglob("*.jpg"), None) is not None:
+        return preferred
+    if KAGGLE_INPUT.is_dir():
+        for folder in sorted(KAGGLE_INPUT.iterdir()):
+            if folder.is_dir() and "weed" in folder.name.lower():
+                if next(folder.rglob("*.jpg"), None) is not None:
+                    return folder
+        for folder in sorted(KAGGLE_INPUT.iterdir()):
+            if folder.is_dir():
+                count = sum(1 for _ in folder.rglob("*.jpg"))
+                if count > 5000:
+                    print("warning: using " + folder.name + " as the background corpus")
+                    return folder
+    return preferred
+
+
+BACKGROUND_ROOT = find_backgrounds(BACKGROUND_ROOT)
+print("background corpus:", BACKGROUND_ROOT)
+
 if not BACKGROUND_ROOT.is_dir():
     raise FileNotFoundError(
-        f"Background corpus not attached at {BACKGROUND_ROOT}.\\n"
-        "S19 cannot run without a licence-clean corpus disjoint from PlantDoc. "
-        "See docs/BACKGROUND_CORPUS_OPTIONS.md."
+        "Background corpus not attached. Add Input -> Datasets -> 'deepweeds' -> imsparsh/deepweeds. "
+        "S19 cannot run without a licence-clean corpus disjoint from PlantDoc; see "
+        "docs/BACKGROUND_CORPUS_OPTIONS.md."
     )
 
 dev = pd.read_csv(TRAIN_MANIFEST)
