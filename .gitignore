@@ -24,3 +24,8 @@ kaggle_upload/**
 !kaggle_upload/.gitkeep
 .venv*/
 .smoke.log
+.merge.log
+.pytest_cache/
+.cocreate/
+thesis/build/
+reports/thesis/*.pdf

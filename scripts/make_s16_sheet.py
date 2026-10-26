@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from plant_disease.checkpoint_io import load_checkpoint  # noqa: E402
 from plant_disease.gradcam import GradCAM, overlay, target_layer_for  # noqa: E402
 from plant_disease.models import build_model  # noqa: E402
 from occlusion_probe import leaf_mask  # noqa: E402
@@ -52,7 +53,7 @@ def main() -> None:
     with map_path.open(encoding="utf-8") as handle:
         label_map = {r["plantdoc_label"]: r["plantvillage_label"] for r in csv.DictReader(handle)}
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+    checkpoint = load_checkpoint(args.checkpoint)
     classes = list(checkpoint["classes"])
     index_of = {c: i for i, c in enumerate(classes)}
     model = build_model(args.arch, len(classes), pretrained=False)

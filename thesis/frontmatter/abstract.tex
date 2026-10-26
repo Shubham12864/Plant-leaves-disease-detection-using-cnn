@@ -1,0 +1,40 @@
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\thispagestyle{plain}
+
+Convolutional networks reach near-perfect accuracy on curated plant disease
+datasets, and that number is routinely reported as if it described the field. This
+project asks what survives when the photographs stop being curated.
+
+We train four architectures under one frozen protocol on PlantVillage, measure the
+same checkpoints on PlantDoc, and then test explanations for the difference instead
+of asserting one. On 10,709 held-out curated images the best model reaches a
+macro-F1 of 0.9931. On 236 field images covering 27 scored classes the same model
+reaches 0.2232. The drop is 76.8 points, and it replicates across seeds.
+
+We then asked what the decision depends on, by intervention rather than by
+inspecting saliency maps. Replacing an image's leaf with a leaf from another class
+moved the prediction to the donor class 50.3\,\% of the time; replacing the
+background moved it 21.8\,\%, against a 2.6\,\% chance rate and a 4.4\,\% control
+for the edit itself. The leaf dominates, so the model has not learned to ignore the
+plant, but background content can still steer it one time in five.
+
+That measurement predicts the outcome of the fix we tested next. Background
+augmentation during training moved field macro-F1 by 1.24 points, with a 95\,\%
+confidence interval from $-3.32$ to $+5.80$ and one seed in three going backwards,
+while costing 0.87 points in the lab. Recovering 1.6\,\% of the gap is not a
+detectable effect.
+
+The gap is therefore not background overfitting that augmentation can repair. It is
+leaf appearance that differs between curated and field photographs. Confidence
+thresholds were also measured and do not repair it: abstention reduces coverage
+without producing an operating point an advisor could act on.
+
+The contribution is a measured, reproducible statement of what a clean-image
+classifier is worth in the field, with the mechanism tested rather than assumed,
+and with every reported number traceable to a stored artifact.
+
+\vspace{0.6cm}
+\noindent\textbf{Keywords:} plant disease detection, convolutional neural networks,
+domain shift, field validation, Grad-CAM, calibration, background augmentation

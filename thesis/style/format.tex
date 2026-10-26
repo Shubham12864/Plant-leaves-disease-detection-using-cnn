@@ -1,0 +1,95 @@
+% =====================================================================
+%  format.tex — EVERY formatting decision for the BT40 dissertation
+%  lives in this file. Nothing in chapters/ hard-codes layout.
+%
+%  When the university supplies its own template, edit the SETTINGS
+%  block below and rebuild. The content does not change.
+%
+%  Defaults used here are the common Indian B.Tech project-report
+%  convention. They are a placeholder for an official template, not a
+%  claim that these are IILM's rules.
+% =====================================================================
+
+% ------------------------- SETTINGS ----------------------------------
+\newcommand{\ThesisTitle}{Plant Leaf Disease Detection Using CNN}
+\newcommand{\ThesisSubtitle}{A validity study of clean-image training under field conditions}
+\newcommand{\ThesisAuthorA}{Shubham Kumar}
+\newcommand{\ThesisAuthorB}{Ujjwal Pratap Singh}
+\newcommand{\ThesisAuthorC}{Vivek Kumar Prajapati}
+\newcommand{\ThesisAuthorD}{Shubham Kumar}
+\newcommand{\ThesisProgramme}{B.Tech, Computer Science and Engineering (AI/ML)}
+\newcommand{\ThesisInstitution}{IILM University, Greater Noida}
+\newcommand{\ThesisGuide}{Dr.\ Harendra Singh}
+\newcommand{\ThesisProjectID}{BT40}
+\newcommand{\ThesisYear}{2026}
+
+% margins: left is wider for binding
+\newcommand{\MarginLeft}{1.5in}
+\newcommand{\MarginRight}{1in}
+\newcommand{\MarginTop}{1in}
+\newcommand{\MarginBottom}{1in}
+
+\newcommand{\BodyFont}{Times New Roman}
+\newcommand{\BodySize}{12pt}
+\newcommand{\BodyLeading}{1.5}        % 1.0 single, 1.5 one-and-a-half, 2.0 double
+
+\newcommand{\ChapterLabelSize}{16pt}
+\newcommand{\ChapterTitleSize}{14pt}
+\newcommand{\SectionSize}{13pt}
+% ---------------------- END SETTINGS --------------------------------
+
+\usepackage[a4paper,left=\MarginLeft,right=\MarginRight,top=\MarginTop,bottom=\MarginBottom,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[labelsep=period,font=small]{caption}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{ragged2e}
+
+\setmainfont{\BodyFont}[Ligatures=TeX]
+\setsansfont{\BodyFont}[Ligatures=TeX]
+\onehalfspacing
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6\baselineskip}
+\justifying
+
+% chapter openings: new page, label above title, no rule
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering}
+  {\fontsize{\ChapterLabelSize}{\ChapterLabelSize}\selectfont CHAPTER \thechapter}
+  {8pt}
+  {\fontsize{\ChapterTitleSize}{\ChapterTitleSize}\selectfont}
+\titlespacing*{\chapter}{0pt}{10pt}{28pt}
+
+\titleformat{\section}{\normalfont\bfseries\fontsize{\SectionSize}{\SectionSize}\selectfont}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.7em}{}
+
+% headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% captions: tables above, figures below (applied per-environment by the author)
+\captionsetup[table]{position=top,skip=4pt}
+\captionsetup[figure]{position=bottom,skip=6pt}
+
+% allow wide tables to shrink rather than overflow the margin
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcommand{\tabfont}{\small}
+
+% placeholder marker: anything still waiting on the university template
+\newcommand{\placeholder}[1]{\textcolor{red}{\textbf{[#1]}}}

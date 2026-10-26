@@ -1,0 +1,70 @@
+
+\chapter{Limitations and Threats to Validity}
+\label{ch:limitations}
+
+\section{Scope of the claims}
+
+Every claim in this report is about one curated dataset, one field dataset, four
+architectures and the specific protocol recorded in Table~\ref{tab:protocol}. Nothing
+here establishes behaviour on other crops, other regions, other cameras or other
+diseases.
+
+\section{Dataset limitations}
+
+PlantDoc test contains 236 images across 27 scored classes. A single accuracy
+estimate on that sample has an interval roughly ten points wide. Paired designs and
+multiple seeds reduce the damage, and they do not make the sample large.
+
+Twelve mappings rest on a relationship weaker than ``same disease''. Three carry an
+explicit caveat in the mapping file. If any of those is wrong, the field number moves
+in a direction we cannot determine in advance.
+
+Non-English and low-resolution field photographs are present in PlantDoc and are not
+treated separately, so the field number averages over image quality bands.
+
+\section{Statistical limitations}
+
+The unit of independence for between-run comparisons is the seed, and there are
+three. A paired interval with two degrees of freedom is very wide, which is why the
+augmentation result is reported as no detectable effect rather than as a small
+positive effect.
+
+Bootstrap intervals over test images describe sampling variation in the test set.
+They do not describe variation in training, and they are never used to make a claim
+about model stability.
+
+Calibration error at 15 bins on 236 images is itself noisy. The factor-of-223 rise
+is far outside that noise, but individual bin values should not be read closely.
+
+\section{Disclosed defects}
+
+Two problems in the original pipeline are recorded here rather than removed from the
+record.
+
+\subsection{Protocol v1 could not reproduce the reference result}
+
+The first training protocol failed to reproduce the reference accuracy. It is marked
+as a blocker in the issue log. Every number in this report comes from the frozen
+protocol that replaced it, and no result from protocol v1 is reported.
+
+\subsection{SmallCNN does not replicate its earlier figure}
+
+An early run recorded 96.01\,\% for SmallCNN. Under the frozen protocol and full
+evaluation it reaches 91.60\,\%. The earlier figure is not used anywhere in this
+report. The discrepancy is documented because a reader comparing this report to an
+earlier draft would otherwise find two incompatible numbers without explanation.
+
+\section{Multiplicity}
+
+Test data was scored more than once during development, which weakens the
+interpretation of the locked-test interval as a single pre-registered test. The
+number of scorings is disclosed rather than minimised. The field evaluation was
+performed once per checkpoint.
+
+\section{What is not claimed}
+
+No clinical or agronomic claim. No field-readiness claim. No deployment claim. The
+demonstration interface replays recorded model output and is not a service. The
+system is not a diagnostic instrument and must not be used as one.
+
+No severity grading, no multi-disease frames, no species outside the label set.

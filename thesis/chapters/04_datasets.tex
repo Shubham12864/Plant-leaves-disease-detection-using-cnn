@@ -1,0 +1,116 @@
+
+\chapter{Datasets and Preprocessing}
+\label{ch:datasets}
+
+\section{PlantVillage}
+
+PlantVillage \cite{hughes2015} supplies 38 classes covering 14 crop species with
+healthy and diseased variants. Images were collected to isolate the leaf against a
+uniform background under controlled lighting, which is what makes the benchmark clean
+and what makes its assumptions narrow.
+
+\begin{table}[H]
+\centering
+\caption{PlantVillage splits used in this study}
+\label{tab:pvsplits}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Split} & \textbf{Images} & \textbf{Classes} & \textbf{Role} \\
+\midrule
+Train & 36,762 & 38 & fitting \\
+Validation & 6,544 & 38 & checkpoint selection and calibration \\
+Development total & 43,306 & 38 & train plus validation \\
+Locked test & 10,709 & 38 & final evaluation, scored once \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Splits were constructed at the group level so that no near-duplicate occupies two
+sides of a split. The frozen split definition is stored in
+`data/manifests/split\_freeze.json` and is checked by the test suite; a change to the
+split breaks the tests rather than silently shifting results.
+
+\section{PlantDoc}
+
+PlantDoc \cite{singh2020} represents field conditions: cluttered backgrounds,
+variable illumination, leaves partially occluded by other leaves, and photographs
+taken at working distance rather than for a camera.
+
+\begin{table}[H]
+\centering
+\caption{PlantDoc as used for field evaluation}
+\label{tab:pdsplits}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Property} & \textbf{Value} & & \textbf{Note} \\
+\midrule
+Dataset classes & 28 & & all assigned a PlantVillage target \\
+Test images & 236 & & the field evaluation set \\
+Classes with test images & 27 & & one class has none in this split \\
+Validation split & none & & so field data is never used for selection \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Label mapping}
+
+The two datasets do not share a label space, so every PlantDoc class was assigned a
+PlantVillage target explicitly, and the assignment is stored with its justification.
+
+\begin{table}[H]
+\centering
+\caption{PlantDoc to PlantVillage mapping decisions}
+\label{tab:mapping}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+\textbf{Decision} & \textbf{Count} \\
+\midrule
+Mapped, status confirmed & 25 \\
+Mapped, confirmed with caveat & 3 \\
+Unmapped and excluded from scoring & 0 \\
+\midrule
+Relationship labelled ``same disease'' & 12 \\
+Relationship labelled ``healthy class'' & 10 \\
+Relationship labelled ``synonym'' & 4 \\
+Relationship labelled ``likely synonym'' & 1 \\
+Relationship labelled ``assumed synonym'' & 1 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Three mappings carry a caveat rather than a confirmation. They are retained because
+the alternative, dropping the class, discards real test images and biases the field
+estimate towards classes that happen to be easy to map. The caveat is recorded in
+`data/manifests/plantdoc\_to\_plantvillage\_map.csv` beside the mapping itself.
+
+An earlier version of this mapping covered only part of the label space and produced
+a meaningless macro-F1, because predicting a class outside the scored subset was
+counted as a miss against a class that was not being scored. That pathology is
+documented in Chapter~\ref{ch:limitations} and the mapping was completed before any
+number in this report was produced.
+
+\section{Preprocessing}
+
+Images are resized to the model input with bilinear interpolation, converted to
+tensors, and normalised with the ImageNet mean and standard deviation stored inside
+the checkpoint. The normalisation constants travel with the weights, so an inference
+path cannot silently disagree with the training path.
+
+Training-only augmentation is described in Table~\ref{tab:protocol}. No augmentation
+is applied at evaluation, on either dataset.
+
+\section{Dataset limitations}
+
+PlantVillage is not a sample of field conditions and was not collected to be one.
+Results on it describe behaviour under the conditions it encodes.
+
+PlantDoc is small. At 236 test images the 95\,\% interval on a single accuracy
+estimate is roughly ten percentage points wide, which is why paired comparisons and
+replication are used rather than a single number. It is also not a random sample of
+Indian field conditions; it is the best available proxy.
+
+Neither dataset supports a claim about severity, multiple concurrent diseases, or
+disease on species absent from the label set.

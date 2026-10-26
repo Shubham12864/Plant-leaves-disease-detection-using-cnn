@@ -1,0 +1,89 @@
+
+\chapter{Introduction}
+
+\section{The problem}
+
+A photograph of a diseased leaf carries the information needed to name the disease.
+Teaching a convolutional network to recover that information from labelled examples
+is now routine, and published accuracies on curated datasets sit above 99\,\%. The
+number is impressive and it is also fragile, because the datasets that produce it
+were collected under narrow conditions: single leaves, plain backgrounds, even
+lighting, one disease per frame.
+
+A farmer photographs a leaf on a plant, in a field, with soil and other leaves
+behind it and the sun somewhere off-axis. If a model trained on the first kind of
+image is evaluated on the second, the accuracy it reports and the accuracy it
+delivers are different quantities.
+
+This project measures both, then asks why they differ. The distinction matters
+because a screening tool that is wrong four times out of five is worse than no tool
+at all, and because a model that appears to work is harder to question than one that
+visibly fails.
+
+\section{Motivation}
+
+Plant disease causes substantial annual losses, and early identification is one of
+the cheaper interventions available. Automated identification from a phone
+photograph is attractive precisely where expert advice is scarce, which is also
+where the consequences of a wrong answer are largest.
+
+Three things make the gap between reported and delivered accuracy worth studying
+rather than merely noting. First, it is large: our own measurement is a 76.8 point
+drop in macro-F1 between curated and field images. Second, it is invisible in the
+usual reporting: a paper that quotes only curated accuracy is not lying, it is
+answering a different question. Third, an explanation exists in the literature and
+is usually asserted rather than tested. If models are exploiting laboratory
+backgrounds, targeted augmentation should help, and that prediction is testable.
+
+\section{Objectives}
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Train a CNN classifier on PlantVillage under a protocol frozen before any
+      result is inspected, and report held-out performance with class-wise detail.
+\item Measure the same checkpoints on PlantDoc without retraining, and quantify the
+      domain gap with confidence intervals rather than a single number.
+\item Test, rather than assume, whether the gap is caused by the model relying on
+      background context, using an intervention experiment that needs no human
+      labelling of saliency maps.
+\item Test whether targeted background augmentation closes the gap, with three
+      seeds per condition and a pre-registered direction of effect.
+\item Bound the usefulness of the system with calibration and abstention analysis,
+      and state plainly where it should not be used.
+\end{enumerate}
+
+\section{Scope}
+
+The study covers one controlled dataset (PlantVillage, 38 classes) and one field
+dataset (PlantDoc, 236 test images, 27 classes scored after label review). Four
+architectures are compared under one protocol. The unit of independence for
+inference is the training seed, not the image.
+
+Work outside scope is stated in Chapter~\ref{ch:limitations}: no expert agronomic
+re-labelling, no multi-disease frames, no severity grading, no deployment claim, and
+no assertion of field readiness.
+
+\section{Contributions}
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item A measured domain gap with intervals, replicated over five seeds, rather than
+      a single accuracy pair.
+\item An intervention-based mechanism result that contradicts the common
+      background-shortcut explanation in its strong form, and supports a weaker one.
+\item A pre-registered null result for background augmentation, with the mechanism
+      measurement used to explain why the fix cannot work.
+\item A calibration and abstention bound showing the confidence threshold does not
+      rescue the field case.
+\item A repository in which every reported number is generated from a stored
+      artifact by a registry check, so the document cannot drift from the evidence.
+\end{enumerate}
+
+\section{Organisation of the report}
+
+Chapter~\ref{ch:literature} reviews prior work and identifies what is usually
+asserted without measurement. Chapter~\ref{ch:methodology} describes the frozen
+protocol, the architectures and the evaluation design. Chapter~\ref{ch:datasets}
+documents both datasets, the label mapping decisions and the split construction.
+Chapter~\ref{ch:results} answers each hypothesis in turn. Chapter~\ref{ch:discussion}
+interprets the combined picture. Chapter~\ref{ch:limitations} states what the work
+does not establish, including two defects found in the original pipeline.
+Chapter~\ref{ch:conclusion} closes with what would be worth doing next.

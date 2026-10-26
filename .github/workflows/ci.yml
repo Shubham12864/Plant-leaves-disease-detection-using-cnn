@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - name: Install pinned dependencies (CPU torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install -e . ruff
+      - name: Lint (syntax errors, undefined names, unused imports)
+        run: ruff check src tests scripts
+      - name: Tests
+        run: python -m pytest tests -q
+      # scripts/run_all.py --check is intentionally not run here: it needs the
+      # local dataset manifests and checkpoints, which are not in the repository.

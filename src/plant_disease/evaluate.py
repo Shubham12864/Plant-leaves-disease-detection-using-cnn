@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
+from .checkpoint_io import load_checkpoint
 from .data import IMAGENET_MEAN, IMAGENET_STD, SMALLCNN_MEAN, SMALLCNN_STD, PlantVillageImages, load_split
 from .metrics import classification_metrics
 from .models import build_model
@@ -24,7 +25,7 @@ def evaluate_checkpoint(model_name: str, checkpoint_path: Path, dataset_root: Pa
     checkpoint_path = Path(checkpoint_path)
     if not checkpoint_path.is_file():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
-    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    checkpoint = load_checkpoint(checkpoint_path)
     frame, manifest_classes = load_split(Path(dataset_root), split)
     classes = checkpoint.get("classes") if isinstance(checkpoint, dict) else None
     if not classes:

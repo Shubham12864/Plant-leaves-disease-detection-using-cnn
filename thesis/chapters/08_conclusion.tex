@@ -1,0 +1,75 @@
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{What was established}
+
+A convolutional classifier trained on curated leaf images reaches a macro-F1 of
+0.9931 on held-out curated images and 0.1798 on field images, a difference of 81
+points on the same checkpoints. The measurement replicates across five seeds.
+
+The gap is not caused by the model ignoring the plant. Replacing the leaf moves the
+prediction to the donor class 50.3\,\% of the time; replacing the background moves it
+21.8\,\%, against a 2.6\,\% chance rate and a 4.4\,\% control for the edit itself.
+The model uses both, and the leaf carries more of the decision.
+
+Background augmentation during training does not close the gap. Six runs across two
+conditions and three seeds give a paired difference of $+1.24$ points with a 95\,\%
+interval of $[-3.32, +5.80]$, recovering 1.6\,\% of the gap while costing 0.87 points
+in the lab. The direction was predicted from the mechanism measurement before the
+experiment ran.
+
+Confidence thresholds do not repair the field case. Calibration error rises by a
+factor of 223 between domains, abstaining costs coverage without producing a usable
+operating point, and errors are confident errors.
+
+\section{What the project contributes}
+
+The contribution is not a better classifier. It is a measured account of what a
+clean-image classifier is worth when the images stop being clean, with the mechanism
+tested by intervention rather than asserted, and with the negative result on the
+obvious fix pre-registered and explained.
+
+Every number traces to a stored artifact, and the document build fails if a quoted
+figure is absent from the registry.
+
+\section{What would be worth doing next}
+
+The results point at leaf appearance as the remaining problem, so the next
+experiments are the ones that attack it.
+
+\subsection*{Field-domain leaf augmentation}
+
+Background augmentation failed because it targets the wrong factor. The analogous
+treatment for leaf appearance is style transfer restricted to the leaf region, using
+field photographs as the style source and PlantVillage leaves as the content. The
+harness for regional compositing already exists and the evaluation design in this
+report would carry over unchanged.
+
+\subsection*{A small field-labelled fine-tune}
+
+Fine-tuning on a modest number of hand-labelled field images would test how much of
+the gap is recoverable appearance versus genuine ambiguity. The number worth knowing
+is the slope: how many labelled field images buy how much field macro-F1. If the
+curve is steep the problem is practical, and if it is flat the problem is harder than
+it looks.
+
+\subsection*{A field-appropriate evaluation set}
+
+PlantDoc at 236 images cannot support intervals tighter than about ten points. A
+larger field set, collected with a stated protocol and expert labels for a subset,
+would make the remaining questions answerable.
+
+\subsection*{Segment before classifying}
+
+If leaf appearance varies with how the leaf is framed, isolating and normalising the
+leaf region before classification may remove variation that no augmentation can
+reach. The masks used in the intervention experiment are a starting point, not a
+solution.
+
+\section{Closing statement}
+
+A model that reports 99\,\% and delivers 18\,\% is not a model with a bug. It is a
+model answering a question nobody asked. The useful work is to find out which
+question it is answering, and this report does that for one case, with numbers that
+can be checked.

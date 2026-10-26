@@ -1,0 +1,33 @@
+\documentclass[12pt,a4paper]{report}
+\input{style/format}
+
+\begin{document}
+
+% ---------- front matter: roman numerals ----------
+\pagenumbering{roman}
+\input{frontmatter/titlepage}
+\input{frontmatter/declaration}
+\input{frontmatter/certificate}
+\input{frontmatter/acknowledgement}
+\input{frontmatter/abstract}
+\input{frontmatter/contents}
+
+% ---------- main matter: arabic numerals ----------
+\clearpage
+\pagenumbering{arabic}
+
+\input{chapters/01_introduction}
+\input{chapters/02_literature}
+\input{chapters/03_methodology}
+\input{chapters/04_datasets}
+\input{chapters/05_results}
+\input{chapters/06_discussion}
+\input{chapters/07_limitations}
+\input{chapters/08_conclusion}
+
+\appendix
+\input{chapters/09_appendix}
+
+\input{chapters/10_references}
+
+\end{document}

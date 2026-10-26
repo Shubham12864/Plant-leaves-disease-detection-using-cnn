@@ -42,6 +42,7 @@ from torch.utils.data import DataLoader, Dataset
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from plant_disease.checkpoint_io import load_checkpoint  # noqa: E402
 from plant_disease.models import build_model  # noqa: E402
 
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
@@ -205,7 +206,7 @@ def main() -> None:
         with map_path.open(encoding="utf-8") as handle:
             label_map = {r["plantdoc_label"]: r["plantvillage_label"] for r in csv.DictReader(handle)}
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+    checkpoint = load_checkpoint(args.checkpoint)
     class_names = list(checkpoint["classes"])
     model = build_model(args.arch, len(class_names), pretrained=False)
     model.load_state_dict({k.replace("module.", "", 1): v for k, v in checkpoint["model_state_dict"].items()})

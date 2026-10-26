@@ -45,6 +45,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from plant_disease.checkpoint_io import load_checkpoint  # noqa: E402
 from plant_disease.models import build_model  # noqa: E402
 from occlusion_probe import leaf_mask  # noqa: E402
 
@@ -89,7 +90,7 @@ def main() -> None:
     args = parser.parse_args()
 
     args.out.mkdir(parents=True, exist_ok=True)
-    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+    checkpoint = load_checkpoint(args.checkpoint)
     classes = list(checkpoint["classes"])
     model = build_model(args.arch, len(classes), pretrained=False)
     model.load_state_dict({k.replace("module.", "", 1): v for k, v in checkpoint["model_state_dict"].items()})

@@ -1,0 +1,76 @@
+
+\chapter{Reproducibility Detail}
+\label{ch:appendix}
+
+\section{Compute}
+
+All training ran on Kaggle with two Tesla T4 GPUs. Local hardware was used for data
+preparation, evaluation of returned checkpoints and document generation. No training
+was performed locally.
+
+\begin{table}[H]
+\centering
+\caption{Wall-clock cost of the reported experiments}
+\label{tab:compute}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Block} & \textbf{Runs} & \textbf{Time} & \textbf{Note} \\
+\midrule
+Architecture comparison & 14 & approx.\ 5 h & one protocol, four architectures, seeds \\
+Paired augmentation & 6 & approx.\ 3 h & three seeds, two conditions \\
+Intervention and evaluation & --- & under 1 h & inference only, CPU \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Commands}
+
+\begin{verbatim}
+# training (Kaggle, generated notebook)
+python scripts/build_s19_notebook.py
+
+# evaluate a checkpoint on PlantDoc
+python scripts/evaluate_plantdoc.py \
+    --checkpoint <path>/efficientnet_b0_best.pt \
+    --arch efficientnet_b0 --out <dir>
+
+# intervention experiment
+python scripts/swap_localisation_test.py \
+    --checkpoint checkpoints/efficientnet_b0/efficientnet_b0_best.pt \
+    --limit 300 --out reports/mechanism/swap_test_b0
+
+# regenerate tables and check every quoted number
+python scripts/build_tables.py
+python scripts/build_tables.py --verify
+
+# build this document
+python scripts/build_thesis.py
+\end{verbatim}
+
+\section{Artifact map}
+
+\begin{table}[H]
+\centering
+\caption{Where each reported number comes from}
+\label{tab:artifacts}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+\textbf{Claim} & \textbf{Artifact} \\
+\midrule
+Locked-test performance & reports/model\_comparison/locked\_test\_efficientnet\_b0/ \\
+Domain gap & reports/field\_gap/FIELD\_GAP\_RESULTS.md \\
+Mechanism & reports/mechanism/MECHANISM\_RESULTS.md, swap\_test\_b0/ \\
+Augmentation null & reports/mechanism/S19\_BACKGROUND\_AUGMENTATION\_RESULTS.md \\
+Calibration and abstention & reports/field\_gap/USEFULNESS\_RESULTS.md \\
+Registry of all claims & results/registry.json \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Version control}
+
+The repository is under Git. Each experiment is committed with the command that
+produced it and the artifact directory it wrote. Checkpoints are not committed;
+their SHA-256 hashes are, in `reports/s19/checkpoint\_hashes.json`.

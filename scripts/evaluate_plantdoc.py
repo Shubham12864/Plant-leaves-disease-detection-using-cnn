@@ -42,6 +42,7 @@ from torch.utils.data import DataLoader, Dataset
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from plant_disease.checkpoint_io import load_checkpoint  # noqa: E402
 from plant_disease.models import build_model  # noqa: E402
 
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
@@ -149,7 +150,7 @@ def main() -> None:
     if not rows:
         raise SystemExit(f"no scored images: manifest {args.manifest} split {args.split}")
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+    checkpoint = load_checkpoint(args.checkpoint)
     class_names = list(checkpoint["classes"])
     if len(class_names) != 38:
         raise SystemExit(f"checkpoint has {len(class_names)} classes, expected 38")

@@ -1,0 +1,100 @@
+
+\chapter{Literature Review}
+\label{ch:literature}
+
+\section{Deep learning for plant disease classification}
+
+The dominant approach treats disease identification as image classification over a
+fixed label set. Mohanty et al.\ demonstrated that a fine-tuned deep network reaches
+high accuracy on PlantVillage and, in the same paper, that performance falls sharply
+on images taken under different conditions \cite{mohanty2016}. That second result is
+the one this project builds on, and it is frequently dropped when the first is
+quoted.
+
+Ferentinos \cite{ferentinos2018} extended coverage to a larger label set using
+transfer learning from ImageNet weights, establishing the recipe that most later
+work follows. Too et al.\ \cite{too2019} compared several modern architectures on
+PlantVillage and found small differences between them, all above 99\,\%. The
+consistency across architectures is itself informative: when four different model
+families converge on the same number, the number is describing the dataset more than
+the models.
+
+\section{Datasets and the conditions they encode}
+
+PlantVillage \cite{hughes2015} is the standard benchmark. Its images were collected
+to isolate the leaf: the leaf is centred, the background is uniform, and lighting is
+controlled. These choices make the classification task clean and make the resulting
+model's assumptions narrow.
+
+PlantDoc \cite{singh2020} was built to represent field conditions, with cluttered
+backgrounds, variable lighting and multiple leaves. It has fewer images and fewer
+classes, which limits how precisely it can be evaluated, and it is the closest
+available proxy for the deployment setting.
+
+The two datasets do not share a label space. PlantDoc contains classes PlantVillage
+does not, and some PlantDoc images are ambiguous between categories. Any cross
+dataset evaluation therefore requires an explicit mapping, and the mapping decision
+changes the reported numbers. Chapter~\ref{ch:datasets} documents ours.
+
+\section{Domain shift and shortcut learning}
+
+The observation that models exploit incidental features correlated with labels in
+the training set is well established outside agriculture, notably in Geirhos et
+al.\ \cite{geirhos2020}, who show that standard training encourages reliance on
+texture and context over shape. In the plant setting, the incidental feature
+candidate is the background: soil, hands, pots and laboratory surfaces correlate
+with disease category in curated data because collection was organised by category.
+
+The mechanism story that follows is usually stated as a hypothesis and rarely
+tested. If background is the shortcut, then randomising background during training
+should reduce the field gap. That is a testable prediction, and to our knowledge it
+has not been tested with a pre-registered direction and a seed-level paired design
+in this setting.
+
+\section{Explainability}
+
+Grad-CAM \cite{selvaraju2017} is the standard tool for localising the evidence
+behind a convolutional prediction. It is widely used in plant disease work to argue
+that the model is looking at the lesion.
+
+A heat map is an observation about gradient magnitude, not a measurement of causal
+dependence. A model can attend to a lesion and still classify correctly from
+background context, and a diffuse map can indicate uncertainty as easily as
+attention. This project therefore treats Grad-CAM as a qualitative illustration and
+uses an intervention design to answer the causal question.
+
+\section{Calibration and selective prediction}
+
+A classifier that reports a probability is only useful if that probability means
+something. Guo et al.\ \cite{guo2017} showed that modern networks are often
+overconfident, and that a temperature scaling parameter estimated on held-out data
+corrects much of the error. Selective prediction, in which the model abstains below
+a confidence threshold, converts a probability into an operating point: a coverage
+level and the accuracy retained at that coverage.
+
+For a screening tool the relevant question is not average accuracy but retained
+accuracy at usable coverage. This project measures that directly rather than
+assuming a threshold works.
+
+\section{Summary of the gap in prior work}
+
+\begin{table}[H]
+\centering
+\caption{What prior work establishes and what it leaves open}
+\label{tab:litsummary}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}p{3.1cm}Y Y@{}}
+\toprule
+\textbf{Area} & \textbf{Established} & \textbf{Left open} \\
+\midrule
+Curated accuracy & Above 99\,\% on PlantVillage across many architectures & Whether the number transfers \\
+Field performance & Falls sharply on field images & How far, measured with intervals \\
+Mechanism & Background suspected as shortcut & Whether background is relied on, measured by intervention \\
+Remediation & Augmentation proposed & Whether it works, tested with seeds and a pre-registered direction \\
+Usefulness & Calibration discussed & Retained accuracy at usable coverage \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The contribution of this project sits in the four rows that say ``left open''. Each
+becomes a measured quantity rather than a claim.

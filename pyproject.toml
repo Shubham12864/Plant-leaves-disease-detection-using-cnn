@@ -18,5 +18,19 @@ dependencies = [
   "tqdm>=4.66",
 ]
 
+# Ranges above are the supported minimums. The exact versions the results were
+# produced with are pinned in requirements.lock; install from that to reproduce.
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+extend-exclude = ["kaggle_upload", "data", "checkpoints", ".venv-smoke"]
+
+[tool.ruff.lint]
+# Correctness only (syntax errors, undefined names, unused imports/variables).
+select = ["E9", "F"]
