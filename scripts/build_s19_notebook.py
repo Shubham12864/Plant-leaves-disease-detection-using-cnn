@@ -287,23 +287,44 @@ print("Disjointness gate: if a background came from PlantDoc, the whole")
 print("comparison is void, so this runs before anything trains.")
 print("=" * 68)
 
+if not DISJOINT_SCRIPT.is_file():
+    raise RuntimeError(
+        "The disjointness script is not on disk yet. The cell that writes the scripts "
+        "must run first, so use Run All to keep the order correct."
+    )
+
 disjoint_out = DERIVED / "disjointness.json"
 check = subprocess.run([sys.executable, str(DISJOINT_SCRIPT),
                         "--backgrounds", str(BACKGROUND_ROOT),
                         "--out", str(disjoint_out)],
                        env={**os.environ, "PYTHONUNBUFFERED": "1"})
-if check.returncode != 0:
+
+# Read the verdict from the report, never from the exit code alone. A non-zero exit
+# used to be treated as overlap, which also fired when the script was simply absent
+# and blamed the dataset for contamination it had not caused.
+if not disjoint_out.is_file():
     raise RuntimeError(
-        "DEDISJOINTNESS FAILED: a background image is byte-identical to a PlantDoc or "
-        "PlantVillage image. Training on it would put the evaluation set into the training "
-        "data. See " + str(disjoint_out)
-)
+        "The disjointness check produced no report, so it did not complete. Exit code "
+        + str(check.returncode) + ". Scroll up for the script's own error."
+    )
+
 DISJOINT = json.loads(disjoint_out.read_text())
-print(f"\\nchecked {DISJOINT['candidate_images']:,} backgrounds against "
-      f"{DISJOINT['plantdoc_hashes']:,} PlantDoc and {DISJOINT['plantvillage_hashes']:,} "
-      f"PlantVillage hashes: {DISJOINT['verdict']}")
+if DISJOINT["overlaps"]:
+    for hit in DISJOINT["overlaps"][:10]:
+        print("  overlap:", hit["background"], "==", hit["collides_with"], "(", hit["corpus"], ")")
+    raise RuntimeError(
+        "DISJOINTNESS FAILED: " + str(len(DISJOINT["overlaps"])) + " background image(s) are "
+        "byte-identical to a PlantDoc or PlantVillage image. Remove those files or use "
+        "another corpus."
+    )
+
+print("checked " + str(DISJOINT["candidate_images"]) + " backgrounds against "
+      + str(DISJOINT["plantdoc_hashes"]) + " PlantDoc and "
+      + str(DISJOINT["plantvillage_hashes"]) + " PlantVillage hashes")
+print("verdict:", DISJOINT["verdict"])
 print("limitation:", DISJOINT["limitation"])
 '''
+
 
 CACHE_CODE = '''def cache_split(frame, image_root, tag):
     labels = np.asarray([classes.index(label) for label in frame.label], dtype=np.int64)
