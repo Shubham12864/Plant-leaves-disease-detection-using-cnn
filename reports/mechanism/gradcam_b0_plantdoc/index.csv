@@ -1,0 +1,19 @@
+overlay,group,path,true_class,predicted_class,confidence,cam_mass_inside_leaf
+high_confidence_wrong_00.png,high_confidence_wrong,Apple leaf/20180511_090912-14gtw8a-e1526047952754.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.9214,0.7794
+high_confidence_wrong_01.png,high_confidence_wrong,Apple leaf/apple-leaf-9834637.jpg,Apple___healthy,Tomato___Late_blight,0.9691,0.6001
+high_confidence_wrong_02.png,high_confidence_wrong,Apple rust leaf/185161-004-EAF28842.jpg,Apple___Cedar_apple_rust,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9974,0.9338
+high_confidence_wrong_03.png,high_confidence_wrong,Apple rust leaf/20130802_111632.jpg,Apple___Cedar_apple_rust,Strawberry___Leaf_scorch,0.9998,0.7435
+high_confidence_wrong_04.png,high_confidence_wrong,Apple rust leaf/4-apple-rust2_19011_matt-bertone.jpg,Apple___Cedar_apple_rust,Apple___Black_rot,0.9667,0.5427
+high_confidence_wrong_05.png,high_confidence_wrong,Apple Scab Leaf/1b321015-6e33-4f18-aade-888f4383fe92.jpeg.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.973,0.2384
+cross_crop_00.png,cross_crop,Apple leaf/20180511_090912-14gtw8a-e1526047952754.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.9214,0.7794
+cross_crop_01.png,cross_crop,Apple leaf/20180511_091133-24l1vhg-e1526047988236.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.5678,0.8041
+cross_crop_02.png,cross_crop,Apple leaf/4120978-single-green-leaf-of-apple-tree.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.4798,0.6543
+cross_crop_03.png,cross_crop,Apple leaf/apple-leaf-14319997.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.5334,0.4106
+cross_crop_04.png,cross_crop,Apple leaf/apple-leaf-9834637.jpg,Apple___healthy,Tomato___Late_blight,0.9691,0.6001
+cross_crop_05.png,cross_crop,Apple leaf/apple-leaf-closeup-37636177.jpg,Apple___healthy,Blueberry___healthy,0.7752,0.6177
+high_confidence_right_00.png,high_confidence_right,Apple Scab Leaf/052609%20Hartman%20Crabapple%20scab%20single%20leaf.JPG.jpg,Apple___Apple_scab,Apple___Apple_scab,0.9797,0.9197
+high_confidence_right_01.png,high_confidence_right,Bell_pepper leaf/IMG_1629.JPG_1507122477.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9772,0.9338
+high_confidence_right_02.png,high_confidence_right,Bell_pepper leaf/pepper_leaf.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9996,0.9027
+high_confidence_right_03.png,high_confidence_right,Bell_pepper leaf/RnGnC.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9995,0.9126
+high_confidence_right_04.png,high_confidence_right,Bell_pepper leaf/why-are-my-pepper-plants-yellow-yellow-pepper-plants-yellow-leaves-green-veins-pepper-plants-yellow-veins.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9742,0.9866
+high_confidence_right_05.png,high_confidence_right,Blueberry leaf/blueberrysilverleaf16-1372b.jpg,Blueberry___healthy,Blueberry___healthy,0.9377,0.4586

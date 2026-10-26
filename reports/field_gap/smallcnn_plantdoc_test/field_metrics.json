@@ -1,0 +1,23 @@
+{
+  "checkpoint": "checkpoints\\smallcnn\\smallcnn_best.pt",
+  "architecture": "smallcnn",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.06779661016949153,
+  "accuracy_ci95": [
+    0.038135593220338986,
+    0.1016949152542373
+  ],
+  "ci_width_pp": 6.36,
+  "macro_f1": 0.0714006419059795,
+  "macro_recall": 0.06872427983539095,
+  "weighted_f1": 0.06666378125120966,
+  "mean_confidence": 0.8619675040245056,
+  "out_of_mapping_rate": 0.2457627118644068,
+  "out_of_mapping_count": 58,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

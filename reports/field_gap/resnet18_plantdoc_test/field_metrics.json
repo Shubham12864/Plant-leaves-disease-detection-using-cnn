@@ -1,0 +1,23 @@
+{
+  "checkpoint": "checkpoints\\resnet18\\resnet18_best.pt",
+  "architecture": "resnet18",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.18220338983050846,
+  "accuracy_ci95": [
+    0.13972457627118642,
+    0.2330508474576271
+  ],
+  "ci_width_pp": 9.33,
+  "macro_f1": 0.17599588196079427,
+  "macro_recall": 0.18673240339907005,
+  "weighted_f1": 0.17741798641441817,
+  "mean_confidence": 0.6762285232543945,
+  "out_of_mapping_rate": 0.2923728813559322,
+  "out_of_mapping_count": 69,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

@@ -1,0 +1,23 @@
+{
+  "checkpoint": "checkpoints\\convnext_tiny\\convnext_tiny_best.pt",
+  "architecture": "convnext_tiny",
+  "dataset": "PlantDoc",
+  "split": "test",
+  "images_scored": 236,
+  "plantdoc_classes_scored": 27,
+  "plantdoc_classes_unmapped": {},
+  "accuracy": 0.2627118644067797,
+  "accuracy_ci95": [
+    0.211864406779661,
+    0.3177966101694915
+  ],
+  "ci_width_pp": 10.59,
+  "macro_f1": 0.25256933412353044,
+  "macro_recall": 0.25879963657741434,
+  "weighted_f1": 0.2601710619275223,
+  "mean_confidence": 0.7037355899810791,
+  "out_of_mapping_rate": 0.2288135593220339,
+  "out_of_mapping_count": 54,
+  "mean_over_classes_present_only": true,
+  "class_count_note": "macro averages use only classes with non-zero support in this split"
+}

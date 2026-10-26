@@ -31,56 +31,48 @@ Last updated: 2026-10-25.
 ---
 ## Current position
 
-Stage A closed, Stage B closed, **Stage C closed**. The field gap is measured.
-Next is Stage D: explain it (Grad-CAM + occlusion probe), then Stage E.
+Stages A, B, C, D, E and F are closed. **Stage G (writing) is what remains**, plus
+one blocked experiment (S19) and one outstanding manual step (S16 labels).
 
-| Step | State |
+| Stage | State |
 |---|---|
-| S1 locked-test evaluation | **done** — bit-identical, 53 errors in 10,709 |
-| S2 PlantDoc label map | **done** — 28/28 decided, 3 caveated |
-| S3 stale documents | **done** |
-| S4 baseline commit | **done** — tag `baseline-p0.1` |
-| S5–S8 ConvNeXt, SmallCNN, protocol | **done** — v1 later found invalid (R12/R14) |
-| S9 pilot | **done** |
-| S9b gate | **passed** — 0.9836 at epoch 1 |
-| S9c sweep v2 | **done** — 14 runs, 0 failures |
-| S10 comparison table | **done** — `reports/model_comparison/SWEEP_V2_RESULTS.md` |
-| S11 score PlantDoc | **done** — 236 images, 27 classes |
-| S12 quantify the gap | **done** — −81.9 pp, 27/27 classes |
-| S13 answer H1 | **done — H1 confirmed** |
-| **S14 Grad-CAM on the failures** | **NEXT** |
+| A Evidence (S1–S4) | **closed** |
+| B Fair comparison (S5–S10) | **closed** — 14 runs, 0 failures |
+| C Field gap (S11–S13) | **closed — H1 confirmed (−81.9 pp)** |
+| D Mechanism (S14–S19) | **closed except S19** — H2 partial, S18 blocked |
+| E Usefulness (S20–S22) | **closed — H4 confirmed** |
+| F Lock down (S23–S25) | **closed** — 17 tests, registry check, run_all |
+| **G Write (S26–S28)** | **NEXT** |
 
-### Stage C result — the field gap (H1 confirmed)
+### Hypothesis verdicts (registered in results/registry.json)
 
-| | PlantVillage (lab) | PlantDoc (field) |
+| H | Verdict | Core evidence |
+|---|---|---|
+| **H1** field accuracy is far below nominal | **confirmed** | 0.9928 → 0.1737; 27/27 classes worse; ranking reverses |
+| **H2** gap is partly background dependence | **partially supported** | background neutralisation costs 56.5 pp in the lab; Grad-CAM enrichment only 1.20× |
+| **H3** augmentation recovers part | **blocked (S18)** | no licence-clean background corpus disjoint from PlantDoc |
+| **H4** nominal accuracy doesn't bound deployable | **confirmed** | ECE 0.0026 → 0.5808; abstention gains 0.8 pp at 90% coverage |
+
+### The four numbers that carry the project
+
+| | PlantVillage | PlantDoc |
 |---|---:|---:|
-| accuracy | 0.9928 | **0.1737** (95% CI 0.127 – 0.225) |
-| mean per-class recall | 0.9939 | **0.1746** |
-| mean confidence | 0.998 | 0.7522 |
-| ECE | 0.0026 | **0.5784** |
+| reference accuracy | 0.9928 | 0.1737 (95% CI 0.127–0.225) |
+| reference ECE | 0.0026 | 0.5808 |
+| best field model | — | ConvNeXt-Tiny 0.2627 |
+| best field ECE | — | ConvNeXt-Tiny 0.4440 |
 
-**All 27 mapped classes got worse**, median drop 0.851. In the 0.95–1.00
-confidence band the model is right **29.2% of the time at 98.6% confidence**.
-25.4% of field predictions land on classes PlantDoc does not contain.
+Architecture ranking reverses: ConvNeXt and B0 are tied on PlantVillage
+(difference 0.00005, spread 0.0017) but 8.9 pp apart in the field.
 
-Pipeline verified by control: the same script scores 0.9967 on 300 PlantVillage
-validation images, so this is domain shift, not a broken inference path.
+### Open items
 
-Full analysis: `reports/field_gap/FIELD_GAP_RESULTS.md` · figure `field_gap.png`.
-
-### Sweep v2 (PlantVillage validation, 6,544 images)
-
-| Architecture | n | macro-F1 mean | sd |
-|---|---:|---:|---:|
-| ConvNeXt-Tiny | 3 | 0.98951 | 0.00028 |
-| EfficientNet-B0 | 5 | 0.98946 | 0.00171 |
-| ResNet18 | 3 | 0.98460 | 0.00166 |
-| SmallCNN | 3 | 0.91599 | 0.00865 |
-
-The top two are statistically indistinguishable (gap 0.00005, thirty-four times
-smaller than the B0 seed spread): **architecture is not what decides the outcome
-on this benchmark**, which is exactly why Stage C mattered more than another
-model.
+- **S16** 50 hand-labelled saliency maps: instrument ready
+  (`reports/mechanism/gradcam_b0_plantdoc/labelling_sheet.csv`), labels not done.
+- **S18/S19** background corpus + augmentation sweep: blocked, needs a licensing
+  decision.
+- **Abstract wording**: the promised confidence threshold does not survive on
+  field data (S22). Needs a decision, not a silent edit.
 
 ### Measured pilot (2x T4, one epoch each)
 

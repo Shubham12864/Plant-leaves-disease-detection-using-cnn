@@ -1,0 +1,54 @@
+{
+  "convnext_tiny": {
+    "accuracy": 0.2627,
+    "mean_confidence": 0.7037,
+    "ece": 0.444,
+    "accuracy_at_coverage": {
+      "0.5": 0.3644,
+      "0.8": 0.3016,
+      "0.9": 0.2736,
+      "0.95": 0.2679,
+      "1.0": 0.2627
+    },
+    "images": 236
+  },
+  "efficientnet_b0": {
+    "accuracy": 0.1737,
+    "mean_confidence": 0.7522,
+    "ece": 0.5808,
+    "accuracy_at_coverage": {
+      "0.5": 0.2458,
+      "0.8": 0.1852,
+      "0.9": 0.1745,
+      "0.95": 0.1741,
+      "1.0": 0.1737
+    },
+    "images": 236
+  },
+  "resnet18": {
+    "accuracy": 0.1822,
+    "mean_confidence": 0.6762,
+    "ece": 0.494,
+    "accuracy_at_coverage": {
+      "0.5": 0.2458,
+      "0.8": 0.2063,
+      "0.9": 0.184,
+      "0.95": 0.1875,
+      "1.0": 0.1822
+    },
+    "images": 236
+  },
+  "smallcnn": {
+    "accuracy": 0.0678,
+    "mean_confidence": 0.862,
+    "ece": 0.7942,
+    "accuracy_at_coverage": {
+      "0.5": 0.0508,
+      "0.8": 0.0582,
+      "0.9": 0.066,
+      "0.95": 0.067,
+      "1.0": 0.0678
+    },
+    "images": 236
+  }
+}

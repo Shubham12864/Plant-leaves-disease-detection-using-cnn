@@ -319,3 +319,61 @@ Full analysis: `reports/model_comparison/SWEEP_V2_RESULTS.md`. Registered in
 
 H1 verdict: **confirmed**, magnitude far outside the 9.75 pp CI width.
 Registered in `results/registry.json` as `s11_efficientnet_b0_plantdoc_test`.
+
+## 2026-10-26 — Stages D, E, F
+
+### D — mechanism (reports/mechanism/MECHANISM_RESULTS.md)
+
+Occlusion probe, 4 treatments, both domains. The first probe was discarded: filling
+the border with grey also erased part of the leaf, collapsing both domains and
+measuring scale sensitivity instead of background use. The rebuilt probe replaces
+only non-green pixels via an HSV leaf mask.
+
+| | PlantVillage (n=400) | PlantDoc (n=236) |
+|---|---:|---:|
+| baseline accuracy | 0.9975 | 0.1737 |
+| background → grey | **0.4325 (−56.5 pp)** | 0.1441 (−3.0 pp) |
+| background → noise | 0.1450 (−85.3 pp) | 0.0551 (−11.9 pp) |
+| centre crop | 0.8100 (−18.8 pp) | 0.1992 (+2.5 pp) |
+| flip rate, background → grey | 56.8% | 55.9% |
+
+Grad-CAM: 18 overlays on PlantDoc (15 high-confidence-wrong, 39 cross-crop, only
+6 high-confidence-right available). CAM mass inside the leaf mask 0.735 against a
+mask covering 0.613 of the frame — **1.20× enrichment, weak**. H2 therefore
+partially supported: the model is background-dependent in the lab, but it is not
+simply looking at soil.
+
+S16 human labelling outstanding (`labelling_sheet.csv`). S18 blocked: no
+licence-clean background corpus disjoint from PlantDoc.
+
+### E — usefulness (reports/field_gap/USEFULNESS_RESULTS.md)
+
+| model | PV macro-F1 | PlantDoc acc | PlantDoc ECE |
+|---|---:|---:|---:|
+| convnext_tiny | 0.98951 | **0.2627** | 0.4440 |
+| resnet18 | 0.98460 | 0.1822 | 0.4940 |
+| efficientnet_b0 | 0.98946 | 0.1737 | 0.5808 |
+| smallcnn | 0.91599 | 0.0678 | 0.7942 |
+
+Abstention at 90% coverage: reference gains 0.8 pp (17.37 → 17.45). SmallCNN's
+confidence is anti-correlated with correctness (50% coverage lowers accuracy to
+5.08%). **H4 confirmed**: field confidence carries almost no information.
+
+**Architecture ranking reverses.** ConvNeXt-Tiny and B0 differ by 0.00005 macro-F1
+on PlantVillage and by 8.9 pp accuracy on PlantDoc. Lab accuracy does not rank
+candidates correctly for field use.
+
+### F — lock down
+
+- `tests/` 17 tests: split integrity, locked-test disjointness, checkpoint contract
+  and parameter counts, metric sanity (balanced_accuracy ≡ macro_recall; the
+  zero-support macro trap), evaluator output contract. **17 passed.**
+- `scripts/build_tables.py` renders 4 tables from the registry; `--verify` fails on
+  an unbacked claim, a missing artifact, or a stale table. Deleting the registry
+  exits 1 by design.
+- `scripts/run_all.py --check` runs all six local gates: **6/6 passed**.
+- `requirements.lock` pinned to the versions the checks were verified against.
+
+Two test failures found real drift: resnet18 had been recorded as 11,689,512
+params (the ImageNet 1000-class model) when the 38-class checkpoint is 11,196,006,
+and `classification_metrics()` does not take `num_classes`. Both corrected.

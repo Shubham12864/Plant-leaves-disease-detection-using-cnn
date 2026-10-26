@@ -141,6 +141,173 @@
         "PlantDoc carries documented label noise; this evaluation does not estimate that share.",
         "One checkpoint. Seed stability of the gap is not yet measured."
       ]
+    },
+    {
+      "id": "s11_convnext_tiny_plantdoc_test",
+      "model": "convnext_tiny",
+      "checkpoint": null,
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/evaluate_plantdoc.py --arch convnext_tiny --split test --device cpu",
+      "artifact_dir": "reports/field_gap/convnext_tiny_plantdoc_test",
+      "metrics": {
+        "accuracy": 0.262712,
+        "accuracy_ci95": [
+          0.211864,
+          0.317797
+        ],
+        "macro_f1": 0.252569,
+        "mean_confidence": 0.703736,
+        "out_of_mapping_rate": 0.228814
+      },
+      "caveats": [
+        "236 images, CI width ~10 pp",
+        "one checkpoint"
+      ]
+    },
+    {
+      "id": "s11_resnet18_plantdoc_test",
+      "model": "resnet18",
+      "checkpoint": null,
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/evaluate_plantdoc.py --arch resnet18 --split test --device cpu",
+      "artifact_dir": "reports/field_gap/resnet18_plantdoc_test",
+      "metrics": {
+        "accuracy": 0.182203,
+        "accuracy_ci95": [
+          0.139725,
+          0.233051
+        ],
+        "macro_f1": 0.175996,
+        "mean_confidence": 0.676229,
+        "out_of_mapping_rate": 0.292373
+      },
+      "caveats": [
+        "236 images, CI width ~10 pp",
+        "one checkpoint"
+      ]
+    },
+    {
+      "id": "s11_smallcnn_plantdoc_test",
+      "model": "smallcnn",
+      "checkpoint": null,
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/evaluate_plantdoc.py --arch smallcnn --split test --device cpu",
+      "artifact_dir": "reports/field_gap/smallcnn_plantdoc_test",
+      "metrics": {
+        "accuracy": 0.067797,
+        "accuracy_ci95": [
+          0.038136,
+          0.101695
+        ],
+        "macro_f1": 0.071401,
+        "mean_confidence": 0.861968,
+        "out_of_mapping_rate": 0.245763
+      },
+      "caveats": [
+        "236 images, CI width ~10 pp",
+        "one checkpoint"
+      ]
+    },
+    {
+      "id": "occlusion_b0_plantdoc",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/occlusion_probe.py --checkpoint ... --arch efficientnet_b0",
+      "artifact_dir": "reports/mechanism/occlusion_b0_plantdoc",
+      "metrics": {
+        "background_grey": {
+          "accuracy": 0.1440677966101695,
+          "accuracy_delta_pp": -2.97,
+          "flip_rate": 0.559322033898305,
+          "mean_confidence": 0.6336768269538879
+        },
+        "background_noise": {
+          "accuracy": 0.05508474576271186,
+          "accuracy_delta_pp": -11.86,
+          "flip_rate": 0.8220338983050848,
+          "mean_confidence": 0.8487548232078552
+        },
+        "centre_crop": {
+          "accuracy": 0.19915254237288135,
+          "accuracy_delta_pp": 2.54,
+          "flip_rate": 0.5847457627118644,
+          "mean_confidence": 0.7281173467636108
+        }
+      },
+      "caveats": [
+        "HSV leaf mask is a heuristic, not a segmentation model"
+      ]
+    },
+    {
+      "id": "occlusion_b0_plantvillage",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantVillage",
+      "split": "validation",
+      "images": 400,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/occlusion_probe.py --checkpoint ... --arch efficientnet_b0 --limit 400",
+      "artifact_dir": "reports/mechanism/occlusion_b0_plantvillage",
+      "metrics": {
+        "background_grey": {
+          "accuracy": 0.4325,
+          "accuracy_delta_pp": -56.5,
+          "flip_rate": 0.5675,
+          "mean_confidence": 0.6763706803321838
+        },
+        "background_noise": {
+          "accuracy": 0.145,
+          "accuracy_delta_pp": -85.25,
+          "flip_rate": 0.8525,
+          "mean_confidence": 0.7636088728904724
+        },
+        "centre_crop": {
+          "accuracy": 0.81,
+          "accuracy_delta_pp": -18.75,
+          "flip_rate": 0.1925,
+          "mean_confidence": 0.8860145807266235
+        }
+      },
+      "caveats": [
+        "HSV leaf mask is a heuristic, not a segmentation model"
+      ]
+    },
+    {
+      "id": "gradcam_b0_plantdoc",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 50,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/explain_field_failures.py --arch efficientnet_b0",
+      "artifact_dir": "reports/mechanism/gradcam_b0_plantdoc",
+      "metrics": {
+        "cam_mass_inside_leaf_mean": 0.7352,
+        "maps_rendered": 18
+      },
+      "caveats": [
+        "automated proxy over a heuristic mask; S16 human labelling outstanding"
+      ]
     }
   ],
   "document_claims": [
@@ -239,6 +406,63 @@
       "value": 0.254237,
       "run": "s11_efficientnet_b0_plantdoc_test",
       "status": "verified"
+    },
+    {
+      "claim": "convnext_tiny field calibration on PlantDoc (ECE 0.444, accuracy 0.263)",
+      "value": 0.444,
+      "run": "s11_convnext_tiny_plantdoc_test",
+      "status": "verified",
+      "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
+    },
+    {
+      "claim": "efficientnet_b0 field calibration on PlantDoc (ECE 0.581, accuracy 0.174)",
+      "value": 0.5808,
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified",
+      "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
+    },
+    {
+      "claim": "resnet18 field calibration on PlantDoc (ECE 0.494, accuracy 0.182)",
+      "value": 0.494,
+      "run": "s11_resnet18_plantdoc_test",
+      "status": "verified",
+      "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
+    },
+    {
+      "claim": "smallcnn field calibration on PlantDoc (ECE 0.794, accuracy 0.068)",
+      "value": 0.7942,
+      "run": "s11_smallcnn_plantdoc_test",
+      "status": "verified",
+      "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
+    },
+    {
+      "claim": "The architecture ranking reverses between PlantVillage and PlantDoc",
+      "value": {
+        "plantvillage_gap_convnext_vs_b0": 5e-05,
+        "plantdoc_gap_pp": 8.9
+      },
+      "run": "sweep_v2_overnight",
+      "status": "verified",
+      "caveat": "field side uses one checkpoint per architecture"
+    },
+    {
+      "claim": "At 90% coverage, abstention gains 0.8 pp for the reference model on PlantDoc",
+      "value": {
+        "full_coverage": 0.1737,
+        "at_90pct": 0.1745
+      },
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified"
+    },
+    {
+      "claim": "Neutralising the background costs 56.5 pp on PlantVillage",
+      "value": {
+        "baseline": 0.9975,
+        "background_grey": 0.4325
+      },
+      "run": "occlusion_b0_plantvillage",
+      "status": "verified",
+      "caveat": "HSV leaf mask heuristic; 400 images"
     }
   ],
   "sweeps": {
@@ -511,5 +735,31 @@
       "median_per_class_drop": 0.850806
     },
     "artifact": "reports/field_gap/FIELD_GAP_RESULTS.md"
+  },
+  "hypotheses": {
+    "H1": {
+      "verdict": "confirmed",
+      "evidence": "reports/field_gap/FIELD_GAP_RESULTS.md",
+      "statement": "Field accuracy is 81.9 pp below validation accuracy; all 27 mapped classes worse; and the architecture ranking reverses in the field.",
+      "artifact": "s11_efficientnet_b0_plantdoc_test"
+    },
+    "H2": {
+      "verdict": "partially supported",
+      "evidence": "reports/mechanism/MECHANISM_RESULTS.md",
+      "statement": "Neutralising the background costs 56.5 pp on PlantVillage, so lab accuracy is substantially background-dependent. But Grad-CAM enrichment over a leaf mask is only 1.20x, so the model is not simply 'looking at soil'. S16 human labelling is outstanding.",
+      "artifact": "occlusion_b0_plantvillage / occlusion_b0_plantdoc"
+    },
+    "H3": {
+      "verdict": "blocked",
+      "evidence": "reports/mechanism/MECHANISM_RESULTS.md",
+      "statement": "S18 failed: no licence-clean background corpus disjoint from PlantDoc exists in the repository, so the augmentation experiment cannot start without contaminating the field evaluation.",
+      "artifact": null
+    },
+    "H4": {
+      "verdict": "confirmed",
+      "evidence": "reports/field_gap/USEFULNESS_RESULTS.md",
+      "statement": "Nominal accuracy does not bound deployable accuracy, and abstention does not rescue it: at 90% coverage the reference model gains 0.8 pp (17.37 to 17.45). SmallCNN's confidence is anti-correlated with correctness.",
+      "artifact": "calibration_summary.json"
+    }
   }
 }

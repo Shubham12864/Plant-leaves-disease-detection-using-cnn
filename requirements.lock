@@ -1,0 +1,14 @@
+# Pinned versions the local checks in scripts/run_all.py were verified against.
+# torch/torchvision are the CPU builds because no local training or GPU inference is
+# permitted in this project; all model training runs on Kaggle 2x T4.
+# Kaggle's own environment is recorded per run in results/registry.json (torch_version,
+# torchvision_version are stored in every checkpoint's resume_config).
+torch==2.9.1+cpu
+torchvision==0.24.1+cpu
+numpy==2.4.6
+pandas==3.1.0
+matplotlib==3.11.2
+scikit-learn==1.9.1
+pillow==12.3.0
+tqdm==4.70.1
+pytest==9.1.1

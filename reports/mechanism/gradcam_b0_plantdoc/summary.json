@@ -1,0 +1,15 @@
+{
+  "checkpoint": "checkpoints\\efficientnet_b0\\efficientnet_b0_best.pt",
+  "architecture": "efficientnet_b0",
+  "maps_rendered": 18,
+  "groups": {
+    "high_confidence_wrong": 15,
+    "cross_crop": 39,
+    "high_confidence_right": 6
+  },
+  "saliency_sample": 50,
+  "cam_mass_inside_leaf_mean": 0.7352,
+  "cam_mass_inside_leaf_median": 0.7428,
+  "interpretation": "automated proxy over a heuristic HSV leaf mask; NOT the hand-labelling S16 requires",
+  "human_labels": "pending, see labelling_sheet.csv"
+}

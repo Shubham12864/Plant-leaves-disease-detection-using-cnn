@@ -1,0 +1,28 @@
+{
+  "checkpoint": "checkpoints\\efficientnet_b0\\efficientnet_b0_best.pt",
+  "architecture": "efficientnet_b0",
+  "domain": "PlantDoc",
+  "images": 236,
+  "baseline_accuracy": 0.17372881355932204,
+  "baseline_confidence": 0.7521607279777527,
+  "perturbations": {
+    "background_grey": {
+      "accuracy": 0.1440677966101695,
+      "accuracy_delta_pp": -2.97,
+      "flip_rate": 0.559322033898305,
+      "mean_confidence": 0.6336768269538879
+    },
+    "background_noise": {
+      "accuracy": 0.05508474576271186,
+      "accuracy_delta_pp": -11.86,
+      "flip_rate": 0.8220338983050848,
+      "mean_confidence": 0.8487548232078552
+    },
+    "centre_crop": {
+      "accuracy": 0.19915254237288135,
+      "accuracy_delta_pp": 2.54,
+      "flip_rate": 0.5847457627118644,
+      "mean_confidence": 0.7281173467636108
+    }
+  }
+}

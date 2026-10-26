@@ -1,0 +1,237 @@
+relative_path,true_class,baseline_pred,baseline_conf,background_grey_pred,background_noise_pred,centre_crop_pred,flipped_bg_grey,flipped_bg_noise,flipped_crop
+Apple leaf/20180511_090912-14gtw8a-e1526047952754.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.9214,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),0,1,1
+Apple leaf/20180511_091133-24l1vhg-e1526047988236.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.5678,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___Powdery_mildew,0,1,1
+Apple leaf/20180511_091252-1gy5xf5-e1526048000596.jpg,Apple___healthy,Apple___healthy,0.8724,Tomato___Septoria_leaf_spot,Apple___healthy,Apple___healthy,1,0,0
+Apple leaf/4120978-single-green-leaf-of-apple-tree.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.4798,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,0,0,0
+Apple leaf/apple-leaf-14319997.jpg,Apple___healthy,Cherry_(including_sour)___healthy,0.5334,Cherry_(including_sour)___healthy,Orange___Haunglongbing_(Citrus_greening),Cherry_(including_sour)___healthy,0,1,0
+Apple leaf/apple-leaf-9834637.jpg,Apple___healthy,Tomato___Late_blight,0.9691,Tomato___Tomato_mosaic_virus,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Squash___Powdery_mildew,1,1,1
+Apple leaf/apple-leaf-closeup-37636177.jpg,Apple___healthy,Blueberry___healthy,0.7752,Blueberry___healthy,Blueberry___healthy,Cherry_(including_sour)___healthy,0,0,1
+Apple leaf/apple-leaf-isolated-white-background-56631026.jpg,Apple___healthy,Orange___Haunglongbing_(Citrus_greening),0.7424,Cherry_(including_sour)___healthy,Orange___Haunglongbing_(Citrus_greening),Cherry_(including_sour)___healthy,1,0,1
+Apple leaf/Apple-Leaf-Wallpaper-17.jpg,Apple___healthy,Strawberry___healthy,0.7376,Strawberry___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Strawberry___healthy,0,1,0
+Apple rust leaf/02.-Rust-2017-207u24s.jpg,Apple___Cedar_apple_rust,Strawberry___Leaf_scorch,0.853,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___healthy,0,1,1
+Apple rust leaf/0605_Rust-induced_leafspot.jpg,Apple___Cedar_apple_rust,Strawberry___Leaf_scorch,0.8537,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Apple rust leaf/185161-004-EAF28842.jpg,Apple___Cedar_apple_rust,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9974,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+Apple rust leaf/2011-011.jpg,Apple___Cedar_apple_rust,Grape___Esca_(Black_Measles),0.4969,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Apple___Black_rot,1,1,1
+Apple rust leaf/20130519cedarapplerust.jpg,Apple___Cedar_apple_rust,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.863,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Grape___Black_rot,0,1,1
+Apple rust leaf/20130610_110514.jpg,Apple___Cedar_apple_rust,Grape___Black_rot,0.3255,Potato___Early_blight,Potato___Early_blight,Apple___Black_rot,1,1,1
+Apple rust leaf/20130802_111632.jpg,Apple___Cedar_apple_rust,Strawberry___Leaf_scorch,0.9998,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Apple rust leaf/4-apple-rust2_19011_matt-bertone.jpg,Apple___Cedar_apple_rust,Apple___Black_rot,0.9667,Tomato___Septoria_leaf_spot,Soybean___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Apple rust leaf/9343310-small.jpg,Apple___Cedar_apple_rust,Tomato___Early_blight,0.3708,Tomato___Early_blight,Corn_(maize)___healthy,Peach___Bacterial_spot,0,1,1
+Apple rust leaf/99e886623c2080c22f6519b0e708c531.jpg,Apple___Cedar_apple_rust,Peach___healthy,0.2704,Tomato___Late_blight,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,1
+Apple Scab Leaf/052609%20Hartman%20Crabapple%20scab%20single%20leaf.JPG.jpg,Apple___Apple_scab,Apple___Apple_scab,0.9797,Apple___Apple_scab,Corn_(maize)___healthy,Apple___Apple_scab,0,1,0
+Apple Scab Leaf/1b321015-6e33-4f18-aade-888f4383fe92.jpeg.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.973,Strawberry___Leaf_scorch,Cherry_(including_sour)___Powdery_mildew,Strawberry___Leaf_scorch,0,1,0
+Apple Scab Leaf/28-500x375.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.9997,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Apple Scab Leaf/816.jpg,Apple___Apple_scab,Apple___Apple_scab,0.7718,Strawberry___Leaf_scorch,Tomato___Late_blight,Apple___Cedar_apple_rust,1,1,1
+Apple Scab Leaf/apple%20scab%20leaf.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.8927,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,1
+Apple Scab Leaf/apple%20scabnew.jpg,Apple___Apple_scab,Tomato___Late_blight,0.4271,Strawberry___Leaf_scorch,Apple___healthy,Cherry_(including_sour)___healthy,1,1,1
+Apple Scab Leaf/apple-scab-5366820.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.9949,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Apple Scab Leaf/apples_apple-scab_01_zoom.jpg,Apple___Apple_scab,Strawberry___Leaf_scorch,0.8657,Tomato___Late_blight,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,1
+Apple Scab Leaf/apples_apple-scab_02_thm.jpg,Apple___Apple_scab,Potato___Early_blight,0.6937,Apple___Apple_scab,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,1
+Apple Scab Leaf/apples_apple-scab_10_zoom.jpg,Apple___Apple_scab,Squash___Powdery_mildew,0.419,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Squash___Powdery_mildew,1,1,0
+Bell_pepper leaf/10148582-green-leaf-of-pepper.jpg,"Pepper,_bell___healthy",Tomato___Late_blight,0.5023,Strawberry___healthy,Soybean___healthy,Cherry_(including_sour)___healthy,1,1,1
+Bell_pepper leaf/4825902504_5fa80b65b8_z.jpg,"Pepper,_bell___healthy",Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.9555,Tomato___Septoria_leaf_spot,Blueberry___healthy,Cherry_(including_sour)___healthy,1,1,1
+Bell_pepper leaf/e33155.jpg,"Pepper,_bell___healthy",Cherry_(including_sour)___healthy,0.9965,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,0
+Bell_pepper leaf/GREEN%20BELL%20PLANT%20YELLOW%20LEAF.JPG.jpg,"Pepper,_bell___healthy",Strawberry___Leaf_scorch,0.8235,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),0,1,1
+Bell_pepper leaf/IMG_1629.JPG_1507122477.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9772,Tomato___Late_blight,Corn_(maize)___healthy,Corn_(maize)___healthy,1,1,1
+Bell_pepper leaf/pepper_leaf.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9996,"Pepper,_bell___healthy",Corn_(maize)___healthy,"Pepper,_bell___healthy",0,1,0
+Bell_pepper leaf/RnGnC.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9995,"Pepper,_bell___healthy",Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Bell_pepper leaf/why-are-my-pepper-plants-yellow-yellow-pepper-plants-yellow-leaves-green-veins-pepper-plants-yellow-veins.jpg,"Pepper,_bell___healthy","Pepper,_bell___healthy",0.9742,"Pepper,_bell___healthy","Pepper,_bell___healthy","Pepper,_bell___healthy",0,0,0
+Bell_pepper leaf spot/00.jpg,"Pepper,_bell___Bacterial_spot",Strawberry___Leaf_scorch,0.9905,Corn_(maize)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Bell_pepper leaf spot/000.jpg,"Pepper,_bell___Bacterial_spot",Tomato___Early_blight,0.3344,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___Early_blight,1,1,0
+Bell_pepper leaf spot/01.jpg,"Pepper,_bell___Bacterial_spot",Tomato___Late_blight,0.9596,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Late_blight,1,1,0
+Bell_pepper leaf spot/Bacterial-spot-pepper2.jpg,"Pepper,_bell___Bacterial_spot",Grape___Black_rot,0.9418,Grape___Black_rot,Corn_(maize)___healthy,Grape___Black_rot,0,1,0
+Bell_pepper leaf spot/bacterial_leaf_spot_pepper_l.jpg,"Pepper,_bell___Bacterial_spot","Pepper,_bell___healthy",0.6808,"Pepper,_bell___healthy",Corn_(maize)___healthy,"Pepper,_bell___Bacterial_spot",0,1,1
+Bell_pepper leaf spot/CMVpepperLeafShock-copy-50QUALITY-1ge8umw.jpg,"Pepper,_bell___Bacterial_spot",Grape___Black_rot,0.764,Grape___Black_rot,Grape___Black_rot,Grape___Black_rot,0,0,0
+Bell_pepper leaf spot/H5w92.jpg,"Pepper,_bell___Bacterial_spot","Pepper,_bell___Bacterial_spot",0.5125,Tomato___Late_blight,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),1,1,1
+Bell_pepper leaf spot/pepper-spot.jpg,"Pepper,_bell___Bacterial_spot","Pepper,_bell___healthy",0.9689,"Pepper,_bell___healthy",Corn_(maize)___healthy,"Pepper,_bell___healthy",0,1,0
+Bell_pepper leaf spot/pepper_bacterial-spot_03_zoom.jpg,"Pepper,_bell___Bacterial_spot",Tomato___Septoria_leaf_spot,0.7962,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,1,1,0
+Blueberry leaf/blueberry-leaves-normal-above-and-iron-deficient-below-bgahf8.jpg,Blueberry___healthy,Cherry_(including_sour)___healthy,0.2735,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,0
+Blueberry leaf/blueberrysilverleaf16-1372b.jpg,Blueberry___healthy,Blueberry___healthy,0.9377,Blueberry___healthy,Blueberry___healthy,Blueberry___healthy,0,0,0
+Blueberry leaf/leaf-blueberry-15281271.jpg,Blueberry___healthy,Tomato___Late_blight,0.9944,Tomato___Late_blight,Tomato___Late_blight,Tomato___Late_blight,0,0,0
+Blueberry leaf/northern-highbush-blueberry-blue-huckleberry-vaccinium-corymbosum-EHNXRR.jpg,Blueberry___healthy,Orange___Haunglongbing_(Citrus_greening),0.7592,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),1,1,0
+Blueberry leaf/P1200665+Vaccinium+alaskaense+vs+ovalifolium+leaf+and++twig+cr.jpg,Blueberry___healthy,Orange___Haunglongbing_(Citrus_greening),0.8247,Tomato___Septoria_leaf_spot,Orange___Haunglongbing_(Citrus_greening),Orange___Haunglongbing_(Citrus_greening),1,0,0
+Blueberry leaf/P1200701+Vaccinium+ovalifolium+Oval-leaf+Blueberry+leaf+margin+Heather+Meadows+cr.jpg,Blueberry___healthy,Cherry_(including_sour)___healthy,0.9526,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,0
+Blueberry leaf/stock-photo-blueberry-leaf-closeup-isolated-on-white-306486470.jpg,Blueberry___healthy,Blueberry___healthy,0.9886,Blueberry___healthy,Blueberry___healthy,Blueberry___healthy,0,0,0
+Blueberry leaf/stock-photo-green-blueberry-leaf-isolated-with-clipping-path-550344304.jpg,Blueberry___healthy,Apple___healthy,0.4481,Blueberry___healthy,Apple___healthy,Blueberry___healthy,1,0,1
+Blueberry leaf/stock-photo-two-sides-of-blueberry-leaf-isolated-on-white-15582232.jpg,Blueberry___healthy,Blueberry___healthy,0.9988,Tomato___Septoria_leaf_spot,Blueberry___healthy,Blueberry___healthy,1,0,0
+Blueberry leaf/vaccinium-angustifolium-low-bush-blueberry_0830_124221.jpg,Blueberry___healthy,Strawberry___Leaf_scorch,0.9062,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Blueberry leaf/vaccinium_angustifolium_leaf2.JPG.jpg,Blueberry___healthy,Cherry_(including_sour)___healthy,0.4665,Tomato___Late_blight,Corn_(maize)___healthy,Corn_(maize)___healthy,1,1,1
+Cherry leaf/d7b79dbc0bca0eb3e63fbe5dfb256ccd53d90a4eb1413_1260x1260.jpg,Cherry_(including_sour)___healthy,Blueberry___healthy,0.5909,Strawberry___healthy,Corn_(maize)___healthy,Tomato___Late_blight,1,1,1
+Cherry leaf/e52bbb9a08ede2948ba0c006f02fe7b053ad7831d1df6_1260x1260.jpg,Cherry_(including_sour)___healthy,Tomato___Late_blight,0.5404,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),1,1,1
+Cherry leaf/ed12ff77ce021883de241830dee55e2e53d2c93231699_1260x1260.jpg,Cherry_(including_sour)___healthy,Apple___healthy,0.7,Strawberry___healthy,Blueberry___healthy,Apple___healthy,1,1,0
+Cherry leaf/fc729af279e9087d00bd32d89a1552a756a3ad9de7f2b_1260x1260.jpg,Cherry_(including_sour)___healthy,Apple___healthy,0.9208,Cherry_(including_sour)___healthy,Blueberry___healthy,Cherry_(including_sour)___healthy,1,1,1
+Cherry leaf/five-cherry-tree-green-leaves-white-isolated-background-34493587.jpg,Cherry_(including_sour)___healthy,Tomato___Late_blight,0.9987,Tomato___Late_blight,Tomato___Late_blight,Corn_(maize)___healthy,0,0,1
+Cherry leaf/prunsero_leaf1.jpg,Cherry_(including_sour)___healthy,Apple___healthy,0.4577,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Peach___Bacterial_spot,1,1,1
+Cherry leaf/prunsero_leaf2.jpg,Cherry_(including_sour)___healthy,Peach___Bacterial_spot,0.7503,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Apple___healthy,1,1,1
+Cherry leaf/prunus-virginiana-le-gmittelhauser.jpg,Cherry_(including_sour)___healthy,"Pepper,_bell___healthy",0.4848,Apple___healthy,"Pepper,_bell___healthy",Apple___healthy,1,0,1
+Cherry leaf/red-cherry-tree-leaf-isolated-crisp-white-background-35742030.jpg,Cherry_(including_sour)___healthy,Tomato___Late_blight,0.2257,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___Common_rust_,1,1,1
+Cherry leaf/three-vibrant-leaves-bird-cherry-tree-13905898.jpg,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,0.2501,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,0
+Corn Gray leaf spot/IMG_42231.jpg,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,0.7892,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,0,0,0
+Corn Gray leaf spot/rsz0803Figure6.jpg,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Northern_Leaf_Blight,0.9932,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Northern_Leaf_Blight,0,0,0
+"Corn Gray leaf spot/show_picture.asp_id=aaaaaaaaaaogcqq&w2=420&h2=378&clip=center,420,378&meta=0.jpg",Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9968,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,0,0
+Corn Gray leaf spot/strom5.jpg,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1.0,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+Corn leaf blight/02c.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___healthy,0.6327,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___Northern_Leaf_Blight,0,0,1
+Corn leaf blight/0796.20graylssymt.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9975,Corn_(maize)___Common_rust_,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,0
+Corn leaf blight/07c.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.8202,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,0
+Corn leaf blight/0c.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Northern_Leaf_Blight,0.6747,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___Northern_Leaf_Blight,1,1,0
+Corn leaf blight/1321189.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.7031,Tomato___Leaf_Mold,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,0
+Corn leaf blight/160314_web.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Northern_Leaf_Blight,0.9998,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Northern_Leaf_Blight,0,1,0
+Corn leaf blight/2013Corn_GrayLeafSpot_0815_0003.JPG.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9959,Corn_(maize)___Common_rust_,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,0
+Corn leaf blight/2015070295153021.jpg,Corn_(maize)___Northern_Leaf_Blight,Orange___Haunglongbing_(Citrus_greening),0.9443,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Corn leaf blight/Common%20Diseases%20Figure%201.JPG.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9999,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+Corn leaf blight/corn-disease-update-fig-3-gray-leaf-spot.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.6772,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,1,1,1
+Corn leaf blight/corn-gray-leaf-spot-f4.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1.0,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+Corn leaf blight/Corn-SCLB-2017-1.jpg,Corn_(maize)___Northern_Leaf_Blight,Corn_(maize)___Common_rust_,0.9829,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Corn rust leaf/0796.39maizerust.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.985,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Corn rust leaf/0796.40comrust.jpg,Corn_(maize)___Common_rust_,Strawberry___Leaf_scorch,0.8971,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Corn rust leaf/0796.47southrust.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___healthy,0.6427,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,0,0,0
+Corn rust leaf/0796.52srusttelia.jpg,Corn_(maize)___Common_rust_,Tomato___Septoria_leaf_spot,0.9949,Tomato___Septoria_leaf_spot,Tomato___Septoria_leaf_spot,Tomato___Septoria_leaf_spot,0,0,0
+Corn rust leaf/12-19striprustJIM.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.999,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+Corn rust leaf/1355.50commonrust.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9765,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Corn rust leaf/2256-body-1501555581-1.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___healthy,0.6799,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,0,0,0
+Corn rust leaf/393.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___Northern_Leaf_Blight,0.6755,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Corn rust leaf/5496239405_d95bdb97d1_z.jpg,Corn_(maize)___Common_rust_,Strawberry___Leaf_scorch,0.4287,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Corn rust leaf/80104747.jpg,Corn_(maize)___Common_rust_,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0.9997,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,0
+grape leaf/0000.jpg,Grape___healthy,Grape___healthy,0.5369,Tomato___Late_blight,Corn_(maize)___healthy,Grape___Esca_(Black_Measles),1,1,1
+grape leaf/730-grape-leaf-2560x1600-nature-wallpaper.jpg,Grape___healthy,Tomato___Late_blight,0.5749,Tomato___Septoria_leaf_spot,Tomato___Late_blight,Corn_(maize)___healthy,1,0,1
+grape leaf/depositphotos_3443387-stock-photo-the-green-grape-leaf-on.jpg,Grape___healthy,Grape___healthy,0.8498,Strawberry___healthy,Tomato___Late_blight,Grape___healthy,1,1,0
+grape leaf/depositphotos_6898486-stock-photo-grape-leaves.jpg,Grape___healthy,Grape___healthy,0.9173,Strawberry___healthy,Corn_(maize)___healthy,Grape___healthy,1,1,0
+grape leaf/DSCN7317.JPG.jpg,Grape___healthy,Cherry_(including_sour)___healthy,0.9764,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,0
+grape leaf/grape-leaf-14309623.jpg,Grape___healthy,Grape___healthy,1.0,Tomato___Septoria_leaf_spot,Grape___healthy,Grape___healthy,1,0,0
+grape leaf/grape-leaf-picture-id119212425_k=6&m=119212425&s=612x612&w=0&h=8RZBWGcvXe4tAwhhvYZVFzWyRyiN5iTxKfWBpPT1FcU=.jpg,Grape___healthy,Grape___healthy,0.9993,Grape___healthy,Grape___healthy,Grape___healthy,0,0,0
+grape leaf/grapes-leaves.jpg,Grape___healthy,Grape___healthy,0.9996,Grape___healthy,Grape___healthy,Grape___healthy,0,0,0
+grape leaf/grapevine-leaf-7466071.jpg,Grape___healthy,Tomato___Late_blight,0.828,Tomato___Late_blight,Corn_(maize)___healthy,Grape___healthy,0,1,1
+grape leaf/latest_cb=20100621160325.jpg,Grape___healthy,Grape___healthy,0.8342,Tomato___Septoria_leaf_spot,Tomato___Late_blight,Orange___Haunglongbing_(Citrus_greening),1,1,1
+grape leaf/P1130286.jpg,Grape___healthy,Strawberry___Leaf_scorch,0.9344,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+grape leaf/vitis-riparia-le-ahaines-b.jpg,Grape___healthy,Cherry_(including_sour)___healthy,0.9944,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,0
+grape leaf black rot/03gb.jpg,Grape___Black_rot,Strawberry___Leaf_scorch,0.9876,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___Late_blight,0,1,1
+grape leaf black rot/35589125035_662dd5b258_b.jpg,Grape___Black_rot,Cherry_(including_sour)___healthy,0.9814,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,Strawberry___Leaf_scorch,0,0,1
+grape leaf black rot/5-29black-rot-chardRR.jpg,Grape___Black_rot,Grape___Black_rot,0.9977,Corn_(maize)___healthy,Corn_(maize)___healthy,Grape___Black_rot,1,1,0
+grape leaf black rot/Black%20rot%20on%20foliage.jpg,Grape___Black_rot,Grape___Black_rot,0.5312,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Apple___Black_rot,1,1,1
+grape leaf black rot/Black%20rot%20on%20foliage2.jpg,Grape___Black_rot,Grape___Black_rot,0.8312,Grape___Black_rot,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,1
+grape leaf black rot/brleaf2_zoom.jpg,Grape___Black_rot,Strawberry___Leaf_scorch,0.9675,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+grape leaf black rot/grape_F15a.jpg,Grape___Black_rot,Tomato___Septoria_leaf_spot,0.8622,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,0
+grape leaf black rot/piano%20gully%20spray%20seed%20damage%2006%20%289%29.JPG.jpg,Grape___Black_rot,Grape___Black_rot,0.9357,Grape___Black_rot,Corn_(maize)___healthy,Grape___Black_rot,0,1,0
+Peach leaf/00pe.jpg,Peach___healthy,Cherry_(including_sour)___healthy,0.383,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Apple___healthy,0,1,1
+Peach leaf/7190f27ead55c0f6e3ff8b982972810a5446a9713a49d_1260x1260.jpg,Peach___healthy,Blueberry___healthy,0.5484,Strawberry___healthy,Peach___healthy,Peach___Bacterial_spot,1,1,1
+Peach leaf/depositphotos_3786198-Peach-leaf.jpg,Peach___healthy,Blueberry___healthy,0.7702,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Peach___healthy,Peach___healthy,1,1,1
+Peach leaf/peach-leaf-10223898.jpg,Peach___healthy,Blueberry___healthy,0.9745,Cherry_(including_sour)___healthy,Blueberry___healthy,Blueberry___healthy,1,0,0
+Peach leaf/peach-leaf-16690421.jpg,Peach___healthy,Cherry_(including_sour)___healthy,0.3242,Tomato___Tomato_mosaic_virus,Orange___Haunglongbing_(Citrus_greening),Corn_(maize)___healthy,1,1,1
+Peach leaf/peach-leaf-isolated-white-background-42295220.jpg,Peach___healthy,Blueberry___healthy,0.8381,Blueberry___healthy,Corn_(maize)___healthy,Blueberry___healthy,0,1,0
+Peach leaf/rose_tree_220430.jpg,Peach___healthy,Strawberry___Leaf_scorch,0.8757,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Peach___Bacterial_spot,1,1,1
+Peach leaf/stock-photo-peach-leaf-isolated-on-white-background-281097503.jpg,Peach___healthy,Tomato___Late_blight,0.7166,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),1,1,1
+Peach leaf/stock-photo-peach-tree-leaf-isolated-over-white-background-back-side-64472731.jpg,Peach___healthy,Blueberry___healthy,0.984,Strawberry___healthy,Peach___healthy,Peach___healthy,1,1,1
+Potato leaf early blight/3023.jpg,Potato___Early_blight,Cherry_(including_sour)___healthy,0.9015,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,1
+Potato leaf early blight/backus-056-potato-blight.jpg,Potato___Early_blight,Cherry_(including_sour)___healthy,0.6905,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,0
+Potato leaf early blight/early-blight-alternaria-alternata-leaf-spotting-on-potato-leaf-X91XJE.jpg,Potato___Early_blight,Tomato___Early_blight,0.4764,Strawberry___Leaf_scorch,Tomato___Septoria_leaf_spot,Potato___Early_blight,1,1,1
+Potato leaf early blight/early-blight-or-target-spot-alternaria-solani-lesions-on-a-tomato-AXK6AY.jpg,Potato___Early_blight,Tomato___Late_blight,0.8504,Tomato___Septoria_leaf_spot,Tomato___Late_blight,Tomato___Early_blight,1,0,1
+Potato leaf early blight/earlyblightpotato.jpg,Potato___Early_blight,Potato___Early_blight,0.3922,Strawberry___Leaf_scorch,Strawberry___Leaf_scorch,Tomato___Septoria_leaf_spot,1,1,1
+Potato leaf early blight/potato-blight-phytophthora-infestans-close-up-of-upper-surface-of-BMMRXC.jpg,Potato___Early_blight,Tomato___Late_blight,0.9248,Strawberry___Leaf_scorch,Blueberry___healthy,Potato___Late_blight,1,1,1
+Potato leaf early blight/potato-early-blight-alternaria-alternata-lesion-on-a-potato-leaf-a1w1em.jpg,Potato___Early_blight,Tomato___Late_blight,0.4486,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,1,1,1
+Potato leaf early blight/potatobd001.jpg,Potato___Early_blight,Grape___Leaf_blight_(Isariopsis_Leaf_Spot),0.5903,Grape___Leaf_blight_(Isariopsis_Leaf_Spot),Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,1
+Potato leaf late blight/1421_0.jpeg_itok=FMtmgePj.jpg,Potato___Late_blight,Potato___Early_blight,0.9946,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,1
+Potato leaf late blight/20090710-lateblight.jpg,Potato___Late_blight,Tomato___Late_blight,0.9676,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Strawberry___healthy,1,1,1
+Potato leaf late blight/2540_600.jpg,Potato___Late_blight,Tomato___Late_blight,0.9903,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Late_blight,0,1,0
+Potato leaf late blight/5816740026_d42ef24413_Phytophthora-Infestans.jpg,Potato___Late_blight,Strawberry___Leaf_scorch,0.4052,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Late_blight,1,1,1
+Potato leaf late blight/B2750109-Late_blight_on_a_potato_plant-SPL.jpg,Potato___Late_blight,"Pepper,_bell___healthy",0.2975,"Pepper,_bell___Bacterial_spot",Corn_(maize)___healthy,Blueberry___healthy,1,1,1
+Potato leaf late blight/irish-blight-symptoms-on-potato-leaves-atmf8b.jpg,Potato___Late_blight,Tomato___Late_blight,0.985,Strawberry___Leaf_scorch,Tomato___Late_blight,Tomato___Late_blight,1,0,0
+Potato leaf late blight/LateBlight04.jpg,Potato___Late_blight,Strawberry___Leaf_scorch,0.5891,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,Tomato___Septoria_leaf_spot,1,1,1
+Potato leaf late blight/potato-late-blight.jpg,Potato___Late_blight,Tomato___Late_blight,1.0,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Late_blight,0,1,0
+Raspberry leaf/depositphotos_1323264-Raspberry-leaf-on-white.jpg,Raspberry___healthy,Raspberry___healthy,0.6906,Raspberry___healthy,Corn_(maize)___healthy,Raspberry___healthy,0,1,0
+Raspberry leaf/depositphotos_1323551-stock-photo-raspberry-leaves.jpg,Raspberry___healthy,Tomato___Late_blight,0.4137,Tomato___Late_blight,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Strawberry___healthy,0,1,1
+Raspberry leaf/depositphotos_2795312-stock-photo-green-raspberry-leaf.jpg,Raspberry___healthy,Tomato___Late_blight,0.9365,Strawberry___Leaf_scorch,Tomato___Late_blight,Grape___healthy,1,0,1
+Raspberry leaf/iron-deficiency-raspberry-leaf-chlorosis-isolated-32457798.jpg,Raspberry___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.9217,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Strawberry___healthy,1,1,1
+Raspberry leaf/leaves-of-raspberry-stock-picture-2529053.jpg,Raspberry___healthy,Grape___healthy,0.5843,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Raspberry___healthy,1,1,1
+Raspberry leaf/Raspberry-leaf.jpg,Raspberry___healthy,Raspberry___healthy,0.7199,Tomato___Late_blight,Corn_(maize)___healthy,Raspberry___healthy,1,1,0
+Raspberry leaf/three-raspberry-green-leaves-isolated-white-background-62022932.jpg,Raspberry___healthy,Tomato___Late_blight,0.7866,Tomato___Late_blight,Tomato___Late_blight,Tomato___Tomato_mosaic_virus,0,0,1
+Soyabean leaf/07feb_ma_sbr3.JPG.jpg,Soybean___healthy,Corn_(maize)___Common_rust_,0.6621,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Orange___Haunglongbing_(Citrus_greening),1,1,1
+Soyabean leaf/fresh-soy-leaves-isolated-on-260nw-667193923.jpg,Soybean___healthy,Tomato___Late_blight,0.9025,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Tomato___Late_blight,Strawberry___healthy,1,0,1
+Soyabean leaf/leaf-raspberry-isolated-on-a-white-stock-photography-image-10106222-1625198.jpg,Soybean___healthy,Grape___healthy,0.6102,Tomato___Late_blight,Blueberry___healthy,Strawberry___healthy,1,1,1
+Soyabean leaf/resistance1c.jpg,Soybean___healthy,Cherry_(including_sour)___healthy,0.8747,Corn_(maize)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,0
+Soyabean leaf/Soybean%20edamame%20leaf1.JPG.jpg,Soybean___healthy,Tomato___Late_blight,0.4514,Blueberry___healthy,Tomato___healthy,Tomato___Late_blight,1,1,0
+Soyabean leaf/stock-photo-fresh-soy-leaves-isolated-on-white-94266130.jpg,Soybean___healthy,Tomato___Late_blight,0.9789,Tomato___Tomato_mosaic_virus,Blueberry___healthy,Tomato___Late_blight,1,1,0
+Soyabean leaf/stock-photo-fresh-soy-leaves-isolated-on-white-94700095.jpg,Soybean___healthy,Tomato___Late_blight,0.8498,Tomato___Late_blight,Blueberry___healthy,Blueberry___healthy,0,1,1
+Soyabean leaf/stock-photo-soy-leaf-isolated-on-white-background-120961801.jpg,Soybean___healthy,Strawberry___healthy,0.4051,Tomato___Tomato_mosaic_virus,Blueberry___healthy,Strawberry___healthy,1,1,0
+Squash Powdery mildew leaf/powdery-mildew-erysiphe-plantani-on-young-sycamore-leaves-b774tm.jpg,Squash___Powdery_mildew,Cherry_(including_sour)___healthy,0.6385,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Squash___Powdery_mildew,0,1,1
+Squash Powdery mildew leaf/powdery-mildew-on-pumpkin-leaves-close-up-2.jpg,Squash___Powdery_mildew,Corn_(maize)___healthy,0.7487,Squash___Powdery_mildew,Corn_(maize)___healthy,Squash___Powdery_mildew,1,0,1
+Squash Powdery mildew leaf/Powdery-Mildew-on-squash.jpg,Squash___Powdery_mildew,Squash___Powdery_mildew,0.3276,Squash___Powdery_mildew,Corn_(maize)___healthy,Tomato___Early_blight,0,1,1
+Squash Powdery mildew leaf/powdery-mildew-sphaerotheca-fuliginea-infection-on-pumpkin-leaves-ajdkkx.jpg,Squash___Powdery_mildew,Strawberry___Leaf_scorch,0.7117,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,0,1,1
+Squash Powdery mildew leaf/squash-leave-w-powd-mild.jpg,Squash___Powdery_mildew,Tomato___Target_Spot,0.4492,Tomato___Early_blight,Corn_(maize)___healthy,Squash___Powdery_mildew,1,1,1
+Squash Powdery mildew leaf/surface.jpg,Squash___Powdery_mildew,"Pepper,_bell___healthy",0.8364,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,1,1,1
+Strawberry leaf/strawberry-leaf--stock-photo-1431216.jpg,Strawberry___healthy,Raspberry___healthy,0.5391,Raspberry___healthy,Corn_(maize)___healthy,Raspberry___healthy,0,1,0
+Strawberry leaf/strawberry-leaf-22360816.jpg,Strawberry___healthy,Grape___healthy,0.9155,Tomato___Late_blight,Grape___healthy,Grape___healthy,1,0,0
+Strawberry leaf/strawberry-leaves-collection-white-background-36684676.jpg,Strawberry___healthy,Grape___healthy,0.6958,Tomato___Late_blight,Grape___healthy,Corn_(maize)___healthy,1,0,1
+Strawberry leaf/strawberry-leaves-isolated-white-17473157.jpg,Strawberry___healthy,Strawberry___Leaf_scorch,0.4256,Strawberry___healthy,Corn_(maize)___healthy,Strawberry___healthy,1,1,1
+Strawberry leaf/strawberry-leaves-isolated-white-34722259.jpg,Strawberry___healthy,Tomato___Late_blight,0.3443,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___healthy,1,1,1
+Strawberry leaf/strawberry-leaves-stock-image-948674.jpg,Strawberry___healthy,Tomato___Late_blight,0.5237,Strawberry___Leaf_scorch,Tomato___Late_blight,Strawberry___Leaf_scorch,1,0,1
+Strawberry leaf/strawberry-leaves-stock-picture-948708.jpg,Strawberry___healthy,Tomato___Late_blight,0.8079,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___healthy,1,1,1
+Strawberry leaf/wild-strawberry-leaf-top-view-rotated-KTBXCY.jpg,Strawberry___healthy,Tomato___Late_blight,0.4382,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,1
+Tomato Early blight leaf/039b47d574bc4bb8a14259a1cd96a741.jpg,Tomato___Early_blight,Tomato___Septoria_leaf_spot,0.8997,Tomato___Early_blight,Corn_(maize)___healthy,Tomato___Leaf_Mold,1,1,1
+Tomato Early blight leaf/100983448.jpg,Tomato___Early_blight,Tomato___Early_blight,0.9819,Tomato___Early_blight,Corn_(maize)___healthy,Tomato___Early_blight,0,1,0
+Tomato Early blight leaf/1234080-Early-Blight.jpg,Tomato___Early_blight,Strawberry___Leaf_scorch,0.7431,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato Early blight leaf/bugs-and-blight-061.jpg,Tomato___Early_blight,Cherry_(including_sour)___healthy,0.5428,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,1
+Tomato Early blight leaf/dscn3175.jpg,Tomato___Early_blight,Strawberry___Leaf_scorch,0.6458,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato Early blight leaf/early_blight1-150x150.jpg,Tomato___Early_blight,Tomato___Early_blight,0.9009,Tomato___Early_blight,Corn_(maize)___healthy,Tomato___Early_blight,0,1,0
+Tomato Early blight leaf/earlyblight21_.jpg,Tomato___Early_blight,Tomato___Early_blight,0.4224,"Pepper,_bell___Bacterial_spot",Corn_(maize)___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,1,1,1
+Tomato Early blight leaf/Shoemaker_7068.JPG.jpg,Tomato___Early_blight,Tomato___Early_blight,0.9789,Corn_(maize)___healthy,Corn_(maize)___healthy,Grape___Black_rot,1,1,1
+Tomato Early blight leaf/tomato_early-blight_01_zoom.jpg,Tomato___Early_blight,Strawberry___Leaf_scorch,0.8291,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Early_blight,1,1,1
+Tomato leaf/1684.jpg,Tomato___healthy,Grape___healthy,0.3316,Strawberry___healthy,Corn_(maize)___healthy,Tomato___Late_blight,1,1,1
+Tomato leaf/2013-08-20-06.jpg,Tomato___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.3996,Tomato___Septoria_leaf_spot,Grape___Esca_(Black_Measles),Strawberry___Leaf_scorch,1,1,1
+Tomato leaf/90e2c0.jpg,Tomato___healthy,Tomato___Tomato_mosaic_virus,0.3021,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Tomato___Early_blight,0,1,1
+Tomato leaf/DSCN1015.JPG.jpg,Tomato___healthy,Tomato___Late_blight,0.9136,Strawberry___healthy,Corn_(maize)___healthy,Tomato___Late_blight,1,1,0
+Tomato leaf/IMG_1246.jpg,Tomato___healthy,Cherry_(including_sour)___healthy,0.5693,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Tomato leaf/main-qimg-d9c2a93f60568485c989670d9bbf703b.jpg,Tomato___healthy,Tomato___Late_blight,0.841,Strawberry___healthy,Corn_(maize)___healthy,Strawberry___healthy,1,1,1
+Tomato leaf/Tomato59.JPG.jpg,Tomato___healthy,Strawberry___Leaf_scorch,0.7668,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf/Tomato_leaf.jpg,Tomato___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.9429,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Potato___healthy,Cherry_(including_sour)___healthy,0,1,1
+Tomato leaf bacterial spot/%2320+Bacterial+Spot+and+Speck.jpg,Tomato___Bacterial_spot,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.7396,Tomato___Early_blight,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Strawberry___Leaf_scorch,1,0,1
+Tomato leaf bacterial spot/07.17.18-Common_Tomato_Diseases_Canker-258x300.jpg,Tomato___Bacterial_spot,Strawberry___Leaf_scorch,0.5493,Tomato___Late_blight,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf bacterial spot/bact-spot-fig-1.jpg,Tomato___Bacterial_spot,Strawberry___Leaf_scorch,0.7565,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Tomato leaf bacterial spot/Bacterial_spots563.jpg,Tomato___Bacterial_spot,Grape___Black_rot,0.5294,Blueberry___healthy,Corn_(maize)___healthy,Peach___Bacterial_spot,1,1,1
+Tomato leaf bacterial spot/Tom_Bact3.jpg,Tomato___Bacterial_spot,Tomato___Septoria_leaf_spot,0.4557,Tomato___Septoria_leaf_spot,Corn_(maize)___Common_rust_,Orange___Haunglongbing_(Citrus_greening),0,1,1
+Tomato leaf bacterial spot/Tom_Bact7.jpg,Tomato___Bacterial_spot,Strawberry___Leaf_scorch,0.6664,Strawberry___Leaf_scorch,Strawberry___Leaf_scorch,Cherry_(including_sour)___healthy,0,0,1
+Tomato leaf bacterial spot/Tomato%2BBacterial%2BSpot%2Bon%2BLeaves.jpg,Tomato___Bacterial_spot,Strawberry___Leaf_scorch,0.9405,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf bacterial spot/tomato_bacterial-speck_01_zoom.jpg,Tomato___Bacterial_spot,Tomato___Septoria_leaf_spot,0.2685,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Grape___Black_rot,0,1,1
+Tomato leaf bacterial spot/tomato_V8.jpg,Tomato___Bacterial_spot,Tomato___Septoria_leaf_spot,0.8681,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,0
+Tomato leaf late blight/110822-206-Tomato-blight.jpg,Tomato___Late_blight,Tomato___Late_blight,0.9893,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Late_blight,0,1,0
+Tomato leaf late blight/18c.jpg,Tomato___Late_blight,Tomato___Late_blight,0.308,Tomato___Early_blight,Corn_(maize)___healthy,Potato___Early_blight,1,1,1
+Tomato leaf late blight/636368370164094909-late-blight-15-.jpg,Tomato___Late_blight,Tomato___Target_Spot,0.9308,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Late_blight,1,1,1
+Tomato leaf late blight/70.jpg,Tomato___Late_blight,Strawberry___Leaf_scorch,0.9762,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf late blight/dsc_8148cs.jpg,Tomato___Late_blight,Strawberry___Leaf_scorch,0.5861,Tomato___Late_blight,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf late blight/E%29Tomato-late-blight-foliar.jpg,Tomato___Late_blight,Tomato___Late_blight,0.996,Tomato___Late_blight,Tomato___Late_blight,Tomato___Late_blight,0,0,0
+Tomato leaf late blight/image.jpg,Tomato___Late_blight,Tomato___Early_blight,0.5968,Tomato___Early_blight,Corn_(maize)___healthy,Tomato___Tomato_mosaic_virus,0,1,1
+Tomato leaf late blight/IMG_5808.jpg,Tomato___Late_blight,Cherry_(including_sour)___healthy,0.3036,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Late_blight,0,1,1
+Tomato leaf late blight/late_blight_tomato_leaf_spore1x1200.jpg,Tomato___Late_blight,Tomato___Target_Spot,0.9393,Strawberry___healthy,Corn_(maize)___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,1,1,1
+Tomato leaf late blight/LateBlt09_06.jpg,Tomato___Late_blight,Strawberry___Leaf_scorch,0.5074,Corn_(maize)___healthy,Corn_(maize)___healthy,Grape___Esca_(Black_Measles),1,1,1
+Tomato leaf mosaic virus/9511.img.jpg,Tomato___Tomato_mosaic_virus,Strawberry___Leaf_scorch,0.9626,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Tomato leaf mosaic virus/D%29AlfMov.jpg,Tomato___Tomato_mosaic_virus,Tomato___Septoria_leaf_spot,0.6293,Tomato___Tomato_mosaic_virus,Corn_(maize)___healthy,Tomato___Leaf_Mold,1,1,1
+Tomato leaf mosaic virus/everystockphoto-21099455-l.jpg,Tomato___Tomato_mosaic_virus,Cherry_(including_sour)___healthy,0.9702,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Squash___Powdery_mildew,0,1,1
+Tomato leaf mosaic virus/ill-tomato-of-tomato-mosaic-virus-DBE17N.jpg,Tomato___Tomato_mosaic_virus,Cherry_(including_sour)___healthy,0.7681,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Early_blight,0,1,1
+Tomato leaf mosaic virus/page_2.jpg,Tomato___Tomato_mosaic_virus,Grape___Esca_(Black_Measles),0.9963,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,1
+Tomato leaf mosaic virus/tmv-tomato-34.jpg,Tomato___Tomato_mosaic_virus,Cherry_(including_sour)___healthy,0.5766,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,Tomato___Septoria_leaf_spot,0,0,1
+Tomato leaf mosaic virus/tmv-tomato-9.jpg,Tomato___Tomato_mosaic_virus,Tomato___Late_blight,0.999,Tomato___Late_blight,Corn_(maize)___healthy,Corn_(maize)___healthy,0,1,1
+Tomato leaf mosaic virus/toma_TMV.jpg,Tomato___Tomato_mosaic_virus,Cherry_(including_sour)___healthy,0.5984,Strawberry___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,1,1,0
+Tomato leaf mosaic virus/Tomato-Mosaic-1wdr2jx-300x225.jpg,Tomato___Tomato_mosaic_virus,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0.3604,Corn_(maize)___healthy,Corn_(maize)___healthy,Corn_(maize)___healthy,1,1,1
+Tomato leaf mosaic virus/tomato_virus_04_zoom.jpg,Tomato___Tomato_mosaic_virus,Strawberry___Leaf_scorch,0.9008,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato leaf yellow virus/11-40580_5.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Cherry_(including_sour)___healthy,0.8482,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,0
+Tomato leaf yellow virus/17fc47.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Strawberry___Leaf_scorch,0.9771,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Cherry_(including_sour)___healthy,0,1,1
+Tomato leaf yellow virus/8226402877_9abf151b5b_b.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Cherry_(including_sour)___healthy,0.8699,Cherry_(including_sour)___healthy,Cherry_(including_sour)___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0,0,1
+Tomato leaf yellow virus/fwa2013313115151.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Cherry_(including_sour)___healthy,0.7589,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Tomato_mosaic_virus,0,1,1
+Tomato leaf yellow virus/glyphosate.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Strawberry___Leaf_scorch,0.2448,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,1,1,1
+Tomato leaf yellow virus/tylcv-seminar-1-638.jpg,Tomato___Tomato_Yellow_Leaf_Curl_Virus,Tomato___Tomato_mosaic_virus,0.6695,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,1,1,1
+Tomato mold leaf/49%20Leafmold%20Bottom.jpg,Tomato___Leaf_Mold,Tomato___Late_blight,0.8909,Tomato___Late_blight,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,1
+Tomato mold leaf/50%20Leafmold%20Top.jpg,Tomato___Leaf_Mold,Tomato___Leaf_Mold,0.8885,Tomato___Leaf_Mold,Blueberry___healthy,Tomato___Tomato_Yellow_Leaf_Curl_Virus,0,1,1
+Tomato mold leaf/BIGSD.jpg,Tomato___Leaf_Mold,Grape___Esca_(Black_Measles),0.4828,Tomato___Tomato_mosaic_virus,Cherry_(including_sour)___Powdery_mildew,Blueberry___healthy,1,1,1
+Tomato mold leaf/black_leaf_mold_in_zina_tina.jpg,Tomato___Leaf_Mold,Strawberry___Leaf_scorch,0.3125,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Early_blight,1,1,1
+Tomato mold leaf/dscn6689.jpg,Tomato___Leaf_Mold,Strawberry___Leaf_scorch,0.6577,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,1,1,1
+Tomato mold leaf/fungus-univ-of-minnesoeta.jpg,Tomato___Leaf_Mold,Strawberry___Leaf_scorch,0.91,Strawberry___Leaf_scorch,Strawberry___Leaf_scorch,Tomato___Early_blight,0,0,1
+Tomato Septoria leaf spot/0.jpg,Tomato___Septoria_leaf_spot,Tomato___Late_blight,0.9334,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___Late_blight,1,1,0
+Tomato Septoria leaf spot/2septoria-tomato.jpg,Tomato___Septoria_leaf_spot,Tomato___Septoria_leaf_spot,0.9699,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,0
+Tomato Septoria leaf spot/2STEM.jpg,Tomato___Septoria_leaf_spot,Corn_(maize)___Common_rust_,0.6208,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Early_blight,1,1,1
+Tomato Septoria leaf spot/55830b60a7cf2.image.jpg,Tomato___Septoria_leaf_spot,Strawberry___Leaf_scorch,0.9522,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Strawberry___Leaf_scorch,0,1,0
+Tomato Septoria leaf spot/6134794031202304.jpeg.jpg,Tomato___Septoria_leaf_spot,Strawberry___Leaf_scorch,0.6825,Strawberry___Leaf_scorch,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,1
+Tomato Septoria leaf spot/636227737977191231-septoria-leaf-spot-VT.jpg,Tomato___Septoria_leaf_spot,Cherry_(including_sour)___healthy,0.9175,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Septoria_leaf_spot,0,1,1
+Tomato Septoria leaf spot/6447731_orig.jpg,Tomato___Septoria_leaf_spot,Grape___Black_rot,0.4974,Tomato___Septoria_leaf_spot,"Pepper,_bell___healthy",Grape___Black_rot,1,1,0
+Tomato Septoria leaf spot/7-17-Photo3_Septoria-MARY.jpg,Tomato___Septoria_leaf_spot,Tomato___Early_blight,0.7289,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Early_blight,1,1,0
+Tomato Septoria leaf spot/early-blight-septoria-ls-fig-3.jpg,Tomato___Septoria_leaf_spot,Tomato___Early_blight,0.8671,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Tomato___Early_blight,1,1,0
+Tomato Septoria leaf spot/RARZ4.jpg,Tomato___Septoria_leaf_spot,Strawberry___Leaf_scorch,0.8574,Cherry_(including_sour)___healthy,Corn_(maize)___healthy,Strawberry___Leaf_scorch,1,1,0
+Tomato Septoria leaf spot/sept4disease-019.jpg,Tomato___Septoria_leaf_spot,Tomato___Septoria_leaf_spot,0.8952,Tomato___Septoria_leaf_spot,Corn_(maize)___healthy,Tomato___Early_blight,0,1,1
