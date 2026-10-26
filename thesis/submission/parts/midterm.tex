@@ -1,0 +1,198 @@
+
+\chapter{Mid-Term Progress}
+
+This part reports the project at the mid-term review point. It is the state of the
+work before the mechanism experiment and the augmentation experiment were run.
+
+\section{System architecture and design}
+
+Data preparation reads the frozen manifests and decodes every image once into a
+\texttt{uint8} memory-mapped cache. Train and validation are separate files keyed by
+a hash of the path list, so changing the split invalidates the cache instead of
+silently reusing it.
+
+Training is a single engine, \texttt{scripts/train\_ddp.py}, parameterised by
+\texttt{configs/protocol\_v2.json}. It runs on two GPUs through
+DistributedDataParallel, applies augmentation on the accelerator, and writes three
+artifacts per run: a best checkpoint, a resumable last checkpoint, and a metrics JSON
+carrying the split fingerprint, the learning rate actually applied per epoch, and the
+full hyperparameter set.
+
+Evaluation is separate from training on purpose. \texttt{evaluate\_locked\_test.py}
+scores PlantVillage splits with bootstrap intervals; \texttt{evaluate\_plantdoc.py}
+scores the field dataset through the label map and reports out-of-mapping
+predictions rather than hiding them.
+
+Everything reported passes through \texttt{results/registry.json}, which
+\texttt{scripts/build\_tables.py} renders into tables. The registry check fails the
+build if a document quotes a number not registered against an artifact.
+
+\section{Methodology and implementation}
+
+Four architectures are compared under one frozen protocol:
+
+\begin{table}[H]
+\centering
+\caption{Architectures compared at mid-term}
+\label{tab:arch-mid}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Model} & \textbf{Parameters} & \textbf{Seeds} & \textbf{Note} \\
+\midrule
+SmallCNN & 398,662 & 3 & trained from scratch \\
+ResNet18 & 11,196,006 & 3 & 38-class head \\
+EfficientNet-B0 & 4,056,226 & 5 & reference model \\
+ConvNeXt-Tiny & 27,849,350 & 3 & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Protocol v2 is AdamW at learning rate $1\times10^{-4}$ with weight decay
+$1\times10^{-4}$, global batch 32, 12 epochs, early stopping with patience 3 on
+validation macro-F1. SmallCNN is the single documented deviation, using learning rate
+$1\times10^{-3}$ and global batch 64, taken from the configuration that produced its
+earlier recorded result. Augmentation is horizontal flip, rotation up to 12 degrees,
+brightness and per-channel gain, applied on the GPU.
+
+The reference model is trained across multiple seeds so variance is reported rather
+than a single run. Macro averages are computed only over classes with non-zero
+support, because an earlier 96-image check produced a meaningless macro-F1 of 0.026 by
+averaging over absent classes.
+
+\section{Prototype development}
+
+Two things ran at mid-term. The research pipeline is complete and reproducible:
+\texttt{scripts/run\_all.py --check} executes six gates, covering the unit tests, the
+table build, the registry check, a batch-composition check, a command-contract test,
+and failure-path tests for the unattended training notebook.
+
+The second is a static front end in \texttt{app/static/} with four pages: a landing
+page, single-image scan with a Grad-CAM slider, batch upload with CSV export, and a
+full inference view. It has no build step and opens in a browser.
+
+The front end is not wired to a live model. When no backend URL is configured,
+\texttt{app/static/js/api.js} fails fast with code \texttt{demo} and each page shows
+recorded checkpoint output instead of inventing a prediction. The service that would
+serve live inference is specified but not implemented, so the prototype demonstrates
+the interface and the recorded results rather than a deployed classifier.
+
+\section{Dataset and experimental setup}
+
+\begin{table}[H]
+\centering
+\caption{Datasets and splits}
+\label{tab:data-mid}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Dataset} & \textbf{Images} & \textbf{Classes} & \textbf{Splits used} \\
+\midrule
+PlantVillage & 54,305 & 38 & 36,762 train, 6,544 validation, 10,709 test \\
+PlantDoc & 2,578 & 28 & 236 test images, 27 classes scored \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Train and validation are disjoint by path and every class appears in both. The test
+split is disjoint from both and was opened once for the reference evaluation,
+reproducing bit-identical results.
+
+Preprocessing is resize to $224\times224$, conversion to RGB, scaling to $[0,1]$ and
+ImageNet normalisation, identical for every model and both datasets. Training ran on
+two Tesla T4 GPUs with mixed precision; the fourteen-run sweep completed in about
+2.6 hours with no run failures. Evaluation ran on CPU. Versions are pinned in
+\texttt{requirements.lock}.
+
+Every run records a dataset fingerprint. All fourteen sweep runs share the same
+fingerprint, which is how the project proves they saw the same split rather than
+assuming it.
+
+\section{Testing and validation}
+
+The test suite covered split integrity and disjointness, the checkpoint contract
+including strict state-dict loading and parameter counts, metric sanity, and the
+evaluator output contract.
+
+Two tests caught real errors during this work. ResNet18 had been recorded with the
+parameter count of the 1000-class ImageNet model rather than the 38-class one, and a
+metrics function signature had been assumed incorrectly.
+
+Beyond unit tests, the training engine has a smoke test covering a distributed run,
+the checkpoint contract and the resume fingerprint guard. The unattended notebook has
+failure-path tests that execute the real cells against stubbed workers: a failed gate
+ships its evidence without starting the sweep, a crashed run does not abort the loop,
+a hung run is killed by timeout, and finished seeds are skipped on restart.
+
+\section{Quantitative results and performance analysis}
+
+\begin{table}[H]
+\centering
+\caption{Architecture comparison under protocol v2, validation macro-F1}
+\label{tab:results-mid}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}lrrY@{}}
+\toprule
+\textbf{Model} & \textbf{Mean macro-F1} & \textbf{SD} & \\
+\midrule
+ConvNeXt-Tiny & 0.98951 & 0.00028 & 3 seeds \\
+EfficientNet-B0 & 0.98946 & 0.00171 & 5 seeds, reference \\
+ResNet18 & 0.98460 & 0.00166 & 3 seeds \\
+SmallCNN & 0.91599 & 0.00865 & 3 seeds \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The reference model and ConvNeXt-Tiny differ by 0.00005, which is thirty-four times
+smaller than the reference model's own seed spread. On this benchmark the
+architecture does not decide the outcome.
+
+Field transfer on PlantDoc test, averaged over five protocol-v2 seeds, falls from
+0.9928 to 0.2085, a drop of 78.4 percentage points. Scoring all fourteen checkpoints
+shows the lab ranking is preserved but the lab gaps are not: ConvNeXt-Tiny 0.3008,
+EfficientNet-B0 0.2085, ResNet18 0.1610, SmallCNN 0.0438.
+
+\section{Integration and verification}
+
+Modules are verified at their interfaces rather than assumed to fit. A parity check
+builds each model through the package and through the engine and compares parameter
+counts and state-dict keys, matching for all four.
+
+The notebooks are generated by builder scripts that embed the engine, the worker and
+the protocol byte for byte, and the build fails if an embedded file differs from the
+repository version. This exists because a hand-edited notebook cell silently diverged
+once already.
+
+The registry is integrated with the documents: \texttt{build\_tables.py --verify}
+fails when a claim has no registered run, when an artifact directory is missing, or
+when a generated table is stale.
+
+\section{Technical challenges and limitations}
+
+The most expensive problem was a frozen training protocol that looked reasonable and
+could not learn. Twelve runs across four architectures came back between 0.07 and
+0.95 where the reference model was at 0.99. The cause was not the learning rate,
+which is what the configuration suggested. Blocked shuffling was permuting
+2{,}048-image blocks on a manifest sorted by class, so the median batch contained
+three distinct classes instead of twelve, and BatchNorm normalised using statistics
+from three classes. The tell was that the only architecture which trained,
+ConvNeXt-Tiny, uses LayerNorm and ignores batch composition. Fixing the shuffle mode
+restored reference behaviour.
+
+Limitations recorded at mid-term: the field evaluation rests on 236 images from a
+single source with few images per class, so per-class field numbers are indicative.
+Part of the gap is likely annotation noise, which this work does not estimate.
+
+\section{Milestone achievement and future work}
+
+Completed at mid-term: a frozen split with a proven disjointness check, a restored
+and structurally verified reference checkpoint, four architectures on one engine, a
+fourteen-run sweep with zero failures, a complete PlantDoc label map with three
+caveats recorded, field evaluation with bootstrap intervals, and calibration analysis
+for all four models.
+
+Planned and not started at mid-term: the background-augmentation experiment, a second
+independent field dataset with expert labels, and out-of-distribution detection as a
+replacement for the confidence threshold.
+
+Part~II reports what happened to each of these.

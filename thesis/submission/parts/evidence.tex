@@ -1,0 +1,87 @@
+
+\chapter{Evidence and artefacts}
+
+Every claim in this submission maps to a file in the project repository. This
+appendix records that mapping so a reviewer can check any number without asking.
+
+\section{Claim to artefact map}
+
+\begin{table}[H]
+\centering
+\caption{Where each reported number comes from}
+\label{tab:evidence}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}p{4.6cm}Y@{}}
+\toprule
+\textbf{Claim} & \textbf{Artefact} \\
+\midrule
+Locked-test performance & \texttt{reports/model\_comparison/locked\_test\_efficientnet\_b0/} \\
+Architecture comparison & \texttt{reports/model\_comparison/SWEEP\_V2\_RESULTS.md} \\
+Domain gap & \texttt{reports/field\_gap/FIELD\_GAP\_RESULTS.md} \\
+Calibration and abstention & \texttt{reports/field\_gap/USEFULNESS\_RESULTS.md} \\
+Mechanism and intervention & \texttt{reports/mechanism/MECHANISM\_RESULTS.md}, \texttt{swap\_test\_b0/} \\
+Augmentation null result & \texttt{reports/mechanism/S19\_BACKGROUND\_AUGMENTATION\_RESULTS.md} \\
+Every claim in one file & \texttt{results/registry.json} \\
+Test evidence & \texttt{tests/}, \texttt{scripts/run\_all.py} \\
+Defect log & \texttt{docs/KNOWN\_ISSUES.md} \\
+Final report & \texttt{reports/thesis/BT40\_dissertation\_draft.pdf} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Reproducing the numbers}
+
+\begin{verbatim}
+# regenerate the reported tables and verify every claim
+python scripts/build_tables.py
+python scripts/build_tables.py --verify
+
+# all checks in one command
+python scripts/run_all.py --check
+
+# intervention experiment (CPU, under five minutes)
+python scripts/swap_localisation_test.py \
+    --checkpoint checkpoints/efficientnet_b0/efficientnet_b0_best.pt \
+    --limit 300 --out reports/mechanism/swap_test_b0
+
+# field evaluation of a returned checkpoint
+python scripts/evaluate_plantdoc.py \
+    --checkpoint <path>/efficientnet_b0_best.pt \
+    --arch efficientnet_b0 --out <dir>
+\end{verbatim}
+
+\section{Verification checklist for the form}
+
+The coordinator's mail asks that the following be checked before the form is
+submitted. Their current state in the project is given so nothing is assumed.
+
+\begin{table}[H]
+\centering
+\caption{Pre-submission checklist}
+\label{tab:checklist}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}p{5.6cm}lY@{}}
+\toprule
+\textbf{Requirement} & \textbf{State} & \textbf{Note} \\
+\midrule
+Project ID and title correct & Verified & BT40, title as recorded \\
+Guide's name and official email verified & Partial & Name verified, email must be supplied \\
+Minimum three WPRs submitted & Drafts ready & \texttt{docs/WPR\_1.md} to \texttt{WPR\_3.md} \\
+Phase III and Mid-Term both completed & Done & Both parts of this document \\
+Technical details reflect the evidence & Done & Every number is registered \\
+Reviewed with the project guide & Pending & For the guide to confirm \\
+Enrolment numbers & Missing & Must be supplied by the students \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Two members of the team share the name Shubham Kumar. The form must not merge their
+entries, and their enrolment numbers are the only reliable way to distinguish them.
+
+\section{Statement on scope}
+
+This submission reports measured results. It does not claim field readiness, clinical
+or agronomic reliability, or a deployed system. The field evaluation rests on 236
+images from a single source, and the reported accuracy on that set is low enough that
+no operational use is justified. What the work establishes is what a clean-image
+classifier is worth under field conditions, and why.
