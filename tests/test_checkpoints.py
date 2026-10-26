@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 import torch
 
+from plant_disease.checkpoint_io import load_checkpoint
 from plant_disease.models import build_model
 
 # 38-class heads, not ImageNet's 1000. ResNet18 replaces a 1000-way fc
@@ -24,12 +25,19 @@ CHECKPOINTS = {
 }
 
 
+def _efficientnet_path(repo: Path) -> Path:
+    path = repo / CHECKPOINTS["efficientnet_b0"]
+    if not path.is_file():
+        pytest.skip(f"{CHECKPOINTS['efficientnet_b0']} not present (weights are not kept in git)")
+    return path
+
+
 @pytest.mark.parametrize("arch,relative", sorted(CHECKPOINTS.items()))
 def test_checkpoint_loads_strictly_and_matches_parameter_count(repo: Path, arch: str, relative: str):
     path = repo / relative
     if not path.is_file():
         pytest.skip(f"{relative} not present")
-    blob = torch.load(path, map_location="cpu", weights_only=False)
+    blob = load_checkpoint(path)
     assert "model_state_dict" in blob, sorted(blob)
     assert len(blob["classes"]) == 38
 
@@ -42,16 +50,14 @@ def test_checkpoint_loads_strictly_and_matches_parameter_count(repo: Path, arch:
 def test_class_order_matches_the_manifest(repo: Path, manifests: Path):
     import pandas as pd
 
-    blob = torch.load(repo / "checkpoints/efficientnet_b0/efficientnet_b0_best.pt",
-                      map_location="cpu", weights_only=False)
+    blob = load_checkpoint(_efficientnet_path(repo))
     dev = pd.read_csv(manifests / "plantvillage_development.csv")
     expected = sorted(set(dev.label))
     assert list(blob["classes"]) == expected, "checkpoint class order drifted from the manifest"
 
 
 def test_checkpoint_records_its_normalisation(repo: Path):
-    blob = torch.load(repo / "checkpoints/efficientnet_b0/efficientnet_b0_best.pt",
-                      map_location="cpu", weights_only=False)
+    blob = load_checkpoint(_efficientnet_path(repo))
     assert blob["image_size"] == 224
     assert blob["normalization_mean"] == [0.485, 0.456, 0.406]
     assert blob["normalization_std"] == [0.229, 0.224, 0.225]

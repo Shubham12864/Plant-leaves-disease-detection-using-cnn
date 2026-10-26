@@ -2,6 +2,14 @@
 
 This repository contains the research code and results. It is not the final application.
 
+## Headline finding
+
+The PlantVillage scores below do **not** carry over to field photographs. On the PlantDoc test set (236 images, 27 mapped classes), EfficientNet-B0 accuracy falls from 0.9928 on PlantVillage to **0.2085** (mean of five seeds), and calibration error rises from 0.0026 to 0.5808 for the published checkpoint. Background augmentation did not close the gap (hypothesis H3 not supported), and a confidence threshold gained only 0.8 pp at 90% coverage. PlantDoc is small, so read these numbers with an interval of about ±6 pp.
+
+The full evidence and verdicts for H1–H4 are in [`PROJECT_STATUS.md`](PROJECT_STATUS.md); the claims in the approved abstract that the evidence does not support are listed in [`docs/ABSTRACT_VS_EVIDENCE.md`](docs/ABSTRACT_VS_EVIDENCE.md). Open defects are in [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
+
+The sections below describe the original PlantVillage-only comparison.
+
 ## Project question
 
 Can a CNN identify plant leaf disease classes in PlantVillage images? We trained a simple CNN baseline. We also fine-tuned ResNet18 and EfficientNet-B0. We used the same PlantVillage training and validation splits for all models.

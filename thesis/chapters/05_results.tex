@@ -63,6 +63,15 @@ Macro-F1 & 0.9895 & 0.1798 & $-81.0$ pp & \\
 \end{tabularx}
 \end{table}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{fig_field_gap.png}
+\caption{Curated and field performance for each architecture. Intervals are
+bootstrap intervals over the field test set; the curated bars are near the top of
+the scale and the field bars are near the bottom, which is the whole finding.}
+\label{fig:gap}
+\end{figure}
+
 \subsection{Verdict}
 
 H1 is confirmed. The drop is 81.0 points of macro-F1, it replicates across five
@@ -107,6 +116,15 @@ The control is the load-bearing number. A same-class donor changes the answer 4.
 of the time, so the compositing itself is not disruptive. Against that floor,
 swapping the leaf moves the prediction on half the images, and swapping the
 background moves it on one in five, which is eight times chance.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{fig_swap.png}
+\caption{Adoption rates from the swap test. Error bars are 95\,\% bootstrap
+intervals. The control bar measures how often the edit alone changes the answer, so
+everything above it is attributable to the swapped content.}
+\label{fig:swap}
+\end{figure}
 
 \subsection{Verdict}
 
@@ -186,6 +204,20 @@ of 223. At 90\,\% coverage the reference model gains 0.8 points, from 17.37 to
 17.45. Reaching 24.6\,\% requires discarding half the images, and the model is still
 wrong three times in four. SmallCNN gets worse when its least confident half is
 removed, which means its confidence is anti-correlated with correctness.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}\centering
+\includegraphics[width=\textwidth]{fig_reliability_test.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering
+\includegraphics[width=\textwidth]{fig_coverage.png}
+\end{minipage}
+\caption{Left: reliability on the locked test, where marker area is proportional to
+bin count and the single largest bin holds 10,590 of 10,709 images. Right: accuracy
+retained as coverage falls, the curve behind Table~\ref{tab:h4}.}
+\label{fig:reliability}
+\end{figure}
 
 \subsection{Verdict}
 

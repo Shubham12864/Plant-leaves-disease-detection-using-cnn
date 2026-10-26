@@ -4,7 +4,7 @@ type: defect-register
 # severity: S1 = evaluator/reviewer can catch false/unsupported claim
 #         S2 = weakens the science
 #         S3 = hygiene/engineering
-status: 27 entries; 7 resolved, 20 open
+status: 28 D-entries (D01-D28; 1 marked resolved in the Sev column, 27 not), plus the R01-R12 resolution log and the R12/R13/R15 detail sections below
 generated: 2026-10-25
 related-to: WALLET_INDEX.md, PROJECT_STATUS.md, EXPERIMENT_LOG.md, RESEARCH_CLAIM.md
 ---

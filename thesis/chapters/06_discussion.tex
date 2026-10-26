@@ -43,6 +43,15 @@ force rather than being a post-hoc story.
 
 \section{What the failure modes look like}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{fig_confusion.png}
+\caption{Confusion structure on PlantDoc test. Off-diagonal mass is not confined to
+neighbouring classes; predictions migrate to classes that PlantDoc does not contain,
+which is the signature of a prior learned on a different label space.}
+\label{fig:confusion}
+\end{figure}
+
 Field errors are not distributed evenly. Classes that depend on subtle lesion
 morphology, such as rusts and blights, collapse to zero recall, while classes defined
 by gross colour change survive better. The confusion structure shows predictions
@@ -60,6 +69,16 @@ Grad-CAM produced plausible-looking maps that pointed at leaves. Taken alone, th
 maps would have supported the wrong conclusion, since the model demonstrably uses
 background as well. A heat map shows where the gradient is large, and a large
 gradient is not the same as causal dependence.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{fig_saliency.png}
+\caption{Grad-CAM on four field cases, grouped by whether the prediction was correct
+and how confident the model was. The maps look plausible and point at foliage. Taken
+alone they would support the conclusion that the model reads the leaf, which the
+intervention experiment later qualified.}
+\label{fig:saliency}
+\end{figure}
 
 The intervention design cost one afternoon and produced an interpretable number with
 an interval. For questions of the form ``what does this decision depend on'', it is

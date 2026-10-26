@@ -1,5 +1,7 @@
 # Workspace analysis — Plant leaf disease detection using CNN
 
+> **Superseded.** This is a snapshot from 2026-10-18. Several statements below have since changed (for example, the EfficientNet-B0 checkpoint was restored and the locked test split was re-scored on 2026-10-25). For the current state, read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) and [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md). Kept for history only.
+
 Analysis date: 2026-10-18. Scope: the whole working tree (`C:\Users\Shubham\Downloads\Capstone project`).
 Method: read every source, script, config, notebook, manifest and report; then independently
 re-evaluated the saved checkpoints on CPU and re-audited the split manifests.
