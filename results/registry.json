@@ -102,6 +102,45 @@
         "absolute_delta": 0.0,
         "verdict": "bit-identical"
       }
+    },
+    {
+      "id": "s11_efficientnet_b0_plantdoc_test",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantDoc",
+      "split": "test",
+      "images": 236,
+      "seed": null,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/evaluate_plantdoc.py --checkpoint checkpoints/efficientnet_b0/efficientnet_b0_best.pt --arch efficientnet_b0 --split test --device cpu",
+      "artifact_dir": "reports/field_gap/b0_plantdoc_test",
+      "metrics": {
+        "accuracy": 0.173729,
+        "accuracy_ci95": [
+          0.127119,
+          0.224576
+        ],
+        "macro_f1": 0.179813,
+        "macro_recall": 0.174639,
+        "mean_confidence": 0.752161,
+        "ece": 0.578428,
+        "out_of_mapping_rate": 0.254237,
+        "classes_scored": 27,
+        "mean_per_class_recall": 0.174639
+      },
+      "pipeline_control": {
+        "check": "same script and preprocessing on 300 PlantVillage validation images",
+        "artifact": "reports/field_gap/_control_pv",
+        "accuracy": 0.9966666666666667,
+        "verdict": "inference path verified; the field result is domain shift, not a bug"
+      },
+      "caveats": [
+        "236 test images; 95% CI width 9.75 pp. Per-class support is 4-12 images.",
+        "Three of 28 mappings are caveated; one PlantDoc class has 0 test images and is excluded from macro averages.",
+        "PlantDoc carries documented label noise; this evaluation does not estimate that share.",
+        "One checkpoint. Seed stability of the gap is not yet measured."
+      ]
     }
   ],
   "document_claims": [
@@ -158,6 +197,47 @@
       "claim": "SmallCNN trails the reference by 7.35 pp macro-F1",
       "value": 0.073465,
       "run": "sweep_v2_overnight",
+      "status": "verified"
+    },
+    {
+      "claim": "EfficientNet-B0 loses 82 percentage points of per-class recall from PlantVillage to PlantDoc",
+      "value": -0.8192,
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified",
+      "caveat": "236 PlantDoc test images, CI width 9.75 pp on accuracy; all 27 mapped classes fell"
+    },
+    {
+      "claim": "On PlantDoc the model is 75% confident and 17% correct",
+      "value": {
+        "mean_confidence": 0.7522,
+        "accuracy": 0.1737
+      },
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified"
+    },
+    {
+      "claim": "In the 0.95-1.00 confidence band on PlantDoc, accuracy is 29.2% at 98.6% confidence",
+      "value": {
+        "bin_accuracy": 0.292,
+        "bin_confidence": 0.986,
+        "n": 65
+      },
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified"
+    },
+    {
+      "claim": "ECE rises from 0.0026 on PlantVillage to 0.578 on PlantDoc",
+      "value": {
+        "plantvillage": 0.002618,
+        "plantdoc": 0.578428
+      },
+      "run": "s11_efficientnet_b0_plantdoc_test",
+      "status": "verified"
+    },
+    {
+      "claim": "25.4% of field predictions land on classes PlantDoc does not contain",
+      "value": 0.254237,
+      "run": "s11_efficientnet_b0_plantdoc_test",
       "status": "verified"
     }
   ],
@@ -398,5 +478,38 @@
       },
       "excluded": "the _gate run is a 2-epoch check and is not part of any comparison"
     }
+  },
+  "field_gap": {
+    "model": "efficientnet_b0 (published checkpoint)",
+    "plantvillage_reference": {
+      "split": "validation",
+      "images": 6544,
+      "accuracy_5seed_mean": 0.992795,
+      "macro_f1_5seed_mean": 0.989459,
+      "per_class_recall_mean": 0.993917,
+      "ece": 0.002618
+    },
+    "plantdoc": {
+      "split": "test",
+      "images": 236,
+      "classes": 27,
+      "accuracy": 0.173729,
+      "accuracy_ci95": [
+        0.127119,
+        0.224576
+      ],
+      "per_class_recall_mean": 0.174639,
+      "ece": 0.578428,
+      "mean_confidence": 0.752161,
+      "out_of_mapping_rate": 0.254237
+    },
+    "delta": {
+      "accuracy_pp": -81.91,
+      "mean_per_class_recall_pp": -81.92,
+      "classes_worse": 27,
+      "classes_total": 27,
+      "median_per_class_drop": 0.850806
+    },
+    "artifact": "reports/field_gap/FIELD_GAP_RESULTS.md"
   }
 }

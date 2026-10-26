@@ -292,3 +292,30 @@ accuracy after one epoch (original run: 0.9826), 2.15 min/epoch.
 
 Full analysis: `reports/model_comparison/SWEEP_V2_RESULTS.md`. Registered in
 `results/registry.json` under `sweeps.sweep_v2_overnight`.
+
+## 2026-10-26 — S11/S12/S13, PlantDoc field evaluation, H1 confirmed
+
+**Model:** EfficientNet-B0 published checkpoint (`90e003cf…`, 0.99369 PV val macro-F1)
+**Data:** PlantDoc test, 236 images, 27 mapped classes, CC BY 4.0
+**Command:** `python scripts/evaluate_plantdoc.py --checkpoint checkpoints/efficientnet_b0/efficientnet_b0_best.pt --arch efficientnet_b0 --split test --device cpu`
+**Artifacts:** `reports/field_gap/b0_plantdoc_test/`, `reports/field_gap/FIELD_GAP_RESULTS.md`
+
+| metric | PlantVillage | PlantDoc |
+|---|---:|---:|
+| accuracy | 0.9928 (5-seed) | 0.1737 (CI 0.1271–0.2246) |
+| mean per-class recall | 0.9939 | 0.1746 |
+| macro-F1 | 0.9895 (5-seed) | 0.1798 |
+| mean confidence | 0.998 | 0.7522 |
+| ECE | 0.0026 | 0.5784 |
+
+- All 27 mapped classes fell: mean drop 0.8192, sd 0.1877, median 0.8508.
+- Reliability: the 0.95–1.00 confidence band holds 65 images at 0.292 accuracy and
+  0.986 mean confidence.
+- 25.42% of predictions (60/236) land on PlantVillage classes PlantDoc lacks.
+- **Pipeline control:** the same script on 300 PlantVillage validation images scores
+  0.9967, so the collapse is domain shift rather than an inference bug.
+- One PlantDoc class has 0 test images and is excluded from macro averages; macro
+  uses classes with non-zero support only.
+
+H1 verdict: **confirmed**, magnitude far outside the 9.75 pp CI width.
+Registered in `results/registry.json` as `s11_efficientnet_b0_plantdoc_test`.

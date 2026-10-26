@@ -31,9 +31,8 @@ Last updated: 2026-10-25.
 ---
 ## Current position
 
-Stage A is closed and **Stage B is closed**: the twelve-run sweep completed,
-plus two extra reference seeds, with no run failures. Next is Stage C, the field
-gap on PlantDoc, which is the actual contribution.
+Stage A closed, Stage B closed, **Stage C closed**. The field gap is measured.
+Next is Stage D: explain it (Grad-CAM + occlusion probe), then Stage E.
 
 | Step | State |
 |---|---|
@@ -41,32 +40,47 @@ gap on PlantDoc, which is the actual contribution.
 | S2 PlantDoc label map | **done** — 28/28 decided, 3 caveated |
 | S3 stale documents | **done** |
 | S4 baseline commit | **done** — tag `baseline-p0.1` |
-| S5 ConvNeXt-Tiny | **done** |
-| S6 SmallCNN on the engine | **done** |
-| S7 protocol pilot | **done** |
-| S8 protocol frozen | **done** — but v1 was invalid; v2 is the live one |
-| S9 sweep v1 | **ran, invalid** — R12/R14, kept as evidence only |
+| S5–S8 ConvNeXt, SmallCNN, protocol | **done** — v1 later found invalid (R12/R14) |
+| S9 pilot | **done** |
 | S9b gate | **passed** — 0.9836 at epoch 1 |
 | S9c sweep v2 | **done** — 14 runs, 0 failures |
 | S10 comparison table | **done** — `reports/model_comparison/SWEEP_V2_RESULTS.md` |
-| **S11 PlantDoc field evaluation** | **NEXT** |
+| S11 score PlantDoc | **done** — 236 images, 27 classes |
+| S12 quantify the gap | **done** — −81.9 pp, 27/27 classes |
+| S13 answer H1 | **done — H1 confirmed** |
+| **S14 Grad-CAM on the failures** | **NEXT** |
 
-### Sweep v2 results (PlantVillage validation, 6,544 images)
+### Stage C result — the field gap (H1 confirmed)
 
-| Architecture | n | macro-F1 mean | sd | 95% CI |
-|---|---:|---:|---:|---|
-| ConvNeXt-Tiny | 3 | 0.98951 | 0.00028 | 0.98881 – 0.99021 |
-| EfficientNet-B0 | 5 | 0.98946 | 0.00171 | 0.98734 – 0.99158 |
-| ResNet18 | 3 | 0.98460 | 0.00166 | 0.98048 – 0.98871 |
-| SmallCNN | 3 | 0.91599 | 0.00865 | 0.89450 – 0.93749 |
+| | PlantVillage (lab) | PlantDoc (field) |
+|---|---:|---:|
+| accuracy | 0.9928 | **0.1737** (95% CI 0.127 – 0.225) |
+| mean per-class recall | 0.9939 | **0.1746** |
+| mean confidence | 0.998 | 0.7522 |
+| ECE | 0.0026 | **0.5784** |
 
-Reference and ConvNeXt differ by 0.00005, thirty-four times smaller than the B0
-seed spread: **the top two are statistically indistinguishable.**
+**All 27 mapped classes got worse**, median drop 0.851. In the 0.95–1.00
+confidence band the model is right **29.2% of the time at 98.6% confidence**.
+25.4% of field predictions land on classes PlantDoc does not contain.
 
-Two disclosures travel with these numbers: the reference mean is 0.42 pp below
-the published 0.99369 because runs early-stop, and SmallCNN replicates at 91.60%
-rather than the previously recorded 96.01%. Both are detailed in
-`reports/model_comparison/SWEEP_V2_RESULTS.md`.
+Pipeline verified by control: the same script scores 0.9967 on 300 PlantVillage
+validation images, so this is domain shift, not a broken inference path.
+
+Full analysis: `reports/field_gap/FIELD_GAP_RESULTS.md` · figure `field_gap.png`.
+
+### Sweep v2 (PlantVillage validation, 6,544 images)
+
+| Architecture | n | macro-F1 mean | sd |
+|---|---:|---:|---:|
+| ConvNeXt-Tiny | 3 | 0.98951 | 0.00028 |
+| EfficientNet-B0 | 5 | 0.98946 | 0.00171 |
+| ResNet18 | 3 | 0.98460 | 0.00166 |
+| SmallCNN | 3 | 0.91599 | 0.00865 |
+
+The top two are statistically indistinguishable (gap 0.00005, thirty-four times
+smaller than the B0 seed spread): **architecture is not what decides the outcome
+on this benchmark**, which is exactly why Stage C mattered more than another
+model.
 
 ### Measured pilot (2x T4, one epoch each)
 

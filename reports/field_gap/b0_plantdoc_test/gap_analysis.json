@@ -1,0 +1,194 @@
+{
+  "ece_plantdoc": 0.5784283898305084,
+  "per_class": [
+    {
+      "class": "Apple___Cedar_apple_rust",
+      "pd_support": 10,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Peach___healthy",
+      "pd_support": 9,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Soybean___healthy",
+      "pd_support": 8,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Strawberry___healthy",
+      "pd_support": 8,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Tomato___healthy",
+      "pd_support": 8,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Tomato___Bacterial_spot",
+      "pd_support": 9,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Tomato___Tomato_mosaic_virus",
+      "pd_support": 10,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+      "pd_support": 6,
+      "pd_recall": 0.0,
+      "pv_recall": 1.0,
+      "delta": 1.0
+    },
+    {
+      "class": "Corn_(maize)___Common_rust_",
+      "pd_support": 10,
+      "pd_recall": 0.0,
+      "pv_recall": 0.9931506849315068,
+      "delta": 0.9931506849315068
+    },
+    {
+      "class": "Potato___Late_blight",
+      "pd_support": 8,
+      "pd_recall": 0.0,
+      "pv_recall": 0.975,
+      "delta": 0.975
+    },
+    {
+      "class": "Cherry_(including_sour)___healthy",
+      "pd_support": 10,
+      "pd_recall": 0.1,
+      "pv_recall": 1.0,
+      "delta": 0.9
+    },
+    {
+      "class": "Apple___healthy",
+      "pd_support": 9,
+      "pd_recall": 0.1111111111111111,
+      "pv_recall": 1.0,
+      "delta": 0.8888888888888888
+    },
+    {
+      "class": "Pepper,_bell___Bacterial_spot",
+      "pd_support": 9,
+      "pd_recall": 0.1111111111111111,
+      "pv_recall": 1.0,
+      "delta": 0.8888888888888888
+    },
+    {
+      "class": "Potato___Early_blight",
+      "pd_support": 8,
+      "pd_recall": 0.125,
+      "pv_recall": 0.9758064516129032,
+      "delta": 0.8508064516129032
+    },
+    {
+      "class": "Squash___Powdery_mildew",
+      "pd_support": 6,
+      "pd_recall": 0.16666666666666666,
+      "pv_recall": 1.0,
+      "delta": 0.8333333333333334
+    },
+    {
+      "class": "Tomato___Leaf_Mold",
+      "pd_support": 6,
+      "pd_recall": 0.16666666666666666,
+      "pv_recall": 1.0,
+      "delta": 0.8333333333333334
+    },
+    {
+      "class": "Apple___Apple_scab",
+      "pd_support": 10,
+      "pd_recall": 0.2,
+      "pv_recall": 1.0,
+      "delta": 0.8
+    },
+    {
+      "class": "Tomato___Septoria_leaf_spot",
+      "pd_support": 11,
+      "pd_recall": 0.18181818181818182,
+      "pv_recall": 0.9768518518518519,
+      "delta": 0.79503367003367
+    },
+    {
+      "class": "Corn_(maize)___Northern_Leaf_Blight",
+      "pd_support": 12,
+      "pd_recall": 0.16666666666666666,
+      "pv_recall": 0.9357798165137615,
+      "delta": 0.7691131498470949
+    },
+    {
+      "class": "Blueberry___healthy",
+      "pd_support": 11,
+      "pd_recall": 0.2727272727272727,
+      "pv_recall": 1.0,
+      "delta": 0.7272727272727273
+    },
+    {
+      "class": "Raspberry___healthy",
+      "pd_support": 7,
+      "pd_recall": 0.2857142857142857,
+      "pv_recall": 1.0,
+      "delta": 0.7142857142857143
+    },
+    {
+      "class": "Tomato___Late_blight",
+      "pd_support": 10,
+      "pd_recall": 0.3,
+      "pv_recall": 0.9869565217391304,
+      "delta": 0.6869565217391305
+    },
+    {
+      "class": "Tomato___Early_blight",
+      "pd_support": 9,
+      "pd_recall": 0.4444444444444444,
+      "pv_recall": 0.9914529914529915,
+      "delta": 0.5470085470085471
+    },
+    {
+      "class": "Pepper,_bell___healthy",
+      "pd_support": 8,
+      "pd_recall": 0.5,
+      "pv_recall": 1.0,
+      "delta": 0.5
+    },
+    {
+      "class": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+      "pd_support": 4,
+      "pd_recall": 0.5,
+      "pv_recall": 1.0,
+      "delta": 0.5
+    },
+    {
+      "class": "Grape___Black_rot",
+      "pd_support": 8,
+      "pd_recall": 0.5,
+      "pv_recall": 1.0,
+      "delta": 0.5
+    },
+    {
+      "class": "Grape___healthy",
+      "pd_support": 12,
+      "pd_recall": 0.5833333333333334,
+      "pv_recall": 1.0,
+      "delta": 0.41666666666666663
+    }
+  ]
+}
