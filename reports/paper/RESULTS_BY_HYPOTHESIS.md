@@ -76,9 +76,19 @@ Grad-CAM mass inside the leaf mask is 0.735, while the mask itself covers 0.613
 of the frame — an enrichment of only **1.20×**. The attention is diffuse and
 mildly leaf-biased, not lesion-focused.
 
-So the accurate statement is: *the model's decision uses global scene statistics
-in addition to the leaf, and those statistics do not transfer.* That is weaker
-than the original framing and it is what the evidence supports.
+The swap test sharpens this. On 298 validation images, replacing the leaf with a
+donor's leaf moved the prediction to the donor class **50.3%** of the time;
+replacing the background moved it **21.8%**, against a 2.6% chance rate and a 4.4%
+same-class control. Both far exceed chance, and the leaf leads by 28.5 points with
+a confidence interval of 20 to 36.
+
+So the accurate statement is: *the model uses the leaf and the scene together, and
+the leaf carries more of the decision.* It is not the shortcut story where the
+model ignored the plant. It learned leaf-plus-laboratory-context as one cue and
+lost the context half when the photographs changed.
+
+That also predicts H3: background augmentation should recover part of the gap, not
+most of it. Written down before S19 runs.
 
 *Figures: `../../mechanism/field_gap.png`, `figures/saliency_grid.png`.*
 

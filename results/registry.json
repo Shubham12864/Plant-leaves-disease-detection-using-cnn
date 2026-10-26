@@ -345,6 +345,35 @@
         "236 images per checkpoint",
         "supersedes the single-checkpoint field numbers as the headline"
       ]
+    },
+    {
+      "id": "swap_s16_b0_plantvillage",
+      "model": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_best",
+      "dataset": "PlantVillage",
+      "split": "validation",
+      "images": 298,
+      "device": "cpu",
+      "date": "2026-10-26",
+      "command": "python scripts/swap_localisation_test.py --limit 300",
+      "artifact_dir": "reports/mechanism/swap_test_b0",
+      "metrics": {
+        "baseline_accuracy": 1.0,
+        "leaf_swap_adoption": 0.503356,
+        "background_swap_adoption": 0.218121,
+        "same_class_control_flip": 0.043624,
+        "chance_adoption": 0.026316,
+        "background_minus_leaf": -0.2852,
+        "background_minus_leaf_ci95": [
+          -0.3624,
+          -0.2047
+        ]
+      },
+      "caveats": [
+        "298 images",
+        "leaf mask is a colour heuristic",
+        "one checkpoint"
+      ]
     }
   ],
   "document_claims": [
@@ -502,6 +531,18 @@
       "run": "field_all_seeds",
       "status": "verified",
       "caveat": "supersedes an earlier claim that the ranking reverses; that claim compared checkpoints from different protocols and was wrong"
+    },
+    {
+      "claim": "Leaf swap moves the prediction to the donor class 50.3% of the time; background swap 21.8%",
+      "value": {
+        "leaf": 0.5034,
+        "background": 0.2181,
+        "control_flip": 0.0436,
+        "chance": 0.0263
+      },
+      "run": "swap_s16_b0_plantvillage",
+      "status": "verified",
+      "caveat": "298 PlantVillage validation images, one checkpoint"
     }
   ],
   "sweeps": {
@@ -839,10 +880,10 @@
       "artifact": "s11_efficientnet_b0_plantdoc_test"
     },
     "H2": {
-      "verdict": "partially supported",
+      "verdict": "partially supported, precisely: joint use of leaf and scene",
       "evidence": "reports/mechanism/MECHANISM_RESULTS.md",
-      "statement": "Neutralising the background costs 56.5 pp on PlantVillage, so lab accuracy is substantially background-dependent. But Grad-CAM enrichment over a leaf mask is only 1.20x, so the model is not simply 'looking at soil'. S16 human labelling is outstanding.",
-      "artifact": "occlusion_b0_plantvillage / occlusion_b0_plantdoc"
+      "statement": "Swapping the leaf moves the prediction to the donor class 50.3% of the time; swapping the background 21.8%, against a 2.6% chance rate and a 4.4% same-class control. The leaf dominates, so the model does not ignore the plant, but background content can steer it one time in five and removing it costs 56.5 points.",
+      "artifact": "swap_s16_b0_plantvillage / occlusion_b0_plantvillage"
     },
     "H3": {
       "verdict": "blocked",

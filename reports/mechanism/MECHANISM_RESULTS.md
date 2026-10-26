@@ -66,49 +66,71 @@ That last row is itself a result: across 236 field images the model is
 confidently correct only **six times**. Most of what it gets right, it gets right
 without conviction.
 
-## S16 — saliency localisation, automated proxy only
+## S16 — what the decision depends on, measured by intervention
 
-Over 50 field maps, the fraction of Grad-CAM mass falling inside the leaf mask:
+The roadmap asked for 50 hand-labelled Grad-CAM maps. That step is still available
+and the sheet exists (`s16/contact_sheet.png`, 50 numbered tiles, ten minutes of
+looking), but it was supplemented by a stronger test that needs no labels.
 
-| statistic | value |
-|---|---:|
-| mean | 0.735 |
-| median | 0.743 |
-| leaf mask coverage of the frame | **0.613** |
-| enrichment over chance | **1.20×** |
+**The swap test.** On 298 PlantVillage validation images, each image was given a
+donor from a different class twice: once receiving the donor's **leaf** while
+keeping its own background, once receiving the donor's **background** while keeping
+its own leaf. Adoption means the prediction moved to the donor's class.
 
-**This is weak evidence, and it should be read as such.** A mask that already
-covers 61% of the frame will capture 61% of any diffuse heat map by chance. The
-observed 73.5% is a 1.2× enrichment, not a lesion-focused model.
+| measurement | value | 95% CI |
+|---|---:|---|
+| chance adoption (1 in 38) | 0.0263 | — |
+| same-class control flip rate | **0.0436** | 0.023 – 0.067 |
+| **leaf swap adoption** | **0.5034** | 0.446 – 0.557 |
+| **background swap adoption** | **0.2181** | 0.171 – 0.268 |
+| background minus leaf | **−0.2852** | −0.362 – −0.205 |
 
-It also sits in tension with S15: the model is strongly sensitive to background
-texture yet its attention is only mildly leaf-biased. Both can be true — a global
-average-pooled feature can depend on scene statistics that Grad-CAM does not
-localise crisply — but the honest summary is that S16 does not independently
-confirm H2.
+The control is the load-bearing part. A same-class donor changes the answer only
+4.4% of the time, so the edit itself is not disruptive. Against that floor,
+swapping the leaf moves the prediction on half the images and swapping the
+background moves it on one in five.
 
-**The roadmap's S16 asks for 50 hand-labelled maps. That step is not done.**
-`gradcam_b0_plantdoc/labelling_sheet.csv` is written with the columns a human
-needs to fill (`peak_region`, `notes`). Until it is filled, S16 is *instrument
-ready, labels outstanding*, and this proxy is explicitly not a substitute.
+**Verdict: the leaf dominates, and the background still matters.** The model reads
+the leaf primarily, which contradicts the strong form of H2. But background swap
+adoption is 21.8% against a 2.6% chance rate, eight times chance, so the scene is
+not ignored either.
+
+That reconciles the two earlier measurements rather than contradicting them:
+removing the background costs 56.5 points, and background content can steer the
+prediction a fifth of the time, yet the leaf remains the main carrier of identity.
+The model is not looking at soil instead of leaves; it is using leaf and scene
+together, and the scene it learned is a laboratory one.
+
+This also weakens the case for H3 before it runs. If the leaf carries most of the
+signal, background augmentation should recover some of the gap but not most of it.
+
+**Automated saliency proxy, kept for completeness.** Grad-CAM mass inside the leaf
+mask was 0.735 against a mask covering 0.613 of the frame, a 1.20× enrichment. It
+is a weak instrument on its own and the swap test supersedes it, but it points the
+same way and it is reported so nobody has to trust only one measurement.
 
 ## S17 — H2 verdict
 
-**Partially supported, not confirmed.**
+**Partially supported, now with a precise statement of which part.**
 
-Supported by S15: neutralising the background costs 56.5 pp on PlantVillage, and
-56% of predictions change class when the backdrop becomes a flat colour. Lab
-accuracy is substantially background-dependent. That is the mechanism H2 named.
+Supported: the model's decision depends on background content. Swapping the
+background moves the prediction to the donor class 21.8% of the time against a
+2.6% chance rate, and neutralising the background costs 56.5 points on
+PlantVillage.
 
-Not supported by S16: attention is not concentrated on lesions to any convincing
-degree (1.20× enrichment). So the picture is not "the model looks at soil instead
-of the leaf"; it is closer to "the model's decision uses global scene statistics
-in addition to the leaf, and those statistics do not transfer".
+Not supported: the strong claim that the model reads the background *instead of*
+the leaf. Swapping the leaf moves the prediction 50.3% of the time, more than twice
+as often as swapping the background, and the confidence interval on that difference
+excludes zero.
 
-Consequence for H3: a background randomisation experiment is still worth running,
-because the 56.5 pp dependence is large enough to be worth attacking. But it
-should be expected to recover a *portion* of the gap, not most of it, since the
-leaf evidence itself is not what the model is primarily using.
+The mechanism is **joint use of leaf and scene**, not substitution. The field gap
+is not a shortcut where the model ignored the plant. It is a model that learned
+leaf-plus-laboratory-context as a single cue and lost the context half of it when
+the photographs changed.
+
+Consequence for H3, recorded before S19 runs: background augmentation should
+recover a portion of the gap, not most of it. If it recovers most of it, that
+contradicts this measurement and one of the two is wrong.
 
 ## S18 — background source: BLOCKED
 

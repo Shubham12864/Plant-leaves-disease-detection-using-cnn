@@ -1,0 +1,34 @@
+{
+  "checkpoint": "checkpoints\\efficientnet_b0\\efficientnet_b0_best.pt",
+  "architecture": "efficientnet_b0",
+  "domain": "PlantVillage validation",
+  "images": 298,
+  "baseline_accuracy": 1.0,
+  "leaf_swap_adoption": 0.5033557046979866,
+  "leaf_swap_adoption_ci95": [
+    0.4463087248322148,
+    0.5570469798657718
+  ],
+  "background_swap_adoption": 0.2181208053691275,
+  "background_swap_adoption_ci95": [
+    0.17114093959731544,
+    0.2684563758389262
+  ],
+  "leaf_swap_flip": 0.7919463087248322,
+  "background_swap_flip": 0.3926174496644295,
+  "same_class_control_flip": 0.0436241610738255,
+  "same_class_control_flip_ci95": [
+    0.02348993288590604,
+    0.06719798657718075
+  ],
+  "chance_adoption": 0.02631578947368421,
+  "method": "swap-with-partner intervention; adoption means the prediction moved to the donor's class; same-class control measures the floor from perturbation alone",
+  "leaf_excess_over_chance": 0.477,
+  "background_excess_over_chance": 0.1918,
+  "background_minus_leaf_adoption": -0.2852,
+  "background_minus_leaf_ci95": [
+    -0.3624,
+    -0.2047
+  ],
+  "verdict": "leaf dominates: swapping the leaf moves the prediction more than swapping the scene, CI excludes zero"
+}
