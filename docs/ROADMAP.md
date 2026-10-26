@@ -184,19 +184,38 @@ Scope statement (one controlled source, one 236-image field set, no expert re-la
 | A — evidence | S1–S4 | **complete** |
 | B — fair comparison | S5–S10 | **complete** — 14 runs, 0 failures, spread reported |
 | C — field gap | S11–S13 | **complete — H1 confirmed (−78.4 pp over 5 seeds)** |
-| D — mechanism | S14–S19 | S14, S15 complete; S16 instrument ready, labels outstanding; S17 H2 **partial**; **S18 blocked**; S19 not started |
+| D — mechanism | S14–S19 | **complete** — S16 done by intervention, S18 resolved, S19 run and H3 answered |
 | E — usefulness | S20–S22 | **complete — H4 confirmed** |
 | F — lock down | S23–S25 | **complete** — 17 tests, registry check, run_all |
-| G — write | S26–S28 | **complete as drafts** — `reports/paper/` |
+| G — write | S26–S28 | results and limitations written; **dissertation and figures pack outstanding** |
 
-Remaining work is not computational:
+Stage D closed as follows:
 
-1. Fill `reports/mechanism/gradcam_b0_plantdoc/labelling_sheet.csv` (S16).
-2. Decide the H3 route: obtain a licence-clean background corpus (S18) or drop H3
-   from the abstract with a stated reason.
-3. Decide the confidence-threshold wording in the approved abstract.
-4. Render the dissertation against the university template, which has not been
-   supplied to this repository.
+- **S16** was completed by intervention instead of by hand labels. The swap test on
+  298 validation images gives leaf adoption 0.5034 against background adoption
+  0.2181, control 0.0436, chance 0.0263. The labelling sheet still exists for a
+  visual cross-check but no longer gates anything.
+- **S18** resolved with a licence-clean field-image background corpus, admitted only
+  through a hash-disjointness gate that refuses to start training on any
+  byte-identical overlap with PlantDoc or PlantVillage.
+- **S19** ran six conditions (three seeds each) and answered H3: **not supported**,
+  +1.24 pp field macro-F1 with a confidence interval spanning zero, 1.6% of the gap
+  recovered.
+
+Remaining work, none of it computational:
+
+1. **Write the dissertation.** `reports/paper/` holds the results-by-hypothesis and
+   limitations sections; the front matter, introduction, literature review,
+   methodology and discussion are not drafted as one document yet.
+2. **Assemble the figure pack.** Reliability diagram as a rendered figure (bins exist
+   as CSV), field-gap bars with intervals, coverage curve, confusion matrix,
+   saliency grid — five candidates exist across `reports/`, three are placed in
+   `reports/paper/figures/`.
+3. **Render against the university template**, which has not been supplied to this
+   repository. Margins, fonts, page numbering and front-matter forms are unknown
+   until it arrives.
+4. **Optional, not blocking:** seed-variance and ensemble check across the six S19
+   checkpoints; the 50-map visual cross-check for S16.
 
 ## Gates that must not be crossed
 
