@@ -29,7 +29,7 @@ Tick both: **Mid-Term Evaluation** and **Phase III – Implementation Evaluation
 ## Current Implementation / Prototype Status
 
 Implemented and working at mid-term:
-- A frozen data split for PlantVillage (54,305 images, 38 classes): 36,762 train, 6,544 validation, 10,709 test, checked for disjointness by a gate.
+- A frozen data split for PlantVillage (38 classes, 54,015 images in the three frozen splits): 36,762 train, 6,544 validation, 10,709 test, checked for disjointness by a gate.
 - One distributed training engine (`scripts/train_ddp.py`) driven by a frozen protocol (`configs/protocol_v2.json`), used for all four architectures: SmallCNN, ResNet18, EfficientNet-B0, ConvNeXt-Tiny.
 - A fourteen-run comparison sweep (3 to 5 seeds per architecture), zero failed runs.
 - A field-image evaluation on PlantDoc (236 test images) with bootstrap intervals.
@@ -61,7 +61,7 @@ Across all fourteen checkpoints the field accuracies are ConvNeXt-Tiny 0.3008, E
 ## Supporting Evidence / Repository / Demonstration Links – Mid-Term
 
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn
-https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/PROJECT_STATUS.md
+https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/docs/RESEARCH_CLAIM.md
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/reports/model_comparison/SWEEP_V2_RESULTS.md
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/tree/main/reports/field_gap
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/results/registry.json
@@ -96,11 +96,11 @@ Software only; no hardware or sensors. Code is in `src/plant_disease/` (package:
 
 Integration is verified at interfaces: model parity between package and engine (all four match); `scripts/run_all.py --check` runs six reproducibility gates; `scripts/build_tables.py --verify` compares four generated tables with the registry and fails on a missing run, a missing artifact or a stale table (currently passes, 23 claims backed).
 
-The static front end (`app/static/`) is not connected to a model: with no backend configured, `api.js` fails fast with code `demo` and the pages show recorded checkpoint output, never an invented prediction. The serving API is specified in `docs/FRONTEND_PLAN.md` but not implemented. Documentation: README, `DATASET_CARD.md`, `MODEL_CARD.md`, `docs/KNOWN_ISSUES.md` (defect register).
+The static front end (`app/static/`) is not connected to a model: with no backend configured, `api.js` fails fast with code `demo` and the pages show recorded checkpoint output, never an invented prediction. The serving API is specified in `docs/FRONTEND_PLAN.md` but not implemented. Documentation: README, `docs/RESEARCH_CLAIM.md` (hypotheses), `docs/KNOWN_ISSUES.md` (defect register).
 
 ## Testing, Validation & Performance Results
 
-**Automated:** 39 tests pass (split integrity and disjointness, checkpoint contract with strict loading, metric sanity, calibration, data loading, Grad-CAM shape, checkpoint loader fallback) plus the six reproducibility gates. The parity check caught one real error: ResNet18 had been recorded with the 1000-class ImageNet parameter count although the 38-class checkpoint has 11,196,006 (`EXPERIMENT_LOG.md`).
+**Automated:** 39 tests pass (split integrity and disjointness, checkpoint contract with strict loading, metric sanity, calibration, data loading, Grad-CAM shape, checkpoint loader fallback) plus the six reproducibility gates. The parity check caught one real error: ResNet18 had been recorded with the 1000-class ImageNet parameter count although the 38-class checkpoint has 11,196,006.
 
 **Performance** (PlantVillage locked test, 10,709 images; PlantDoc field test, 236 images; evaluation on CPU, training on Kaggle 2× Tesla T4):
 
@@ -136,4 +136,4 @@ https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/tree/ma
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/results/registry.json
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/docs/KNOWN_ISSUES.md
 https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/docs/ABSTRACT_VS_EVIDENCE.md
-https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/MODEL_CARD.md
+https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/blob/main/reports/model_comparison/SWEEP_V2_RESULTS.md

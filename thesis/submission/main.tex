@@ -1,6 +1,10 @@
 \documentclass[12pt,a4paper]{report}
 \input{../style/format}
 
+% file paths use \path (url package, loaded by hyperref) so they can break at / and _
+\urlstyle{tt}
+\emergencystretch=3em
+
 % this document is a form submission, not a dissertation: no chapter numbering
 \renewcommand{\ThesisTitle}{Plant Leaf Disease Detection Using CNN}
 \renewcommand{\ThesisSubtitle}{Capstone Project Phase III and Mid-Term Progress Report}

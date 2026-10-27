@@ -11,20 +11,20 @@ Data preparation reads the frozen manifests and decodes every image once into a
 a hash of the path list, so changing the split invalidates the cache instead of
 silently reusing it.
 
-Training is a single engine, \texttt{scripts/train\_ddp.py}, parameterised by
-\texttt{configs/protocol\_v2.json}. It runs on two GPUs through
+Training is a single engine, \path{scripts/train_ddp.py}, parameterised by
+\path{configs/protocol_v2.json}. It runs on two GPUs through
 DistributedDataParallel, applies augmentation on the accelerator, and writes three
 artifacts per run: a best checkpoint, a resumable last checkpoint, and a metrics JSON
 carrying the split fingerprint, the learning rate actually applied per epoch, and the
 full hyperparameter set.
 
-Evaluation is separate from training on purpose. \texttt{evaluate\_locked\_test.py}
-scores PlantVillage splits with bootstrap intervals; \texttt{evaluate\_plantdoc.py}
+Evaluation is separate from training on purpose. \path{evaluate_locked_test.py}
+scores PlantVillage splits with bootstrap intervals; \path{evaluate_plantdoc.py}
 scores the field dataset through the label map and reports out-of-mapping
 predictions rather than hiding them.
 
-Everything reported passes through \texttt{results/registry.json}, which
-\texttt{scripts/build\_tables.py} renders into tables. The registry check fails the
+Everything reported passes through \path{results/registry.json}, which
+\path{scripts/build_tables.py} renders into tables. The registry check fails the
 build if a document quotes a number not registered against an artifact.
 
 \section{Methodology and implementation}
@@ -57,22 +57,21 @@ brightness and per-channel gain, applied on the GPU.
 
 The reference model is trained across multiple seeds so variance is reported rather
 than a single run. Macro averages are computed only over classes with non-zero
-support, because an earlier 96-image check produced a meaningless macro-F1 of 0.026 by
-averaging over absent classes.
+support, so classes absent from a split do not dilute the score.
 
 \section{Prototype development}
 
 Two things ran at mid-term. The research pipeline is complete and reproducible:
-\texttt{scripts/run\_all.py --check} executes six gates, covering the unit tests, the
+\path{scripts/run_all.py --check} executes six gates, covering the unit tests, the
 table build, the registry check, a batch-composition check, a command-contract test,
 and failure-path tests for the unattended training notebook.
 
-The second is a static front end in \texttt{app/static/} with four pages: a landing
+The second is a static front end in \path{app/static/} with four pages: a landing
 page, single-image scan with a Grad-CAM slider, batch upload with CSV export, and a
 full inference view. It has no build step and opens in a browser.
 
 The front end is not wired to a live model. When no backend URL is configured,
-\texttt{app/static/js/api.js} fails fast with code \texttt{demo} and each page shows
+\path{app/static/js/api.js} fails fast with code \texttt{demo} and each page shows
 recorded checkpoint output instead of inventing a prediction. The service that would
 serve live inference is specified but not implemented, so the prototype demonstrates
 the interface and the recorded results rather than a deployed classifier.
@@ -81,28 +80,29 @@ the interface and the recorded results rather than a deployed classifier.
 
 \begin{table}[H]
 \centering
-\caption{Datasets and splits}
+\caption{Datasets and splits (PlantVillage count is the sum of the three frozen splits)}
 \label{tab:data-mid}
 \tabfont
 \begin{tabularx}{\textwidth}{@{}lrrY@{}}
 \toprule
 \textbf{Dataset} & \textbf{Images} & \textbf{Classes} & \textbf{Splits used} \\
 \midrule
-PlantVillage & 54,305 & 38 & 36,762 train, 6,544 validation, 10,709 test \\
+PlantVillage & 54,015 & 38 & 36,762 train, 6,544 validation, 10,709 test \\
 PlantDoc & 2,578 & 28 & 236 test images, 27 classes scored \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 Train and validation are disjoint by path and every class appears in both. The test
-split is disjoint from both and was opened once for the reference evaluation,
-reproducing bit-identical results.
+split is disjoint from both. It has been scored more than once over the life of the
+project (defect D11 in \path{docs/KNOWN_ISSUES.md}), so test figures are reported
+as reporting passes, not as a blind holdout.
 
 Preprocessing is resize to $224\times224$, conversion to RGB, scaling to $[0,1]$ and
 ImageNet normalisation, identical for every model and both datasets. Training ran on
-two Tesla T4 GPUs with mixed precision; the fourteen-run sweep completed in about
-2.6 hours with no run failures. Evaluation ran on CPU. Versions are pinned in
-\texttt{requirements.lock}.
+two Tesla T4 GPUs with FP16 mixed precision, and the fourteen-run sweep completed with
+no run failures. The evaluation scripts run on either GPU or CPU. Versions are pinned
+in \texttt{requirements.lock}.
 
 Every run records a dataset fingerprint. All fourteen sweep runs share the same
 fingerprint, which is how the project proves they saw the same split rather than
@@ -110,13 +110,11 @@ assuming it.
 
 \section{Testing and validation}
 
-The test suite covered split integrity and disjointness, the checkpoint contract
-including strict state-dict loading and parameter counts, metric sanity, and the
-evaluator output contract.
+The 17-test suite covered split integrity and disjointness, the checkpoint contract
+including strict state-dict loading and parameter counts, and metric sanity.
 
-Two tests caught real errors during this work. ResNet18 had been recorded with the
-parameter count of the 1000-class ImageNet model rather than the 38-class one, and a
-metrics function signature had been assumed incorrectly.
+The parity check caught a real error: ResNet18 had been recorded with the parameter
+count of the 1000-class ImageNet model rather than the 38-class one.
 
 Beyond unit tests, the training engine has a smoke test covering a distributed run,
 the checkpoint contract and the resume fingerprint guard. The unattended notebook has
@@ -147,8 +145,8 @@ The reference model and ConvNeXt-Tiny differ by 0.00005, which is thirty-four ti
 smaller than the reference model's own seed spread. On this benchmark the
 architecture does not decide the outcome.
 
-Field transfer on PlantDoc test, averaged over five protocol-v2 seeds, falls from
-0.9928 to 0.2085, a drop of 78.4 percentage points. Scoring all fourteen checkpoints
+Field transfer, averaged over five protocol-v2 seeds, falls from 0.9928 on PlantVillage
+validation to 0.2085 on the PlantDoc test set, a drop of 78.4 percentage points. Scoring all fourteen checkpoints
 shows the lab ranking is preserved but the lab gaps are not: ConvNeXt-Tiny 0.3008,
 EfficientNet-B0 0.2085, ResNet18 0.1610, SmallCNN 0.0438.
 
@@ -163,7 +161,7 @@ the protocol byte for byte, and the build fails if an embedded file differs from
 repository version. This exists because a hand-edited notebook cell silently diverged
 once already.
 
-The registry is integrated with the documents: \texttt{build\_tables.py --verify}
+The registry is integrated with the documents: \path{build_tables.py --verify}
 fails when a claim has no registered run, when an artifact directory is missing, or
 when a generated table is stale.
 
