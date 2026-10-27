@@ -23,7 +23,7 @@ if [ -n "$memory" ]; then
   status=1
 fi
 
-notes=$(git grep -liE 'obsidian|wallet_index' -- . ':!.gitignore' ':!scripts/verify_repo_clean.sh' || true)
+notes=$(git grep -liE 'obsidian|wallet_index' -- . ':!.gitignore' ':!scripts/verify_repo_clean.sh' ':!scripts/verify-history-clean.sh' || true)
 if [ -n "$notes" ]; then
   echo "Tracked files still carry note-vault (Obsidian) markup:"
   echo "$notes"
