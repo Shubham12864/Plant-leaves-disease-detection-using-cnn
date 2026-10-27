@@ -8,6 +8,26 @@ The PlantVillage scores below do **not** carry over to field photographs. On the
 
 The full evidence and verdicts for H1–H4 are in [`PROJECT_STATUS.md`](PROJECT_STATUS.md); the claims in the approved abstract that the evidence does not support are listed in [`docs/ABSTRACT_VS_EVIDENCE.md`](docs/ABSTRACT_VS_EVIDENCE.md). Open defects are in [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
 
+## Repository map
+
+| Path | What it holds |
+|---|---|
+| `src/plant_disease/` | Package: data loading, models, metrics, calibration, Grad-CAM, safe checkpoint loader |
+| `scripts/` | Training engine, evaluation, experiments, table and dissertation builders, reproducibility gates |
+| `tests/` | Automated tests (splits, checkpoints, metrics, calibration, data, Grad-CAM) |
+| `configs/` | Frozen protocol and data contract |
+| `data/manifests/` | Frozen splits and PlantDoc label mapping (images are not in git) |
+| `results/registry.json` | Every reported number, tied to an artifact |
+| `reports/` | Measured results: model comparison, field gap, mechanism, augmentation |
+| `app/static/` | Static front end (demo mode, no live inference service yet) |
+| `thesis/` | Dissertation LaTeX source (built PDFs are not committed) |
+| `docs/` | Defect register, abstract-versus-evidence, form answers, weekly reports |
+| `notebooks/` | Kaggle notebooks used for training runs |
+
+Model weights, datasets, PDFs and LaTeX build output are not stored in git. `bash scripts/verify_repo_clean.sh` fails if any are tracked.
+
+Reproduce the checks: `pip install -r requirements.lock`, then `python -m pytest tests -q` and `python scripts/build_tables.py --verify`.
+
 The sections below describe the original PlantVillage-only comparison.
 
 ## Project question

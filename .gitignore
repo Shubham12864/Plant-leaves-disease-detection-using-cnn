@@ -15,7 +15,7 @@ reports/generated/**
 *.pt
 *.pth
 *.onnx
-!reports/phase2_baseline/plantvillage_smallcnn_best.pt
+*.zip
 
 data/raw/**
 !data/raw/.gitkeep
@@ -27,5 +27,17 @@ kaggle_upload/**
 .merge.log
 .pytest_cache/
 .cocreate/
+
+# Built documents and LaTeX products are regenerated from source, never committed.
+*.pdf
+*.docx
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
 thesis/build/
-reports/thesis/*.pdf
+thesis/submission/build/
+
+# Local AI-assistant tooling
+.claude/
