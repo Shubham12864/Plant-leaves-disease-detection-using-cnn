@@ -4,7 +4,7 @@
 **Project title:** Plant Leaf Disease Detection Using CNN
 **Team:** Shubham Kumar, Ujjwal Pratap Singh, Vivek Kumar Prajapati, Shubham Kumar
 **Guide:** Dr. Harendra Singh
-**Week commencing:** [fill in]
+**Week commencing:** ____ / ____ / 2026
 
 Two members of the team are named Shubham Kumar. Both are listed, in the order
 given above, and enrolment numbers distinguish them.
@@ -26,23 +26,26 @@ Two pieces of infrastructure were built. A single training engine replaces the
 per-model scripts, so all architectures share one auditable code path. A complete
 PlantDoc label map resolves all 28 field classes to PlantVillage classes, with
 three rows marked as caveated and a written reason for each, one of which flags
-that a class has only two training images and cannot support a per-class claim.
+that a class (tomato two-spotted spider mite) has only two training images and
+cannot support a per-class claim.
 
 ## Findings
 
 The earlier project notes claimed a test accuracy of 99.51%. On re-measurement
 that is correct: 10,709 test images, 53 errors. What the notes did not say is that
-the test split has now been opened once, which is a fact any later reader needs.
+the test split had already been scored more than once, so it is no longer a blind
+holdout. This is recorded as defect D11 in `docs/KNOWN_ISSUES.md`, and any further
+test scoring is reported as a reporting pass.
 
-The PlantDoc mapping in the repository covered 16 of 28 classes and marked every
-row `review_required`, so no field evaluation was possible. That is now resolved.
+The PlantDoc label map in the repository was incomplete and every row was still
+marked for review, so no field evaluation was possible. That is now resolved.
 
 ## Problems
 
-The first training engine run dropped the solution to a near-random model twice
-with no error, because a learning-rate schedule decayed to 1% of its nominal value
-by the last epoch. The schedule is now recorded per epoch in the training history,
-so this cannot be invisible again.
+The first training engine runs produced a poor model with no error message. The
+cause was not visible in the saved artifacts because the engine did not record the
+learning rate it actually applied. The applied learning rate is now written to the
+training history for every epoch, so this cannot be invisible again.
 
 ## Next week
 
