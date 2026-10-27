@@ -23,7 +23,7 @@ The hypotheses and their falsifiers were written before the experiments ran ([`d
 | H1 | Field accuracy is far below lab accuracy | **Confirmed** | 0.9928 to 0.2085 over 5 seeds; all 27 mapped classes are worse |
 | H2 | The gap is partly background dependence | **Partially supported** | Swapping the leaf moves the prediction 50.3% of the time, swapping the background 21.8%, against 2.6% by chance: the model uses both, with the leaf dominant |
 | H3 | Background augmentation recovers part of the gap | **Not supported** | Six paired runs: field macro-F1 +1.24 pp, 95% CI [-3.32, +5.80]; in-domain cost -0.87 pp |
-| H4 | Nominal accuracy does not bound deployable accuracy | **Confirmed** | Calibration error 0.0026 to 0.5808; abstaining on low-confidence images gains only 0.8 pp at 90% coverage |
+| H4 | Nominal accuracy does not bound deployable accuracy | **Confirmed** | Calibration error 0.0026 to 0.5808; abstaining on low-confidence images gains only 0.08 pp at 90% coverage |
 
 Negative results are reported as results. Details: [field gap](reports/field_gap/FIELD_GAP_RESULTS.md), [mechanism](reports/mechanism/MECHANISM_RESULTS.md), [augmentation](reports/mechanism/S19_BACKGROUND_AUGMENTATION_RESULTS.md), [usefulness and calibration](reports/field_gap/USEFULNESS_RESULTS.md).
 

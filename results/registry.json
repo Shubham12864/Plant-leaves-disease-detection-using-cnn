@@ -640,7 +640,7 @@
       "caveat": "236 images; ECE at 15 bins is noisy; one checkpoint per architecture"
     },
     {
-      "claim": "At 90% coverage, abstention gains 0.8 pp for the reference model on PlantDoc",
+      "claim": "At 90% coverage, abstention gains 0.08 pp for the reference model on PlantDoc",
       "value": {
         "full_coverage": 0.1737,
         "at_90pct": 0.1745
@@ -1047,7 +1047,7 @@
     "H4": {
       "verdict": "confirmed",
       "evidence": "reports/field_gap/USEFULNESS_RESULTS.md",
-      "statement": "Nominal accuracy does not bound deployable accuracy, and abstention does not rescue it: at 90% coverage the reference model gains 0.8 pp (17.37 to 17.45). SmallCNN's confidence is anti-correlated with correctness.",
+      "statement": "Nominal accuracy does not bound deployable accuracy, and abstention does not rescue it: at 90% coverage the reference model gains 0.08 pp (17.37 to 17.45). SmallCNN's confidence is anti-correlated with correctness.",
       "artifact": "calibration_summary.json"
     }
   }

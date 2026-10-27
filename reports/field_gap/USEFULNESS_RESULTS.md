@@ -85,7 +85,7 @@ Accuracy retained when the lowest-confidence fraction is rejected:
 | SmallCNN | 0.0678 | 0.0670 | 0.0660 | 0.0582 | **0.0508** |
 
 **Abstention buys almost nothing.** At 90% coverage — rejecting one image in ten
-— the reference model gains **0.8 percentage points**, from 17.37% to 17.45%. To
+— the reference model gains **0.08 percentage points**, from 17.37% to 17.45%. To
 reach 24.6% you must throw away **half** the images, and even then the model is
 wrong three times out of four.
 
@@ -103,7 +103,7 @@ confidence threshold would let a user recover the reliable subset.
 
 What the data shows is stronger. The confidence threshold does not recover a
 reliable subset, because **field confidence carries almost no information about
-field correctness.** The 0.8 pp gain at 90% coverage is within noise on 236
+field correctness.** The 0.08 pp gain at 90% coverage is within noise on 236
 images. There is no operating point at which this model is both useful and
 subset-selective.
 

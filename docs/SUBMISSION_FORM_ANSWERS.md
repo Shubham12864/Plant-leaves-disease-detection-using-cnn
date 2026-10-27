@@ -54,7 +54,7 @@ PlantVillage validation macro-F1 under the frozen protocol: ConvNeXt-Tiny 0.9895
 
 Locked test (10,709 images), reference model: macro-F1 0.99314; 53 errors.
 
-Field test (PlantDoc, 236 images, 27 classes with test images): EfficientNet-B0 accuracy falls from 0.9928 to 0.2085 (five-seed mean; the published checkpoint scores 0.1737). Expected calibration error rises from 0.0026 to 0.5808. In the 0.95–1.00 confidence band (65 images) the published checkpoint is right 29.2% of the time. A confidence threshold gains only 0.8 points at 90% coverage.
+Field test (PlantDoc, 236 images, 27 classes with test images): EfficientNet-B0 accuracy falls from 0.9928 to 0.2085 (five-seed mean; the published checkpoint scores 0.1737). Expected calibration error rises from 0.0026 to 0.5808. In the 0.95–1.00 confidence band (65 images) the published checkpoint is right 29.2% of the time. A confidence threshold gains only 0.08 points at 90% coverage.
 
 Across all fourteen checkpoints the field accuracies are ConvNeXt-Tiny 0.3008, EfficientNet-B0 0.2085, ResNet18 0.1610, SmallCNN 0.0438. Caveat: 236 images give about ±6 points of uncertainty on a single estimate.
 
@@ -72,7 +72,7 @@ https://github.com/Shubham12864/Plant-leaves-disease-detection-using-cnn/tree/ma
 - The first sweep collapsed because of batch composition (see above), which made the twelve runs of that sweep unusable. Documented in `reports/model_comparison/SWEEP_V1_INVALID.md`.
 - The first occlusion probe filled the image border grey, which also erased leaf, and would have been reported as strong background dependence. A rendered check caught it and the probe was rebuilt around a leaf mask.
 - Pending at mid-term: the mechanism measurement that separates "depends on the background" from "disrupted by the edit", the background-augmentation experiment, and a live inference service.
-- The approved abstract promises a confidence threshold for uncertain cases. The measured result (0.8 points gained) does not support it, so the abstract wording needs to be agreed with the guide.
+- The approved abstract promises a confidence threshold for uncertain cases. The measured result (0.08 points gained) does not support it, so the abstract wording needs to be agreed with the guide.
 
 ---
 
@@ -110,7 +110,7 @@ The static front end (`app/static/`) is not connected to a model: with no backen
 | Expected calibration error | 0.0026 | 0.5808 |
 | Best field model | n/a | ConvNeXt-Tiny 0.3008 |
 
-**Augmentation experiment** (3 seeds per condition): field macro-F1 0.2232 baseline vs 0.2356 with background replacement. Paired difference +1.24 points, 95% CI [−3.32, +5.80], two of three seeds improved, 1.6% of the gap recovered. In-domain macro-F1 fell 0.87 points. Conclusion: no detectable effect. Abstention gains 0.8 points at 90% coverage.
+**Augmentation experiment** (3 seeds per condition): field macro-F1 0.2232 baseline vs 0.2356 with background replacement. Paired difference +1.24 points, 95% CI [−3.32, +5.80], two of three seeds improved, 1.6% of the gap recovered. In-domain macro-F1 fell 0.87 points. Conclusion: no detectable effect. Abstention gains 0.08 points at 90% coverage.
 
 **Defects found and fixed this phase:** a notebook ran a check before the cell that wrote its script; a field evaluation failed remotely because the project root resolved one level too high; a reliability figure gave a one-image bin the same weight as the bin holding 10,590 of 10,709 images. Latency was not benchmarked and is not reported.
 

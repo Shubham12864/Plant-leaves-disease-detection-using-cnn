@@ -20,7 +20,7 @@ included, until the university says otherwise.
 | 2 | "A separate field-oriented validation set will be used to check whether the model generalises beyond clean images" | Done, and it became the main result: 0.2085 field accuracy against 0.9928 on PlantVillage | **fully supported** |
 | 2b | "...trained with targeted augmentation and class balancing" | Implemented and run at three seeds per condition. The augmentation did not move the field gap: +1.24 pp macro-F1, CI spanning zero, at a cost of 0.87 pp in-domain | **implemented, no measurable benefit** |
 | 3 | "Grad-CAM will be used to show the part of the leaf that influenced the prediction" | Grad-CAM is implemented with 50 labelled-ready tiles, and the influence question was answered better by intervention: leaf swap moves the prediction 50.3%, background swap 21.8%, control 4.4%, chance 2.6%. The leaf is the dominant influence | **supported** |
-| 4 | "a confidence threshold will flag uncertain cases instead of forcing every image into a disease class" | Tested on field data. At 90% coverage the threshold gains 0.8 percentage points. In the top confidence band the model is right 29% of the time at 98.6% confidence. The threshold does not flag uncertain cases usefully | **not supported** |
+| 4 | "a confidence threshold will flag uncertain cases instead of forcing every image into a disease class" | Tested on field data. At 90% coverage the threshold gains 0.08 percentage points. In the top confidence band the model is right 29% of the time at 98.6% confidence. The threshold does not flag uncertain cases usefully | **not supported** |
 | 5 | The goal is "a model that is more consistent, easier to inspect, and practical as a first-stage screening tool" | "More consistent" and "easier to inspect" are achieved. "Practical as a first-stage screening tool" is contradicted by 20.85% field accuracy | **contradicted** |
 
 ## Why this matters for the submission
@@ -64,7 +64,7 @@ Section 8 of the submission already records the confidence-threshold outcome und
 technical challenges. If the abstract stays as approved, add one line to section 9:
 
 > The confidence-threshold mechanism described in the approved abstract was
-> implemented and evaluated. On field data it gained 0.8 percentage points at 90%
+> implemented and evaluated. On field data it gained 0.08 percentage points at 90%
 > coverage, so the abstract's expectation was not confirmed and the result is
 > reported as a negative finding rather than as a delivered feature.
 

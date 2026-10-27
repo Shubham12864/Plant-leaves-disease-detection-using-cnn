@@ -161,6 +161,15 @@ than twice as much. This supersedes the mid-term statement that lab accuracy was
 substantially background dependent, which was based on neutralisation alone and could
 not distinguish dependence from disruption.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{fig_swap.png}
+\caption{How often the prediction follows the swapped-in part. Swapping the leaf
+(dark blue) changes the prediction half the time; swapping the background (orange)
+changes it about one time in five. Bars show 95\,\% intervals.}
+\label{fig:swap}
+\end{figure}
+
 \begin{table}[H]
 \centering
 \caption{Paired augmentation experiment, cohort B}
@@ -183,13 +192,22 @@ two of three seeds improved, and 1.6\,\% of the gap is recovered. There is no
 detectable effect.
 
 Calibration on field data rises from 0.0026 to 0.5808. At 90\,\% coverage the
-reference model gains 0.8 points, so abstention does not produce a usable operating
+reference model gains 0.08 points, so abstention does not produce a usable operating
 point.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{fig_coverage.png}
+\caption{Accuracy on the field images the model is most sure about. If its confidence
+could be trusted, each line would rise steeply as less-sure images are dropped
+(moving left). They barely move; the SmallCNN line falls.}
+\label{fig:coverage}
+\end{figure}
 
 \section{Integration and verification}
 
 The registry now backs 23 claims, each tied to a run and an artifact directory.
-\path{build_tables.py --verify} compares four generated tables against the registry
+\path{build_tables.py} with \texttt{-{}-verify} compares four generated tables against the registry
 and fails on any mismatch, including a claim citing an unknown run. This is exercised
 on every build.
 
@@ -255,7 +273,7 @@ OOD detection & Replacement for the confidence threshold & Not started \\
 One point of consistency with the approved abstract belongs here rather than in a
 reader's discovery. The abstract commits to a confidence threshold that flags
 uncertain cases. The mechanism was implemented and measured. On field data it gained
-0.8 points at 90\,\% coverage, so the expectation was not confirmed, and it is
+0.08 points at 90\,\% coverage, so the expectation was not confirmed, and it is
 reported as a negative finding rather than as a delivered feature.
 
 The abstract also commits to targeted augmentation for realistic variation. That was

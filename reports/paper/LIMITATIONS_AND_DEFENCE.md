@@ -89,7 +89,7 @@ student and guide, not a silent edit.
 | How do you know the field number isn't a bug? | Same script scores 0.9967 on 300 lab images | `registry.runs[].pipeline_control` |
 | Is the model reading background? | Partly: background removal costs 56.5 pp in the lab, but Grad-CAM enrichment is 1.20× | `reports/mechanism/MECHANISM_RESULTS.md` |
 | Why no augmentation result? | No licence-clean corpus disjoint from PlantDoc; using PlantDoc would contaminate the field set | `docs/KNOWN_ISSUES.md` S18 |
-| Does a confidence threshold help? | No: +0.8 pp at 90% coverage; SmallCNN is anti-correlated | `field_gap/USEFULNESS_RESULTS.md` |
+| Does a confidence threshold help? | No: +0.08 pp at 90% coverage; SmallCNN is anti-correlated | `field_gap/USEFULNESS_RESULTS.md` |
 | What is the contribution? | The benchmark number does not survive contact with the field, and both standard mitigations fail | `reports/paper/RESULTS_BY_HYPOTHESIS.md` |
 | What would you do with three more months? | S18 corpus plus S19 augmentation with paired bootstrap; seed the field evaluation; a second independent field set | `docs/ROADMAP.md` |
 

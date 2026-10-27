@@ -43,7 +43,7 @@ Across all fourteen checkpoints the field accuracies are ConvNeXt-Tiny 0.3008,
 EfficientNet-B0 0.2085, ResNet18 0.1610 and SmallCNN 0.0438. ConvNeXt-Tiny and
 EfficientNet-B0 are tied in the lab to within 0.00005 and are 9.2 points apart in
 the field, so the lab benchmark ranks the models in the right order but gets the
-size of the differences wrong. Rejecting the least confident images gains only 0.8
+size of the differences wrong. Rejecting the least confident images gains only 0.08
 points at 90% coverage, so a confidence threshold does not recover a usable subset.
 
 ## Problems

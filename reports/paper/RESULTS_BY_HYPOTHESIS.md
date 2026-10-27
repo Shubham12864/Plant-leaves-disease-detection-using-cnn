@@ -153,7 +153,7 @@ The intended mitigation was a confidence threshold. It does not help:
 | EfficientNet-B0 | 0.1737 | 0.1745 | 0.2458 |
 | SmallCNN | 0.0678 | 0.0660 | **0.0508** |
 
-Rejecting one image in ten gains the reference model **0.8 points**. Recovering
+Rejecting one image in ten gains the reference model **0.08 points**. Recovering
 useful accuracy requires discarding half the images. SmallCNN's confidence is
 **anti-correlated** with correctness: rejecting its least-confident half lowers
 accuracy from 6.78% to 5.08%.

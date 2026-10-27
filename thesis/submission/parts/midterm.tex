@@ -62,7 +62,7 @@ support, so classes absent from a split do not dilute the score.
 \section{Prototype development}
 
 Two things ran at mid-term. The research pipeline is complete and reproducible:
-\path{scripts/run_all.py --check} executes six gates, covering the unit tests, the
+\path{scripts/run_all.py} with the flag \texttt{-{}-check} executes six gates, covering the unit tests, the
 table build, the registry check, a batch-composition check, a command-contract test,
 and failure-path tests for the unattended training notebook.
 
@@ -161,7 +161,7 @@ the protocol byte for byte, and the build fails if an embedded file differs from
 repository version. This exists because a hand-edited notebook cell silently diverged
 once already.
 
-The registry is integrated with the documents: \path{build_tables.py --verify}
+The registry is integrated with the documents: \path{build_tables.py} with \texttt{-{}-verify}
 fails when a claim has no registered run, when an artifact directory is missing, or
 when a generated table is stale.
 

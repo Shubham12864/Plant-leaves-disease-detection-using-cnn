@@ -1,21 +1,86 @@
 
-\chapter*{Summary of this submission}
-\addcontentsline{toc}{chapter}{Summary of this submission}
+\chapter*{Summary}
+\addcontentsline{toc}{chapter}{Summary}
 \thispagestyle{plain}
 
-This document answers the nine technical reporting areas requested in the
-coordinator's mail of 26 October 2026, for both stages that the Google Form covers:
-Mid-Term Progress and Phase III.
+This report shows the progress of project BT40, \emph{Plant Leaf Disease Detection
+Using CNN}: what was built, how it was tested, what was measured, and what is still
+to do. It covers two stages in one file. Part~I is the project as it stood at the
+mid-term review; Part~II is the work completed since. Where Part~II changes a
+mid-term statement, it says so.
 
-Part~I reports the project as it stood at mid-term. Part~II reports the work
-completed since then. Where a mid-term statement has been superseded, Part~II says
-so explicitly rather than leaving the earlier text standing.
+\section*{The result in plain words}
+
+A plant-disease classifier trained on clean laboratory photographs of leaves is about
+99\,\% accurate on more laboratory photographs. On photographs taken in real fields it
+is about 21\,\% accurate (average of five training runs, 236 field images). The
+project measured why this happens and whether it can be fixed:
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item The model relies mostly on the leaf itself, and also on the scene around it.
+\item Training with replaced backgrounds did not measurably help.
+\item The model's confidence cannot be trusted: when it is very sure it is often wrong,
+      and discarding its least-sure answers barely improves accuracy.
+\end{itemize}
+
+So a high laboratory score should not be read as a field score. That is the finding
+this project establishes.
+
+\section*{Documents in this submission}
+
+\begin{table}[H]
+\centering
+\caption{The files submitted together}
+\label{tab:documents}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}p{4.1cm}Yp{3.3cm}@{}}
+\toprule
+\textbf{Document} & \textbf{What it shows} & \textbf{Date} \\
+\midrule
+This report & Project progress at mid-term and since, with every measured result and where it comes from & \today \\
+Weekly Progress Reports 1, 2 and 3 & A week-by-week record of the work done, the findings and the problems met & Week dates are written on each report \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The results quoted in this report come from the project files below. The date is when
+each file was last updated.
+
+\begin{table}[H]
+\centering
+\caption{Project files behind the results}
+\label{tab:evidence-files}
+\tabfont
+\begin{tabularx}{\textwidth}{@{}p{5.2cm}Yp{2.7cm}@{}}
+\toprule
+\textbf{File} & \textbf{What it shows} & \textbf{Last updated} \\
+\midrule
+\path{docs/RESEARCH_CLAIM.md} & The four hypotheses and what would prove each one wrong & 25 Oct 2026 \\
+\path{reports/model_comparison/SWEEP_V2_RESULTS.md} & Comparison of four models over fourteen training runs & 26 Oct 2026 \\
+\path{reports/field_gap/FIELD_GAP_RESULTS.md} & How accuracy falls on field photographs & 26 Oct 2026 \\
+\path{reports/field_gap/USEFULNESS_RESULTS.md} & Whether the model's confidence can be trusted & 27 Oct 2026 \\
+\path{reports/mechanism/MECHANISM_RESULTS.md} & Whether the model uses the leaf or the background & 26 Oct 2026 \\
+\path{reports/mechanism/S19_BACKGROUND_AUGMENTATION_RESULTS.md} & Whether replacing backgrounds in training helps & 26 Oct 2026 \\
+\path{results/registry.json} & Every reported number, tied to its source file & 27 Oct 2026 \\
+\path{docs/KNOWN_ISSUES.md} & Known defects and open problems & 27 Oct 2026 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section*{How to read this report}
+
+\begin{description}[leftmargin=1.2em,labelindent=0em,itemsep=3pt]
+\item[Part I] The mid-term state: how the system is built, what was tested, the first results.
+\item[Part II] What was added afterwards: the experiment on leaf versus background, the
+      augmentation test, the confidence analysis, and the final status of every goal.
+\item[Appendix] Where each number comes from, and how to reproduce it.
+\end{description}
 
 \section*{Status at a glance}
 
 \begin{table}[H]
 \centering
-\caption{Hypotheses and their current verdicts}
+\caption{The four hypotheses and their current verdicts}
 \label{tab:verdicts}
 \tabfont
 \begin{tabularx}{\textwidth}{@{}lYY@{}}
@@ -25,11 +90,20 @@ so explicitly rather than leaving the earlier text standing.
 H1 & Does clean-image accuracy transfer to field photographs? & Confirmed: 99.3\,\% to 20.9\,\% (five-seed mean), a 78-point drop \\
 H2 & Is the gap partly caused by background dependence? & Partly: leaf dominates, scene still matters \\
 H3 & Does background augmentation recover part of the gap? & Not supported \\
-H4 & Does nominal accuracy bound deployable accuracy? & Confirmed: it does not (calibration error 0.0026 to 0.5808; abstention gains 0.8 points) \\
+H4 & Does nominal accuracy bound deployable accuracy? & Confirmed: it does not (calibration error 0.0026 to 0.5808; abstention gains 0.08 points) \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-All numbers in this document come from runs of this project. Each is registered
-against an artifact in \texttt{results/registry.json}; the appendix maps every claim to
-its file.
+\section*{Glossary}
+
+\begin{description}[leftmargin=1.2em,labelindent=0em,itemsep=3pt]
+\item[Laboratory and field images] Laboratory images (PlantVillage) are clean photos of one leaf on a plain background. Field images (PlantDoc) are photographs taken in real conditions.
+\item[Accuracy] The share of images the model labels correctly.
+\item[Macro-F1] A score from 0 to 1 that weights every disease class equally, so rare classes count as much as common ones.
+\item[Checkpoint] The saved state of a trained model.
+\item[Seed] The starting number for a training run. Different seeds give slightly different models, so results are averaged over several.
+\item[Calibration error] How far the model's stated confidence is from how often it is right. Zero means its confidence can be believed.
+\item[Abstention and coverage] Declining to answer when unsure. Coverage is the share of images the model still answers.
+\item[Adoption rate] In the leaf and background test, how often the prediction changes to the class of the swapped-in part.
+\end{description}
