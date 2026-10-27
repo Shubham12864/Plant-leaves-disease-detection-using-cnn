@@ -1,123 +1,92 @@
-# Plant Leaf Disease Detection using CNN
+# Plant Leaf Disease Detection: how far does lab accuracy carry into the field?
 
-This repository contains the research code and results. It is not the final application.
+A research project on leaf-disease classifiers. Models trained on PlantVillage reach about 99% accuracy on their own test split. This project measures what happens when the same models see field photographs, why, and how much of the loss can be recovered.
 
-## Headline finding
+Status: experiments complete, dissertation in writing. This is research code and results, not a deployed application.
 
-The PlantVillage scores below do **not** carry over to field photographs. On the PlantDoc test set (236 images, 27 mapped classes), EfficientNet-B0 accuracy falls from 0.9928 on PlantVillage to **0.2085** (mean of five seeds), and calibration error rises from 0.0026 to 0.5808 for the published checkpoint. Background augmentation did not close the gap (hypothesis H3 not supported), and a confidence threshold gained only 0.8 pp at 90% coverage. PlantDoc is small, so read these numbers with an interval of about ±6 pp.
+## Central finding
 
-The full evidence and verdicts for H1–H4 are in [`PROJECT_STATUS.md`](PROJECT_STATUS.md); the claims in the approved abstract that the evidence does not support are listed in [`docs/ABSTRACT_VS_EVIDENCE.md`](docs/ABSTRACT_VS_EVIDENCE.md). Open defects are in [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
+| | PlantVillage (lab) | PlantDoc (field) |
+|---|---:|---:|
+| EfficientNet-B0 accuracy | 0.9928 | 0.2085 (5-seed mean) |
+| Expected calibration error | 0.0026 | 0.5808 |
+| Best field model (ConvNeXt-Tiny) | | 0.3008 |
 
-## Repository map
+PlantDoc has 236 test images, so each field figure carries an uncertainty of about ±6 percentage points. Lab and field accuracy are not directly comparable: the field set covers fewer classes and is far smaller.
 
-| Path | What it holds |
+## Hypotheses and verdicts
+
+The hypotheses and their falsifiers were written before the experiments ran ([`docs/RESEARCH_CLAIM.md`](docs/RESEARCH_CLAIM.md)).
+
+| | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| H1 | Field accuracy is far below lab accuracy | **Confirmed** | 0.9928 to 0.2085 over 5 seeds; all 27 mapped classes are worse |
+| H2 | The gap is partly background dependence | **Partially supported** | Swapping the leaf moves the prediction 50.3% of the time, swapping the background 21.8%, against 2.6% by chance: the model uses both, with the leaf dominant |
+| H3 | Background augmentation recovers part of the gap | **Not supported** | Six paired runs: field macro-F1 +1.24 pp, 95% CI [-3.32, +5.80]; in-domain cost -0.87 pp |
+| H4 | Nominal accuracy does not bound deployable accuracy | **Confirmed** | Calibration error 0.0026 to 0.5808; abstaining on low-confidence images gains only 0.8 pp at 90% coverage |
+
+Negative results are reported as results. Details: [field gap](reports/field_gap/FIELD_GAP_RESULTS.md), [mechanism](reports/mechanism/MECHANISM_RESULTS.md), [augmentation](reports/mechanism/S19_BACKGROUND_AUGMENTATION_RESULTS.md), [usefulness and calibration](reports/field_gap/USEFULNESS_RESULTS.md).
+
+## Method
+
+- **Data.** PlantVillage (38 classes; frozen split of 36,762 train, 6,544 validation and 10,709 test images) and PlantDoc (field photographs, mapped to PlantVillage classes). Splits are frozen and hash-checked; the test split is scored for reporting only.
+- **Models.** SmallCNN, ResNet18, EfficientNet-B0 and ConvNeXt-Tiny, trained through one engine under one frozen protocol ([`configs/`](configs/)), 3 to 5 seeds each: fourteen runs, no failures. Validation macro-F1: ConvNeXt-Tiny 0.98951, EfficientNet-B0 0.98946, ResNet18 0.98460, SmallCNN 0.91599.
+- **Uncertainty.** Bootstrap intervals on every reported number; paired bootstrap for comparisons.
+- **Traceability.** Every reported number is registered with its artifact in [`results/registry.json`](results/registry.json), and `python scripts/build_tables.py --verify` fails if a table disagrees with it.
+
+See [`reports/model_comparison/SWEEP_V2_RESULTS.md`](reports/model_comparison/SWEEP_V2_RESULTS.md) for the comparison.
+
+## Current status
+
+| Area | State |
 |---|---|
-| `src/plant_disease/` | Package: data loading, models, metrics, calibration, Grad-CAM, safe checkpoint loader |
+| Evidence, split freeze, label mapping | Done |
+| Fair four-model comparison (14 runs) | Done |
+| Field gap (H1) | Done, confirmed |
+| Mechanism: occlusion, leaf/background swap, Grad-CAM (H2) | Done, partially supported |
+| Background augmentation (H3) | Done, not supported |
+| Calibration and abstention (H4) | Done, confirmed |
+| Reproducibility gates, 39 automated tests, registry check | Done |
+| Dissertation | In writing |
+| 50 hand-labelled saliency maps | Instrument ready, labelling pending |
+| Live inference service | Not built; the front end runs on recorded output |
+
+Open defects are tracked in [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md). Where the approved abstract is not supported by the measurements, see [`docs/ABSTRACT_VS_EVIDENCE.md`](docs/ABSTRACT_VS_EVIDENCE.md).
+
+## Next
+
+1. A second, independently labelled field dataset, so the finding does not rest on PlantDoc alone, and a held-out validation split for field data.
+2. Out-of-distribution detection to replace the confidence threshold, which was measured and found ineffective.
+3. Leaf-level rather than background-level field augmentation, which the mechanism result points to.
+4. A live inference service with an abstain response.
+
+The full plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `src/plant_disease/` | Package: data, models, metrics, calibration, Grad-CAM, safe checkpoint loader |
 | `scripts/` | Training engine, evaluation, experiments, table and dissertation builders, reproducibility gates |
-| `tests/` | Automated tests (splits, checkpoints, metrics, calibration, data, Grad-CAM) |
+| `tests/` | Automated tests: splits, checkpoints, metrics, calibration, data, Grad-CAM |
 | `configs/` | Frozen protocol and data contract |
-| `data/manifests/` | Frozen splits and PlantDoc label mapping (images are not in git) |
-| `results/registry.json` | Every reported number, tied to an artifact |
-| `reports/` | Measured results: model comparison, field gap, mechanism, augmentation |
-| `app/static/` | Static front end (demo mode, no live inference service yet) |
-| `thesis/` | Dissertation LaTeX source (built PDFs are not committed) |
-| `docs/` | Defect register, abstract-versus-evidence, form answers, weekly reports |
-| `notebooks/` | Kaggle notebooks used for training runs |
+| `data/manifests/` | Frozen splits and the PlantDoc label mapping (images are not in git) |
+| `results/registry.json` | Reported numbers with their artifacts |
+| `reports/` | Measured results by experiment |
+| `docs/` | Hypotheses, roadmap, defect register, weekly reports |
+| `app/static/` | Static front end ([`app/README.md`](app/README.md)) |
+| `thesis/` | Dissertation LaTeX source |
 
-Model weights, datasets, PDFs and LaTeX build output are not stored in git. `bash scripts/verify_repo_clean.sh` fails if any are tracked.
+Datasets, model weights and built documents are not stored in git. See [`data/README.md`](data/README.md) and [`configs/data_contract.yaml`](configs/data_contract.yaml) for how the data is arranged, and check each dataset's licence before redistributing images.
 
-Reproduce the checks: `pip install -r requirements.lock`, then `python -m pytest tests -q` and `python scripts/build_tables.py --verify`.
+## Reproduce the checks
 
-The sections below describe the original PlantVillage-only comparison.
+```
+pip install -r requirements.lock
+python -m pytest tests -q
+python scripts/build_tables.py --verify
+```
 
-## Project question
+## Licence
 
-Can a CNN identify plant leaf disease classes in PlantVillage images? We trained a simple CNN baseline. We also fine-tuned ResNet18 and EfficientNet-B0. We used the same PlantVillage training and validation splits for all models.
-
-The Phase 1 survey record lists 21 papers. The survey led us to compare a small baseline with transfer-learning models and to report class-aware scores. One study reported 99.35% accuracy on its PlantVillage test split (Mohanty et al., 2016). Different splits and training methods mean that this published result is not a direct comparison with our results.
-
-## Dataset and training
-
-We use the PlantVillage dataset. It has 38 crop-disease or healthy classes across 14 crops. The frozen split has 36,762 training images, 6,544 validation images, and 10,709 test images. Each image is resized to 224 × 224 pixels.
-
-- **SmallCNN:** trained from scratch as the baseline. The final comparison reuses its saved checkpoint.
-- **ResNet18:** started from ImageNet-pretrained weights and was fine-tuned on PlantVillage.
-- **EfficientNet-B0:** started from ImageNet-pretrained weights and was fine-tuned on PlantVillage.
-- Training ran on two Tesla T4 GPUs in Kaggle. The comparison selected checkpoints with validation macro-F1.
-
-The model comparison did not use the locked test split to select a model. After selection, the final test run evaluated SmallCNN and EfficientNet-B0. The available files do not include a locked-test score for ResNet18.
-
-## Results
-
-### Same PlantVillage validation split
-
-| Model | Accuracy | Macro precision | Macro recall | Macro-F1 | Best epoch |
-|---|---:|---:|---:|---:|---:|
-| SmallCNN | 96.01% | 94.29% | 95.40% | 94.44% | 12 |
-| ResNet18 | 96.15% | 96.06% | 95.61% | 95.46% | 8 |
-| EfficientNet-B0 | **99.54%** | **99.31%** | **99.46%** | **99.37%** | 12 |
-
-![PlantVillage validation comparison](reports/model_comparison/plantvillage_validation_comparison.png)
-
-The validation results identify EfficientNet-B0 as the best of these three models for this PlantVillage setup.
-
-### Locked PlantVillage test split
-
-| Model | Images | Accuracy | 95% CI | Balanced accuracy | Macro precision | Macro recall | Macro-F1 | 95% CI (F1) |
-|---|---:|---:|---|---:|---:|---:|---:|---|
-| SmallCNN | 10,709 | 96.95% | — | 96.02% | 96.30% | 96.02% | 96.07% | — |
-| EfficientNet-B0 | 10,709 | **99.51%** | 99.37–99.64% | **99.31%** | **99.33%** | **99.31%** | **99.31%** | 99.10–99.51% |
-
-ResNet18 has no saved result on this locked test split. Do not infer its test score from its validation score.
-
-**EfficientNet-B0 verification (2026-10-25).** The earlier version of this page reported the EfficientNet-B0 test numbers without a retained artifact, so they could not be checked. They have now been reproduced from the checkpoint: 53 errors in 10,709 images, and validation macro-F1 came back **bit-identical** to the value stored in the checkpoint (0.9936894341462544). Re-running validated the class order against the development manifest, the parameter count (4,056,226) and the checkpoint SHA-256. Artifacts: `reports/model_comparison/locked_test_efficientnet_b0/`. Numbers are registered in `results/registry.json`.
-
-Two findings worth keeping with the table:
-
-- **Calibration is good in aggregate but the MCE is misleading.** Expected calibration error is 0.0022 on test, while the maximum calibration error is 0.53. That maximum comes from a single 15-bin cell containing one image (n = 1). Read ECE with the bin counts in `test/reliability_bins.csv`; do not quote MCE on its own.
-- **Abstention buys little on this split.** At 99% coverage test accuracy is 99.88%, and at 90% coverage it is 99.76%, against 99.51% at full coverage. The model is already well calibrated on controlled imagery, so a confidence threshold recovers a few tenths of a point rather than a different operating regime. This says nothing about field imagery, where the calibration is unknown.
-
-The test results apply to PlantVillage images. They do not establish performance on field photographs. This repository page reports PlantVillage results only.
-
-See [`reports/model_comparison/`](reports/model_comparison/README.md) for the comparison files and charts.
-
-## Repository map
-
-| Path | Purpose |
-|---|---|
-| `notebooks/01_Train_EfficientNet_B0.ipynb` | Train EfficientNet-B0 in Kaggle on two T4 GPUs. |
-| `notebooks/02_Final_Evaluation_PlantVillage.ipynb` | Score one selected model on the locked PlantVillage test split. |
-| `notebooks/03_Use_Existing_Model_for_Images.ipynb` | Predict the class for an image with a saved checkpoint. |
-| `notebooks/KAGGLE_NOTEBOOKS_GUIDE.md` | Input paths and run order. |
-| `src/plant_disease/models/` | SmallCNN, ResNet18, and EfficientNet-B0 definitions. |
-| `src/plant_disease/` | Image loading, metrics, and evaluation code. |
-| `scripts/` | Accuracy commands, training helpers, and data preparation. |
-| `configs/` | Data and run settings. |
-| `data/manifests/` | Frozen image paths, labels, and splits. |
-| `reports/phase2_baseline/` | SmallCNN training history and held-out baseline results. |
-| `reports/model_comparison/` | Three-model validation results, test comparison, and charts. |
-
-## Run in Kaggle
-
-1. Add the PlantVillage dataset to the Kaggle notebook.
-2. Select **GPU T4 x2**.
-3. Run Notebook 1 to train EfficientNet-B0. Download its result bundle from the Kaggle Output panel.
-4. Choose a model using the validation comparison.
-5. Run Notebook 2 once with the selected checkpoint to score the locked PlantVillage test split.
-6. Use Notebook 3 to predict a supplied leaf image.
-
-Read the [Kaggle notebook guide](notebooks/KAGGLE_NOTEBOOKS_GUIDE.md) before running. Do not run the old SmallCNN baseline notebook unless you intend to train a new baseline.
-
-## Limit and next work
-
-PlantVillage images have mostly controlled conditions. The high scores apply to that test set. Next, review per-class errors, test on a larger independent field-image set, inspect Grad-CAM maps, and measure confidence calibration. Do not claim field readiness from PlantVillage scores alone.
-
-## Data and model files
-
-Git does not contain the image datasets or trained checkpoints. Add the required dataset and checkpoint in Kaggle. Read [`data/README.md`](data/README.md) and [`configs/data_contract.yaml`](configs/data_contract.yaml) before rebuilding data. Check dataset source terms before you redistribute images.
-
-### Additional charts
-
-![PlantVillage locked-test comparison](reports/model_comparison/plantvillage_locked_test_comparison.png)
-
-![Training curves](reports/model_comparison/plantvillage_training_curves.png)
+Code is released under the [MIT licence](LICENSE). PlantVillage and PlantDoc are separate works under their own licences.

@@ -23,6 +23,13 @@ if [ -n "$memory" ]; then
   status=1
 fi
 
+extra_root_md=$(git ls-files | grep -E '^[^/]+\.md$' | grep -vxE 'README\.md' || true)
+if [ -n "$extra_root_md" ]; then
+  echo "Only README.md may be a tracked markdown file at the repository root (put the rest under docs/):"
+  echo "$extra_root_md"
+  status=1
+fi
+
 notes=$(git grep -liE 'obsidian|wallet_index' -- . ':!.gitignore' ':!scripts/verify_repo_clean.sh' ':!scripts/verify-history-clean.sh' || true)
 if [ -n "$notes" ]; then
   echo "Tracked files still carry note-vault (Obsidian) markup:"
