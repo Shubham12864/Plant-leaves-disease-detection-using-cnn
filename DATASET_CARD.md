@@ -1,6 +1,6 @@
 # DATASET CARD — Plant Leaf Disease Detection Using CNN (BT40)
 
-*YAML frontmatter for Obsidian linking. Every field is traceable to manifest files, `results/registry.json`, or `checkpoints/SHA256SUMS`.*
+*Every field is traceable to manifest files, `results/registry.json`, or `checkpoints/SHA256SUMS`.*
 
 ---
 # Dataset Card: PlantVillage
@@ -13,7 +13,7 @@
 # capturer: extracted from original zip; Windows-invalid filename characters sanitized with reversible map
 # generated_by: scripts/freeze_evaluation_splits.py
 # created: 2026-10-25
-# related-to: WALLET_INDEX.md, PROJECT_STATUS.md, MODEL_CARD.md, EXPERIMENT_LOG.md
+# related-to: PROJECT_STATUS.md, MODEL_CARD.md, EXPERIMENT_LOG.md
 
 ## Class Inventory (38 classes, exact manifest order)
 
@@ -95,14 +95,6 @@
 - D24: Storage redundant (PlantVillage stored in `data/raw` and `kaggle_upload`)
 - Project does not claim field readiness from PlantVillage scores alone (README §85)
 
-## Obsidian Links
-
-- `[[PlantDoc Label Mapping CSV]]` — cross-dataset mapping
-- `[[EfficientNet-B0 Checkpoint]]` — model trained on this dataset
-- `[[SmallCNN Checkpoint]]` — baseline model trained on this dataset
-- `[[ROADMAP.md]]` — next steps for this dataset
-- `[[WALLET_INDEX.md]]` — central navigation hub
-
 ---
 # Dataset Card: PlantDoc
 # type: dataset-card
@@ -114,7 +106,7 @@
 # capturer: original repository train/test folders; Windows-invalid filename characters sanitized with reversible filename map
 # generated_by: scripts/freeze_evaluation_splits.py
 # created: 2026-10-25
-# related-to: WALLET_INDEX.md, PROJECT_STATUS.md, MODEL_CARD.md, EXPERIMENT_LOG.md
+# related-to: PROJECT_STATUS.md, MODEL_CARD.md, EXPERIMENT_LOG.md
 
 ## Class Inventory (28 labeled of 38 PlantVillage classes)
 
@@ -216,14 +208,6 @@ Per the mapping review, all 28 PlantVillage classes have a PlantDoc counterpart,
 - D24: Storage redundant (PlantDoc 1.99 GB raw is unused by any current script)
 - Project does not present PlantDoc accuracy as comparable to PlantVillage accuracy (RESEARCH_CLAIM.md H7)
 
-## Obsidian Links
-
-- `[[PlantVillage Test Split]]` — cross-dataset comparison
-- `[[PlantVillage Label Mapping CSV]]` — 29-row mapping with caveats
-- `[[EfficientNet-B0 Checkpoint]]` — evaluated on both datasets
-- `[[WALLET_INDEX.md]]` — central navigation hub
-- `[[ROADMAP.md]]` — S11: Score PlantDoc; S12: Quantify gap
-
 ---
 # Dataset Card Index
 
@@ -243,7 +227,7 @@ Per the mapping review, all 28 PlantVillage classes have a PlantDoc counterpart,
 *Every field is traceable to: `data/manifests/*.summary.json`, `data/label_mapping.csv`, `data/dataset_registry.csv`, or `results/registry.json`. No values are fabricated.*
 
 ---
-*This dataset card is the authoritative source for dataset provenance in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, and `MODEL_CARD.md`. Updated whenever split definitions, class counts, or license terms change.*
+*This dataset card is the authoritative source for dataset provenance. Referenced from `PROJECT_STATUS.md` and `MODEL_CARD.md`. Updated whenever split definitions, class counts, or license terms change.*
 
 ---
 *Generated: 2026-10-25*

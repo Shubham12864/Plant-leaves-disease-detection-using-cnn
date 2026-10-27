@@ -1,6 +1,6 @@
 # MODEL CARD — Plant Leaf Disease Detection Using CNN (BT40)
 
-*YAML frontmatter for Obsidian linking. Every field traceable to `results/registry.json`, `checkpoints/SHA256SUMS`, or experiment logs.*
+*Every field traceable to `results/registry.json`, `checkpoints/SHA256SUMS`, or experiment logs.*
 
 ---
 # Model Card: EfficientNet-B0
@@ -15,7 +15,7 @@
 # validated_on: PlantVillage validation split; PlantDoc development (2,331 images, train-only)
 # tested_on: Locked PlantVillage test split (10,709 images)
 # generated: 2026-10-25
-# related-to: WALLET_INDEX.md, DATASET_CARD.md, EXPERIMENT_LOG.md, PROJECT_STATUS.md, RESEARCH_CLAIM.md
+# related-to: DATASET_CARD.md, EXPERIMENT_LOG.md, PROJECT_STATUS.md, RESEARCH_CLAIM.md
 
 ## Architecture
 
@@ -135,7 +135,7 @@
 | **Calibration curve** | Generated from test bin counts (reliability_bins.csv) | Axes start at zero; truncation stated if present |
 | **Abstention curve** | At 90% coverage: 99.76% accuracy; at 90%: 99.51% nominal | Abstention buys little on PlantVillage (R67); interesting curve is on field data |
 
-> **Rule**: Do not call softmax output "calibrated confidence" unless calibration has been tested (SOUL.md §6). ECE of 0.0022 on test implies good aggregate calibration, but MCE of 0.53 warns that individual bins can be extreme.
+> **Rule**: Do not call softmax output "calibrated confidence" unless calibration has been tested. ECE of 0.0022 on test implies good aggregate calibration, but MCE of 0.53 warns that individual bins can be extreme.
 
 ## Failure Modes & Limitations
 
@@ -152,19 +152,18 @@
 | **PlantDoc statistical power** | 236 test images over ~27 classes → ±6.4 pp 95% CI; headline claims underpowered (D10) |
 | **No validation split for PlantDoc** | All 2,331 dev rows are `train`; any threshold tuning must use the 236-image test set (D09) |
 
-## Obsidian Links
+## Related documents
 
-- `[[DATASET_CARD.md]]` — which datasets this model was trained/evaluated on
-- `[[WALLET_INDEX.md]]` — central navigation hub
-- `[[EXPERIMENT_LOG.md]]` — which run produced these results
-- `[[KNOWN_ISSUES.md]]` — D27 (no dataset fingerprint), D20 (ResNet18 manifest mismatch)
-- `[[RESEARCH_CLAIM.md]]` — H1–H4 hypotheses this model subject to
-- `[[ROADMAP.md]]` — S11–S13: Score PlantDoc (H1), S14–S19: Explain gap (H2), S20–S22: Bound usefulness (H4)
-- `[[PROJECT_STATUS.md]]` — current model status
-- `[[results/registry.json]]` — registered metrics with artifact paths
-- `[[checkpoints/efficientnet_b0/]]` — the checkpoint itself
-- `[[SHA256SUMS]]` — checksum verification
-- `[[configs/protocol.json]]` — training configuration
+- `DATASET_CARD.md`: which datasets this model was trained and evaluated on
+- `EXPERIMENT_LOG.md`: which run produced these results
+- `docs/KNOWN_ISSUES.md`: D27 (no dataset fingerprint), D20 (ResNet18 manifest mismatch)
+- `docs/RESEARCH_CLAIM.md`: the H1–H4 hypotheses this model is subject to
+- `docs/ROADMAP.md`: S11–S13 score PlantDoc (H1), S14–S19 explain the gap (H2), S20–S22 bound usefulness (H4)
+- `PROJECT_STATUS.md`: current model status
+- `results/registry.json`: registered metrics with artifact paths
+- `checkpoints/efficientnet_b0/`: the checkpoint itself
+- `checkpoints/SHA256SUMS`: checksum verification
+- `configs/protocol.json`: training configuration
 
 ### Model Card Cross-References
 
@@ -179,20 +178,20 @@
 
 ### Model Card Usage Guidelines
 
-> **Do not present** EfficientNet-B0 PlantVillage accuracy as "field-ready" or "production-grade" without external validation (SOUL.md §10).
+> **Do not present** EfficientNet-B0 PlantVillage accuracy as "field-ready" or "production-grade" without external validation.
 > 
-> **Do not claim** calibrated confidence without testing (SOUL.md §6, §13).
+> **Do not claim** calibrated confidence without testing.
 > 
-> **Do not** describe Grad-CAM as proof of causal reasoning (SOUL.md §14).
+> **Do not** describe Grad-CAM as proof of causal reasoning.
 > 
-> **Do report** per-class precision, recall, F1, support, confusion matrix, and macro/weighted averages (SOUL.md §4).
+> **Do report** per-class precision, recall, F1, support, confusion matrix, and macro/weighted averages.
 > 
-> **Do separate** validation performance from test performance from external-dataset performance (SOUL.md §4).
+> **Do separate** validation performance from test performance from external-dataset performance.
 > 
 > **Do include** limitations section listing domain shift, class imbalance, single-seed weakness, and any out-of-mapping predictions.
 
 ---
-*This model card is the authoritative source for EfficientNet-B0 model provenance in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, `EXPERIMENT_LOG.md`, and `DATASET_CARD.md`. Updated whenever checkpoints are re-trained, re-evaluated, or when calibration/ Grad-CAM audit results change.*
+*This model card is the authoritative source for EfficientNet-B0 model provenance. Referenced from `PROJECT_STATUS.md`, `EXPERIMENT_LOG.md` and `DATASET_CARD.md`. Updated whenever checkpoints are re-trained, re-evaluated, or when calibration/ Grad-CAM audit results change.*
 
 ---
 *Generated: 2026-10-25*

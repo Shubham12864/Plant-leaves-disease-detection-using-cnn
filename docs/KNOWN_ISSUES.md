@@ -6,7 +6,7 @@ type: defect-register
 #         S3 = hygiene/engineering
 status: 28 D-entries (D01-D28; 1 marked resolved in the Sev column, 27 not), plus the R01-R12 resolution log and the R12/R13/R15 detail sections below
 generated: 2026-10-25
-related-to: WALLET_INDEX.md, PROJECT_STATUS.md, EXPERIMENT_LOG.md, RESEARCH_CLAIM.md
+related-to: PROJECT_STATUS.md, EXPERIMENT_LOG.md, RESEARCH_CLAIM.md
 ---
 
 # Known issues — defect register
@@ -107,7 +107,7 @@ SmallCNN 0.67 -> 3.01, ConvNeXt 3.15 -> 14.16. Total 5.6 h against a 4.2 h
 projection. Not visible in the artifacts; needs a session log to decide between
 data-loader throughput and `/kaggle/temp` read speed.
 ---
-*This defect register is the authoritative source for project weaknesses in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, `EXPERIMENT_LOG.md`, and `MODEL_CARD.md`. Updated whenever defects are resolved or new ones discovered.*
+*This defect register is the authoritative source for project weaknesses. Referenced from `PROJECT_STATUS.md`, `EXPERIMENT_LOG.md` and `MODEL_CARD.md`. Updated whenever defects are resolved or new ones discovered.*
 *Generated: 2026-10-25*
 
 ## R15 — SmallCNN replicates at 91.60%, not the recorded 96.01% (OPEN)

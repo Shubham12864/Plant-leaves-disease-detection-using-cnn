@@ -1,6 +1,6 @@
 # EXPERIMENT LOG — Plant Leaf Disease Detection Using CNN (BT40)
 
-*Timestamped runs, configs, seeds, checkpoints, metrics, and observations. Every number traced to `results/registry.json` with artifact path. Frontmatter uses Obsidian-compatible YAML.*
+*Timestamped runs, configs, seeds, checkpoints, metrics, and observations. Every number traced to `results/registry.json` with artifact path.*
 
 ---
 # Experiment Log Index
@@ -246,23 +246,22 @@
 | **Reliability bins** | Generated | `test/reliability_bins.csv` |
 | **Abstention curve** | Generated | Coverage vs retained accuracy at multiple thresholds |
 
-## Experiment Log Obsidian Links
+## Related documents
 
-- `[[WALLET_INDEX.md]]` — central navigation hub
-- `[[PROJECT_STATUS.md]]` — current project state
-- `[[MODEL_CARD.md]]` — model-specific card for each run
-- `[[DATASET_CARD.md]]` — which datasets each run used
-- `[[KNOWN_ISSUES.md]]` — D20, D27, D12, D13, D28
-- `[[RESEARCH_CLAIM.md]]` — H1–H4 this run subject to
-- `[[ROADMAP.md]]` — which step each run supports
-- `[[configs/protocol.json]]` — the configuration that produced this run
-- `[[results/registry.json]]` — registered metrics with artifact paths
-- `[[checkpoints/]]` — the checkpoint(s) from this run
-- `[[scripts/smoke_test_engine.py]]` — regression test for this engine
-- `[[scripts/evaluate_locked_test.py]]` — evaluator that produced test metrics
+- `PROJECT_STATUS.md`: current project state
+- `MODEL_CARD.md`: model-specific card for each run
+- `DATASET_CARD.md`: which datasets each run used
+- `docs/KNOWN_ISSUES.md`: D20, D27, D12, D13, D28
+- `docs/RESEARCH_CLAIM.md`: the H1–H4 hypotheses each run is subject to
+- `docs/ROADMAP.md`: which step each run supports
+- `configs/protocol.json`: the configuration that produced this run
+- `results/registry.json`: registered metrics with artifact paths
+- `checkpoints/`: the checkpoint(s) from this run
+- `scripts/smoke_test_engine.py`: regression test for this engine
+- `scripts/evaluate_locked_test.py`: evaluator that produced test metrics
 
 ---
-*This experiment log is the authoritative source for run provenance in the Obsidian vault. Linked from `WALLET_INDEX.md`, `PROJECT_STATUS.md`, `MODEL_CARD.md`, and `DATASET_CARD.md`. Updated whenever new runs are executed, checkpoints re-trained, or evaluation protocols change.*
+*This experiment log is the authoritative source for run provenance. Referenced from `PROJECT_STATUS.md`, `MODEL_CARD.md` and `DATASET_CARD.md`. Updated whenever new runs are executed, checkpoints re-trained, or evaluation protocols change.*
 
 *Generated: 2026-10-25*
 
