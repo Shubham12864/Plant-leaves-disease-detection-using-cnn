@@ -1,0 +1,11 @@
+{
+  "alpha": 0.05,
+  "target_coverage": 0.95,
+  "empirical_field_coverage": 0.9745762711864406,
+  "q_hat_threshold": 0.9978864789009094,
+  "average_set_size": 28.88135593220339,
+  "singleton_rate": 0.0,
+  "taxonomic_consistency": 0.0,
+  "mean_free_energy": -5.711826981124231,
+  "std_free_energy": 0.32994528914083143
+}

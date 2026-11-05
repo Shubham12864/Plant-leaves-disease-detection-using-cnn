@@ -71,6 +71,14 @@ def target_layer_for(model: torch.nn.Module, architecture: str) -> torch.nn.Modu
         return model.layer4[-1]
     if architecture == "efficientnet_b0":
         return model.features[-1]
+    if architecture in ("convnext_tiny", "convnext_v2_tiny"):
+        if hasattr(model, "features"):
+            return model.features[-1]
+        if hasattr(model, "stages"):
+            return model.stages[-1][-1]
+    if architecture == "unified_gated_cnn":
+        if hasattr(model, "stages"):
+            return model.stages[3][-1]
     # SmallCNN: last conv block before pooling.
     if hasattr(model, "features"):
         blocks = [module for module in model.features if isinstance(module, torch.nn.Conv2d)]

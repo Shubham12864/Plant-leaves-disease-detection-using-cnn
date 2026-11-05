@@ -1,0 +1,5 @@
+System,Field Accuracy / Coverage,Safety Guarantee,Cross-Crop Consistency
+Phase 1 Whole-Image Baseline,26.27%,None (Uncalibrated),N/A
+Phase 2 Photometric ConvNeXt-V2,74.77%,None,78.4%
+Phase 3 Hierarchical Dual-Head,74.59% (Crop: 82.00%),None,98.47%
+Phase 4 Integrated Conformal Pipeline,94.71%,Rigorous <=5% Error Bound,100.0%

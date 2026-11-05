@@ -1,0 +1,10 @@
+{
+  "pytorch_size_mb": 107.8417158126831,
+  "onnx_fp32_size_mb": 107.88750553131104,
+  "onnx_int8_size_mb": 27.68812370300293,
+  "onnx_int8_size_reduction_pct": 74.32521961065963,
+  "pytorch_latency_ms": 73.6798383000314,
+  "onnx_fp32_latency_ms": 95.68897847993867,
+  "onnx_int8_latency_ms": 293.6606845400638,
+  "speedup_factor": 0.2509012686374071
+}

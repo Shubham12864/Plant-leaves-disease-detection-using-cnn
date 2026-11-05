@@ -1,0 +1,16 @@
+{
+  "EfficientNet-B0": {
+    "whole_acc": NaN,
+    "crop_acc": NaN,
+    "delta_pp": NaN,
+    "whole_conf": NaN,
+    "crop_conf": NaN
+  },
+  "ConvNeXt-Tiny": {
+    "whole_acc": NaN,
+    "crop_acc": NaN,
+    "delta_pp": NaN,
+    "whole_conf": NaN,
+    "crop_conf": NaN
+  }
+}

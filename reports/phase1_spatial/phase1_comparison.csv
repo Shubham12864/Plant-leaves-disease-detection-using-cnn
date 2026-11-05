@@ -1,0 +1,3 @@
+Model,Whole_Image_Acc (%),YOLO11_Cropped_Acc (%),Spatial_Delta (pp),Whole_Confidence,Crop_Confidence
+EfficientNet-B0,nan%,nan%,+nan pp,nan,nan
+ConvNeXt-Tiny,nan%,nan%,+nan pp,nan,nan

@@ -114,3 +114,120 @@ def to_markdown_table(bins: list[ReliabilityBin]) -> str:
             f"{bin_.mean_confidence:.3f} | {bin_.accuracy:.3f} | {abs(bin_.accuracy - bin_.mean_confidence):.3f} |"
         )
     return "\n".join(lines)
+
+
+# -----------------------------------------------------------------------------
+# Energy-Based OOD Detection & Split Conformal Prediction (Solving H4)
+# -----------------------------------------------------------------------------
+
+def compute_energy_scores(logits: np.ndarray, temperature: float = 1.0) -> np.ndarray:
+    """Compute Helmholtz free energy scores from raw classification logits.
+
+    Reference:
+        Liu et al., "Energy-based Out-of-distribution Detection", NeurIPS 2020.
+
+    Unlike softmax probabilities which are constrained to sum to 1.0 (causing
+    high-confidence hallucinations on foreign objects), energy is unconstrained
+    and maps directly to the data density. In-distribution crop leaves produce
+    low energy (high negative values), while non-plant clutter and unseen weeds
+    produce significantly higher energy.
+    """
+    if logits.ndim != 2:
+        raise ValueError(f"Expected 2D logits array (N, C), got {logits.shape}")
+    scaled = logits / temperature
+    # Stable LogSumExp computation: max + log(sum(exp(x - max)))
+    max_val = np.max(scaled, axis=1, keepdims=True)
+    lse = max_val.squeeze(1) + np.log(np.sum(np.exp(scaled - max_val), axis=1))
+    return -temperature * lse
+
+
+def conformal_calibrate(val_probs: np.ndarray, val_y_true: np.ndarray, alpha: float = 0.05) -> float:
+    """Compute Split Conformal Prediction threshold q_hat.
+
+    Provides finite-sample statistical guarantees that the true class is contained
+    within the predicted set with probability >= 1 - alpha (e.g. 95% coverage).
+
+    Args:
+        val_probs: (N, C) predicted probabilities on held-out validation data.
+        val_y_true: (N,) ground-truth class indices.
+        alpha: Error allowance (default 0.05 for 95% guaranteed coverage).
+
+    Returns:
+        q_hat: Conformal non-conformity score quantile.
+    """
+    n = len(val_y_true)
+    if n == 0:
+        raise ValueError("Cannot calibrate conformal prediction on empty validation set")
+
+    # Non-conformity score: 1 - P(true class)
+    true_probs = val_probs[np.arange(n), val_y_true]
+    nonconformity_scores = 1.0 - true_probs
+
+    # Conformal quantile adjustment: ceil((n + 1) * (1 - alpha)) / n
+    level = min(1.0, np.ceil((n + 1) * (1.0 - alpha)) / n)
+    q_hat = float(np.quantile(nonconformity_scores, level, method="higher" if hasattr(np, "quantile") else "linear"))
+    return q_hat
+
+
+def conformal_predict(probabilities: np.ndarray, q_hat: float) -> list[list[int]]:
+    """Generate prediction sets C(x) with statistical coverage guarantee.
+
+    A class c is included in C(x) if and only if P(c | x) >= 1 - q_hat.
+    If |C(x)| == 1, the model is definitively confident.
+    If |C(x)| > 1, multiple differential diagnoses are provided (e.g. Early vs Late Blight).
+    If |C(x)| == 0, the input is anomalous / unclassifiable.
+    """
+    threshold = 1.0 - q_hat
+    prediction_sets = []
+    for probs in probabilities:
+        included = np.where(probs >= threshold)[0].tolist()
+        prediction_sets.append(included)
+    return prediction_sets
+
+
+def evaluate_conformal_safety(
+    val_probs: np.ndarray,
+    val_y_true: np.ndarray,
+    test_probs: np.ndarray,
+    test_y_true: np.ndarray,
+    test_logits: Optional[np.ndarray] = None,
+    alpha: float = 0.05,
+    energy_percentile: float = 95.0,
+) -> dict:
+    """Evaluate Conformal Prediction coverage and Energy OOD performance.
+
+    Replaces naive softmax confidence thresholding with distribution-free
+    risk bounds and energy filtering.
+    """
+    q_hat = conformal_calibrate(val_probs, val_y_true, alpha=alpha)
+    pred_sets = conformal_predict(test_probs, q_hat)
+
+    # 1. Measure empirical coverage on test set
+    n_test = len(test_y_true)
+    covered = sum(test_y_true[i] in pred_sets[i] for i in range(n_test))
+    empirical_coverage = float(covered / n_test) if n_test > 0 else 0.0
+
+    # 2. Set size distribution
+    set_sizes = [len(s) for s in pred_sets]
+    mean_set_size = float(np.mean(set_sizes)) if set_sizes else 0.0
+    singleton_fraction = float(np.mean([s == 1 for s in set_sizes])) if set_sizes else 0.0
+    empty_fraction = float(np.mean([s == 0 for s in set_sizes])) if set_sizes else 0.0
+
+    result = {
+        "alpha": alpha,
+        "q_hat": q_hat,
+        "guaranteed_coverage": 1.0 - alpha,
+        "empirical_test_coverage": empirical_coverage,
+        "mean_set_size": mean_set_size,
+        "singleton_fraction": singleton_fraction,
+        "empty_set_fraction": empty_fraction,
+    }
+
+    # 3. Energy OOD evaluation if logits are provided
+    if test_logits is not None:
+        energies = compute_energy_scores(test_logits)
+        result["mean_energy"] = float(np.mean(energies))
+        result["std_energy"] = float(np.std(energies))
+
+    return result
+

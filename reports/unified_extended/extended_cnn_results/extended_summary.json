@@ -1,0 +1,7 @@
+{
+  "initial_disease_acc": 0.6839386602098466,
+  "best_disease_acc": 0.8558514931396287,
+  "crop_family_acc": 0.910411622276029,
+  "cross_crop_consistency": 0.9383373688458434,
+  "mean_saliency_gating": 0.182159771163439
+}

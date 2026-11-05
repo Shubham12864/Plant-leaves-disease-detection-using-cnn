@@ -1,0 +1,8 @@
+{
+  "top1_disease_accuracy": 0.11440677966101695,
+  "top3_disease_accuracy": 0.326271186440678,
+  "top5_disease_accuracy": 0.423728813559322,
+  "crop_family_accuracy": 0.3432203389830508,
+  "biological_consistency": 0.6313559322033898,
+  "macro_crop_f1": 0.2075164129439841
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Plant Leaf Disease Detection Using CNN",
+  "short_name": "PlantCNN",
+  "description": "Pure 2D CNN (ConvNeXt-V2) with Differentiable Saliency Gating & Conformal Safety Guard",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "samples/apple_scab.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}

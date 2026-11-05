@@ -1,0 +1,8 @@
+{
+  "empirical_coverage": 0.947062621045836,
+  "target_coverage": 0.95,
+  "mean_set_size": 29.18140735958683,
+  "singleton_rate": 0.0,
+  "singleton_precision": 0.0,
+  "conformal_quantile_qhat": 0.9983264803886414
+}
