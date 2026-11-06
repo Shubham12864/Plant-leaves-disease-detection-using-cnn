@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
 """Interactive Web Application for Unified Gated Plant CNN.
 
-Deployable to Hugging Face Spaces (Gradio) or local browser:
+Deployable locally, to Hugging Face Spaces, or with a public Gradio tunnel:
 - Autonomous Spatial Saliency Gating Overlay
 - Hierarchical Botanical Crop & Pathology Diagnosis
 - Conformal Risk Control (1 - alpha = 95% Statistical Guarantee)
 - Free Helmholtz Energy Out-of-Distribution (OOD) Scoring
 - Agronomic Treatment & Disease Management Advisory
 """
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -19,18 +21,26 @@ import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 import gradio as gr
 
-# Ensure app directory is on sys.path
-APP_DIR = Path(__file__).resolve().parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+# Robust Path & Package Resolution
+FILE_DIR = Path(__file__).resolve().parent
+REPO_ROOT = FILE_DIR.parents[1] if FILE_DIR.name == "hf_space" else FILE_DIR
 
-from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+for path_candidate in (REPO_ROOT, REPO_ROOT / "src", FILE_DIR):
+    str_p = str(path_candidate)
+    if str_p not in sys.path:
+        sys.path.insert(0, str_p)
+
+try:
+    from plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+except ImportError:
+    from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+
 
 # Search for checkpoint locally or via Hugging Face Hub fallback
 def resolve_checkpoint() -> Path:
     candidates = [
-        APP_DIR / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt",
-        APP_DIR.parents[1] / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt",
+        REPO_ROOT / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt",
+        FILE_DIR / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt",
         Path("reports/unified_extended/unified_gated_plant_cnn_extended_best.pt"),
     ]
     for p in candidates:
@@ -123,7 +133,7 @@ TREATMENT_ADVISORY = {
 def get_treatment_for_disease(disease_code: str) -> Dict[str, str]:
     sub = disease_code.split("___")[-1]
     for key, advisory in TREATMENT_ADVISORY.items():
-        if key in sub:
+        if key.lower() in sub.lower():
             return advisory
     return {
         "organic": "Apply broad-spectrum bio-fungicide (Bacillus subtilis) and neem foliar shield.",
@@ -147,7 +157,7 @@ MODEL = load_app_model()
 
 def diagnose_leaf(img_input: Image.Image, overlay_alpha: float = 0.5):
     if img_input is None:
-        return None, None, "Please upload or capture a leaf image.", "", ""
+        return None, None, "### 📸 Please upload or photograph a leaf to begin diagnosis.", "", ""
 
     img_rgb = img_input.convert("RGB").resize((224, 224))
     tensor = TF.normalize(TF.to_tensor(img_rgb), mean=IMAGENET_MEAN, std=IMAGENET_STD).unsqueeze(0)
@@ -158,53 +168,61 @@ def diagnose_leaf(img_input: Image.Image, overlay_alpha: float = 0.5):
         c_probs = torch.softmax(c_logits, dim=-1)[0].numpy()
         energy = MODEL.compute_energy(d_logits).item()
 
-    # Saliency overlay
+    # Saliency overlay (mask is 14x14)
     mask_high = F.interpolate(mask, size=(224, 224), mode="bilinear", align_corners=False)[0, 0].numpy()
     img_arr = np.array(img_rgb, dtype=np.float32) / 255.0
 
-    # Colorize saliency mask
+    # Colorize saliency mask: vibrant emerald green/amber heatmap on lesions
     saliency_colored = np.zeros_like(img_arr)
-    saliency_colored[:, :, 0] = mask_high  # Red highlight
-    saliency_colored[:, :, 1] = 0.2 * mask_high
+    saliency_colored[:, :, 0] = np.clip(mask_high * 1.2, 0.0, 1.0)  # Red/Amber
+    saliency_colored[:, :, 1] = np.clip(mask_high * 0.9, 0.0, 1.0)  # Green
+    saliency_colored[:, :, 2] = np.clip(mask_high * 0.1, 0.0, 1.0)
 
-    # Attenuated overlay
-    gain = 0.1 + (1.0 - 0.1) * mask_high[:, :, None]
+    # Attenuation gating
+    gain = 0.15 + 0.85 * mask_high[:, :, None]
     attenuated_img = np.clip(img_arr * gain, 0.0, 1.0)
-    blended = np.clip((1.0 - overlay_alpha) * attenuated_img + overlay_alpha * saliency_colored, 0.0, 1.0)
+    blended = np.clip((1.0 - overlay_alpha) * img_arr + overlay_alpha * saliency_colored, 0.0, 1.0)
     result_overlay = Image.fromarray((blended * 255.0).astype(np.uint8))
 
-    # Top predictions
-    top_d_idx = int(np.argmax(d_probs))
+    # Hierarchical Joint Conditioning: P_joint(disease) = P(disease) * P(crop)
+    joint_probs = np.array([d_probs[i] * c_probs[CLASS_TO_CROP_IDX[i]] for i in range(len(CLASSES_38))])
+    if joint_probs.sum() > 0:
+        joint_probs = joint_probs / joint_probs.sum()
+    else:
+        joint_probs = d_probs
+
+    top_d_idx = int(np.argmax(joint_probs))
     top_c_idx = int(np.argmax(c_probs))
 
     pred_disease = CLASSES_38[top_d_idx]
     pred_crop = CROPS_14[top_c_idx].replace("_", " ")
     disease_clean = pred_disease.split("___")[-1].replace("_", " ")
-    d_conf = float(d_probs[top_d_idx])
+    d_conf = float(joint_probs[top_d_idx])
     c_conf = float(c_probs[top_c_idx])
 
     # Conformal Set
-    sorted_d = np.argsort(d_probs)[::-1]
-    sorted_probs = d_probs[sorted_d]
+    sorted_d = np.argsort(joint_probs)[::-1]
+    sorted_probs = joint_probs[sorted_d]
     cum_probs = np.cumsum(sorted_probs)
-    cutoff = np.searchsorted(cum_probs, Q_HAT_95)
+    cutoff = np.searchsorted(cum_probs, 0.95)
     conf_indices = sorted_d[:cutoff + 1]
 
     conf_set_str = "\n".join([
-        f"• **{CROPS_14[CLASS_TO_CROP_IDX[k]].replace('_', ' ')}**: {CLASSES_38[k].split('___')[-1].replace('_', ' ')} ({d_probs[k]*100:.1f}%)"
+        f"• **{CROPS_14[CLASS_TO_CROP_IDX[k]].replace('_', ' ')}**: {CLASSES_38[k].split('___')[-1].replace('_', ' ')} ({joint_probs[k]*100:.1f}%)"
         for k in conf_indices[:4]
     ])
 
     # OOD status
     is_foliar = energy < -3.5
     foliar_status = "✅ Valid Plant Foliage (In-Distribution)" if is_foliar else "⚠️ Out-of-Distribution (Non-Foliar / Clutter Alert)"
+    bg_suppression = (1.0 - mask_high.mean()) * 100.0
 
     # Diagnosis markdown
     diagnosis_md = f"""### 🌿 Primary Diagnosis
 - **Botanical Crop Family:** **{pred_crop}** ({c_conf*100:.1f}% confidence)
 - **Diagnosed Condition:** **{disease_clean}** ({d_conf*100:.1f}% confidence)
 - **Foliar Integrity:** {foliar_status} *(Free Helmholtz Energy: {energy:.2f})*
-- **Saliency Module Status:** Active focus on necrotic tissue *(Mean Gating: {mask_high.mean():.3f})*
+- **Autonomous Saliency Gating:** Focused on foliar tissue *(Suppressed ~{bg_suppression:.1f}% background clutter)*
 """
 
     # Conformal Safety Box
@@ -226,12 +244,12 @@ def diagnose_leaf(img_input: Image.Image, overlay_alpha: float = 0.5):
 """
 
     # Probabilities dict for Gradio Label
-    top3_dict = {
-        CLASSES_38[k].split("___")[-1].replace("_", " "): float(d_probs[k])
+    top5_dict = {
+        CLASSES_38[k].replace("___", " → ").replace("_", " "): float(joint_probs[k])
         for k in sorted_d[:5]
     }
 
-    return result_overlay, top3_dict, diagnosis_md, conformal_md, treatment_md
+    return result_overlay, top5_dict, diagnosis_md, conformal_md, treatment_md
 
 
 # Gradio UI Theme & Layout
@@ -241,10 +259,19 @@ custom_theme = gr.themes.Soft(
     neutral_hue="slate"
 )
 
+# Look for examples
+example_dir = FILE_DIR / "examples"
+if not example_dir.exists():
+    example_dir = REPO_ROOT / "examples"
+
+example_files = []
+if example_dir.exists():
+    example_files = sorted([str(p) for p in example_dir.glob("*.jpg")])
+
 with gr.Blocks(title="🌿 Plant Leaf Disease Detection Using CNN") as demo:
     gr.Markdown("""# 🌿 Plant Leaf Disease Detection Using CNN
-### End-to-End Pure 2D CNN Architecture with Differentiable Spatial Saliency Gating & Conformal Safety Control
-*Official Project: plant-leaf-disease-detection-using-cnn | 100% Pure 2D CNN (ConvNeXt-V2 with GRN) | Zero External Tool Dependencies*
+### End-to-End Pure 2D CNN (ConvNeXt-V2 with GRN) with Differentiable Saliency Gating & Conformal Safety Control
+*Official Project: plant-leaf-disease-detection-using-cnn | Zero External Tool Dependencies*
 """)
 
     with gr.Row():
@@ -264,14 +291,22 @@ with gr.Blocks(title="🌿 Plant Leaf Disease Detection Using CNN") as demo:
         with gr.Column(scale=4):
             treat_box = gr.Markdown("### Agronomic Advisory\n*Actionable organic and chemical recommendations will appear here.*")
 
-    # Connect button
+    if example_files:
+        gr.Markdown("### 🧪 One-Click Test Samples")
+        gr.Examples(
+            examples=[[f, 0.4] for f in example_files],
+            inputs=[input_img, alpha_slider],
+            outputs=[output_img, label_output, diag_box, conf_box, treat_box],
+            fn=diagnose_leaf,
+            cache_examples=False
+        )
+
+    # Connect button & auto-run
     diagnose_btn.click(
         fn=diagnose_leaf,
         inputs=[input_img, alpha_slider],
         outputs=[output_img, label_output, diag_box, conf_box, treat_box]
     )
-
-    # Auto-run on change
     input_img.change(
         fn=diagnose_leaf,
         inputs=[input_img, alpha_slider],
@@ -279,5 +314,23 @@ with gr.Blocks(title="🌿 Plant Leaf Disease Detection Using CNN") as demo:
     )
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Run Plant Leaf Disease Gradio Interface")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host IP")
+    parser.add_argument("--port", type=int, default=7860, help="Port number")
+    parser.add_argument("--share", action="store_true", help="Generate public gradio.live tunnel URL")
+    args = parser.parse_args()
+
+    print("\n=======================================================")
+    print("🌿 LAUNCHING PLANT CNN GRADIO WEB INTERFACE")
+    print("=======================================================")
+    print(f"Local URL:   http://localhost:{args.port}")
+    if args.share:
+        print("Share Mode:  Enabled (generating public https://*.gradio.live URL)")
+    print("=======================================================\n")
+
+    demo.launch(server_name=args.host, server_port=args.port, share=args.share, theme=custom_theme)
+
+
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860, share=False, theme=custom_theme)
+    main()

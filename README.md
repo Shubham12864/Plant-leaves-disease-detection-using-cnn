@@ -122,7 +122,13 @@ See [`reports/model_comparison/SWEEP_V2_RESULTS.md`](reports/model_comparison/SW
 python scripts/diagnose_leaf.py data/raw/PlantDoc/test/Tomato\ Early\ blight\ leaf/sample.jpg
 ```
 
-### 2. Run ONNX INT8 Edge Model (WASM / Python)
+### 2. Launch Gradio Diagnostic Web UI (Local & Shareable)
+```bash
+# Launch interactive web interface locally with public gradio.live tunnel
+python app.py --share
+```
+
+### 3. Run ONNX INT8 Edge Model (WASM / Python)
 ```python
 import numpy as np
 from PIL import Image

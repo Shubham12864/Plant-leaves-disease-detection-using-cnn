@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#16a34a">
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://huggingface.co">
 
   <!-- ONNX Runtime Web (WebAssembly / WebGL) -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.min.js"></script>
@@ -156,55 +157,24 @@
       height: 100%;
     }
 
-    .btn-group {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.15s ease;
-      color: white;
-      background: #1f2937;
-    }
-    .btn:hover {
-      background: #374151;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #052e16;
-    }
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
     /* Samples section */
     .samples-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
     }
     .sample-btn {
       background: #1f2937;
       border: 1px solid #374151;
       border-radius: 8px;
-      padding: 0.4rem;
+      padding: 0.35rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
     }
     .sample-btn:hover {
       border-color: var(--accent);
+      transform: translateY(-2px);
     }
     .sample-btn img {
       width: 100%;
@@ -212,10 +182,10 @@
       object-fit: cover;
       border-radius: 6px;
       display: block;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.25rem;
     }
     .sample-btn span {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
       display: block;
       white-space: nowrap;
@@ -380,14 +350,13 @@
       <span class="badge">🚀 In-Browser WASM</span>
     </div>
     <p class="subtitle">
-      Zero-server in-browser plant diagnostic edge application. Evaluated on 6,195 diverse field images: 
-      <strong>85.59% Field Disease Accuracy</strong> and <strong>93.83% Biological Consistency</strong>.
+      Zero-server in-browser plant diagnostic edge application. Real-time inference running directly in your browser with WebAssembly SIMD.
     </p>
   </header>
 
   <div id="statusBanner">
     <div class="spinner" id="statusSpinner"></div>
-    <span id="statusText">Initializing ONNX Runtime WebAssembly engine & loading INT8 model (27.7 MB)...</span>
+    <span id="statusText">Initializing ONNX Runtime WebAssembly engine & downloading model (27.7 MB)...</span>
   </div>
 
   <main class="app-container" style="margin-top: 1rem;">
@@ -404,20 +373,28 @@
       </div>
 
       <div class="card-title" style="font-size:0.95rem; margin-top:0.5rem;">
-        <span>🧪 Or Try Benchmark Field Samples:</span>
+        <span>🧪 Or Try Benchmark Leaf Samples:</span>
       </div>
       <div class="samples-grid">
         <div class="sample-btn" onclick="loadSample('samples/tomato_early_blight.jpg')">
           <img src="samples/tomato_early_blight.jpg" alt="Tomato Early Blight">
-          <span>🍅 Tomato Early Blight</span>
+          <span>🍅 Tomato Blight</span>
+        </div>
+        <div class="sample-btn" onclick="loadSample('samples/corn_common_rust.jpg')">
+          <img src="samples/corn_common_rust.jpg" alt="Corn Common Rust">
+          <span>🌽 Corn Rust</span>
         </div>
         <div class="sample-btn" onclick="loadSample('samples/apple_scab.jpg')">
           <img src="samples/apple_scab.jpg" alt="Apple Scab">
           <span>🍏 Apple Scab</span>
         </div>
-        <div class="sample-btn" onclick="loadSample('samples/corn_rust.jpg')">
-          <img src="samples/corn_rust.jpg" alt="Corn Common Rust">
-          <span>🌽 Corn Common Rust</span>
+        <div class="sample-btn" onclick="loadSample('samples/potato_late_blight.jpg')">
+          <img src="samples/potato_late_blight.jpg" alt="Potato Late Blight">
+          <span>🥔 Potato Blight</span>
+        </div>
+        <div class="sample-btn" onclick="loadSample('samples/apple_healthy.jpg')">
+          <img src="samples/apple_healthy.jpg" alt="Apple Healthy">
+          <span>🍏 Apple Healthy</span>
         </div>
       </div>
 
@@ -477,7 +454,7 @@
 
       <!-- Top Disease Probabilities -->
       <div>
-        <div style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">Diagnostic Softmax Probability Distribution:</div>
+        <div style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">Diagnostic Probability Distribution:</div>
         <div id="probBars">
           <!-- Populated dynamically -->
         </div>
@@ -524,6 +501,8 @@
       'Orange', 'Peach', 'Pepper,_bell', 'Potato', 'Raspberry', 'Soybean',
       'Squash', 'Strawberry', 'Tomato'
     ];
+
+    const CLASS_TO_CROP_IDX = CLASSES_38.map(c => CROPS_14.indexOf(c.split('___')[0]));
 
     const TREATMENT_ADVISORY = {
       "Early_blight": {
@@ -600,14 +579,55 @@
     const probBars = document.getElementById('probBars');
     const advisoryBox = document.getElementById('advisoryBox');
 
-    // 1. Initialize ONNX Runtime Session
+    // 1. Initialize ONNX Runtime Session (Streaming Binary with Live Progress)
     async function initModel() {
       try {
         ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 2);
-        statusText.innerText = "Loading Edge INT8 ONNX Model (unified_gated_plant_cnn_int8.onnx)...";
+        statusText.innerText = "Connecting to Model Repository & Downloading Edge INT8 ONNX (27.7 MB)...";
 
-        // Load quantized model
-        session = await ort.InferenceSession.create('./unified_gated_plant_cnn_int8.onnx', {
+        const primaryUrl = "https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_int8.onnx";
+        const fallbackUrl = "./unified_gated_plant_cnn_int8.onnx";
+
+        let response = null;
+        try {
+          response = await fetch(primaryUrl);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        } catch (e) {
+          console.warn("Primary CDN download failed, trying local fallback:", e);
+          response = await fetch(fallbackUrl);
+        }
+
+        const contentLength = parseInt(response.headers.get('content-length')) || 29033102;
+        const reader = response.body.getReader();
+        let received = 0;
+        const chunks = [];
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          const pct = Math.min(100, Math.round((received / contentLength) * 100));
+          statusText.innerText = `Downloading Edge Model: ${pct}% (${(received / (1024 * 1024)).toFixed(1)} MB / 27.7 MB)...`;
+        }
+
+        statusText.innerText = "Compiling WebAssembly SIMD kernel and optimizing neural graph...";
+        const modelBuffer = new Uint8Array(received);
+        let offset = 0;
+        for (const chunk of chunks) {
+          modelBuffer.set(chunk, offset);
+          offset += chunk.length;
+        }
+
+        // Verify it is not a 133-byte git-lfs text file
+        if (received < 1000) {
+          const text = new TextDecoder().decode(modelBuffer);
+          if (text.includes("git-lfs")) {
+            throw new Error("Hugging Face served Git LFS text pointer instead of binary. Please load via primary Model Hub CDN.");
+          }
+        }
+
+        session = await ort.InferenceSession.create(modelBuffer.buffer, {
           executionProviders: ['wasm'],
           graphOptimizationLevel: 'all'
         });
@@ -615,7 +635,7 @@
         statusSpinner.style.display = 'none';
         statusBanner.style.background = '#064e3b';
         statusBanner.style.color = '#a7f3d0';
-        statusText.innerHTML = "✅ Edge Model Ready! (INT8 WASM Engine Activated). Tap a sample or upload a leaf photo.";
+        statusText.innerHTML = "✅ Edge Model Ready! (In-Browser INT8 WASM Engine Activated). Tap a sample or upload a leaf photo.";
 
         // Automatically load first sample
         loadSample('samples/tomato_early_blight.jpg');
@@ -624,7 +644,7 @@
         statusSpinner.style.display = 'none';
         statusBanner.style.background = '#7f1d1d';
         statusBanner.style.color = '#fecaca';
-        statusText.innerText = `Failed loading model: ${err.message}. Ensure unified_gated_plant_cnn_int8.onnx is hosted alongside index.html.`;
+        statusText.innerText = `Failed loading model: ${err.message}.`;
       }
     }
 
@@ -691,19 +711,37 @@
       const dProbs = softmax(dLogits);
       const cProbs = softmax(cLogits);
 
-      // Top Disease
+      // Hierarchical Joint Conditioning: P_joint(disease) = P(disease) * P(crop)
+      const jointProbs = new Float32Array(dProbs.length);
+      let jointSum = 0;
+      for (let i = 0; i < dProbs.length; i++) {
+        const cropIdx = CLASS_TO_CROP_IDX[i];
+        jointProbs[i] = dProbs[i] * cProbs[cropIdx];
+        jointSum += jointProbs[i];
+      }
+      for (let i = 0; i < jointProbs.length; i++) {
+        jointProbs[i] = jointSum > 0 ? (jointProbs[i] / jointSum) : dProbs[i];
+      }
+
+      // Top Crop
+      let maxCIdx = 0;
+      for (let i = 1; i < cProbs.length; i++) {
+        if (cProbs[i] > cProbs[maxCIdx]) maxCIdx = i;
+      }
+      const cropName = CROPS_14[maxCIdx].replace(/_/g, ' ');
+
+      // Top Disease based on Joint Probability
       let maxDIdx = 0;
-      for (let i = 1; i < dProbs.length; i++) {
-        if (dProbs[i] > dProbs[maxDIdx]) maxDIdx = i;
+      for (let i = 1; i < jointProbs.length; i++) {
+        if (jointProbs[i] > jointProbs[maxDIdx]) maxDIdx = i;
       }
       const topDiseaseRaw = CLASSES_38[maxDIdx];
       const diseaseParts = topDiseaseRaw.split('___');
-      const cropName = diseaseParts[0].replace(/_/g, ' ');
       const diseaseName = diseaseParts[1].replace(/_/g, ' ');
-      const topDProb = (dProbs[maxDIdx] * 100).toFixed(1);
+      const topDProb = (jointProbs[maxDIdx] * 100).toFixed(1);
 
       topDiseaseName.innerText = `${diseaseName} (${topDProb}%)`;
-      topCropName.innerText = cropName;
+      topCropName.innerText = `${cropName} (${(cProbs[maxCIdx]*100).toFixed(1)}%)`;
 
       // Mean Gating Score M(x)
       const meanM = maskData.reduce((a, b) => a + b, 0) / maskData.length;
@@ -716,7 +754,7 @@
       const sumExp = dLogits.reduce((acc, z) => acc + Math.exp(z - maxLogit), 0);
       const freeEnergy = -(maxLogit + Math.log(sumExp));
       energyVal.innerText = freeEnergy.toFixed(2);
-      if (freeEnergy < -10.0) {
+      if (freeEnergy < -3.5) {
         energySubtext.innerText = "In-Distribution Foliage (Pass)";
         energyVal.style.color = "#86efac";
       } else {
@@ -725,24 +763,22 @@
       }
 
       // Conformal Prediction Set (APS)
-      const sortedIdxs = dProbs.map((p, i) => ({ prob: p, idx: i }))
+      const sortedIdxs = Array.from(jointProbs).map((p, i) => ({ prob: p, idx: i }))
                               .sort((a, b) => b.prob - a.prob);
       let cumSum = 0;
       const safeSet = [];
       for (const item of sortedIdxs) {
         safeSet.push(item);
         cumSum += item.prob;
-        if (cumSum >= (1 - Q_HAT_95)) {
-          // In standard APS: stop when cumsum exceeds q_hat threshold
-        }
         if (cumSum >= 0.95) break; // 95% guaranteed coverage
       }
 
       conformalTags.innerHTML = safeSet.map(item => {
         const raw = CLASSES_38[item.idx];
+        const cropPrefix = raw.split('___')[0].replace(/_/g, ' ');
         const label = raw.split('___')[1].replace(/_/g, ' ');
         const pct = (item.prob * 100).toFixed(1);
-        return `<span class="badge badge-accent">${label} (${pct}%)</span>`;
+        return `<span class="badge badge-accent">${cropPrefix}: ${label} (${pct}%)</span>`;
       }).join('');
 
       // Top 5 Probabilities Bar
@@ -786,11 +822,11 @@
 
       for (let i = 0; i < 14 * 14; i++) {
         const val = Math.min(1.0, Math.max(0.0, mask14x14[i]));
-        // Bright emerald green / amber heatmap: RGBA
-        const r = Math.floor(val * 40);
-        const g = Math.floor(val * 255);
-        const b = Math.floor(val * 80);
-        const a = Math.floor(val * 230);
+        // Emerald green / amber heatmap: RGBA
+        const r = Math.floor(val * 240);
+        const g = Math.floor(val * 210);
+        const b = Math.floor(val * 40);
+        const a = Math.floor(val * 210);
 
         imgData.data[i * 4] = r;
         imgData.data[i * 4 + 1] = g;
