@@ -341,16 +341,9 @@
 <body>
 
   <header>
-    <h1>🌿 Plant Leaf Disease Detection Using CNN</h1>
-    <div class="badge-bar">
-      <span class="badge badge-accent">⚡ Pure 2D CNN (ConvNeXt-V2)</span>
-      <span class="badge">🧠 Differentiable Spatial Gating</span>
-      <span class="badge">🛡️ 95% Conformal Safety Guard</span>
-      <span class="badge">📦 Edge INT8 (27.7 MB)</span>
-      <span class="badge">🚀 In-Browser WASM</span>
-    </div>
+    <h1>🌿 Plant Leaf Disease Detection</h1>
     <p class="subtitle">
-      Zero-server in-browser plant diagnostic edge application. Real-time inference running directly in your browser with WebAssembly SIMD.
+      Instant plant leaf pathology diagnosis and actionable treatment protocols.
     </p>
   </header>
 
@@ -583,10 +576,10 @@
     async function initModel() {
       try {
         ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 2);
-        statusText.innerText = "Connecting to Model Repository & Downloading Edge INT8 ONNX (27.7 MB)...";
+        statusText.innerText = "Downloading WebAssembly Neural Model (33.8 MB)...";
 
-        const primaryUrl = "https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_int8.onnx";
-        const fallbackUrl = "./unified_gated_plant_cnn_int8.onnx";
+        const primaryUrl = "https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_web.onnx";
+        const fallbackUrl = "./unified_gated_plant_cnn_web.onnx";
 
         let response = null;
         try {
@@ -597,7 +590,7 @@
           response = await fetch(fallbackUrl);
         }
 
-        const contentLength = parseInt(response.headers.get('content-length')) || 29033102;
+        const contentLength = parseInt(response.headers.get('content-length')) || 35448320;
         const reader = response.body.getReader();
         let received = 0;
         const chunks = [];
@@ -608,7 +601,7 @@
           chunks.push(value);
           received += value.length;
           const pct = Math.min(100, Math.round((received / contentLength) * 100));
-          statusText.innerText = `Downloading Edge Model: ${pct}% (${(received / (1024 * 1024)).toFixed(1)} MB / 27.7 MB)...`;
+          statusText.innerText = `Downloading Model: ${pct}% (${(received / (1024 * 1024)).toFixed(1)} MB / 33.8 MB)...`;
         }
 
         statusText.innerText = "Compiling WebAssembly SIMD kernel and optimizing neural graph...";
@@ -635,7 +628,7 @@
         statusSpinner.style.display = 'none';
         statusBanner.style.background = '#064e3b';
         statusBanner.style.color = '#a7f3d0';
-        statusText.innerHTML = "✅ Edge Model Ready! (In-Browser INT8 WASM Engine Activated). Tap a sample or upload a leaf photo.";
+        statusText.innerHTML = "✅ Model Ready! Tap a sample below or upload a leaf photo to diagnose.";
 
         // Automatically load first sample
         loadSample('samples/tomato_early_blight.jpg');

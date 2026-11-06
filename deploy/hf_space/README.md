@@ -2,13 +2,13 @@
 title: Plant Leaf Disease Detection Using CNN
 emoji: 🌿
 colorFrom: green
-colorTo: emerald
+colorTo: gray
 sdk: gradio
 sdk_version: 6.31.0
 app_file: app.py
 pinned: false
 license: mit
-short_description: Pure 2D CNN (ConvNeXt-V2) with Differentiable Saliency Gating
+short_description: Plant Leaf Disease Detection & Treatment
 ---
 
 # 🌿 Plant Leaf Disease Detection Using CNN

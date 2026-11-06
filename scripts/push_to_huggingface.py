@@ -65,7 +65,7 @@ def publish_to_huggingface(username: str, token: str):
 
     print("  ✅ Model repository published successfully!")
 
-    # 2. Create & Upload Space Repository (Static PWA with In-Browser ONNX Runtime WASM)
+    # 2. Create & Upload Space Repository (Clean In-Browser WebAssembly Edge App)
     print(f"\n[2/2] Syncing Interactive Space ({space_repo_id})...")
     create_repo(
         repo_id=space_repo_id,
@@ -75,14 +75,43 @@ def publish_to_huggingface(username: str, token: str):
         exist_ok=True
     )
 
+    # Clean old python or obsolete files if present
+    obsolete_files = [
+        "app.py",
+        "requirements.txt",
+        "unified_gated_plant_cnn_int8.onnx",
+        "style.css",
+    ]
+    for obs in obsolete_files:
+        try:
+            api.delete_file(
+                path_in_repo=obs,
+                repo_id=space_repo_id,
+                repo_type="space",
+                commit_message=f"Clean {obs}"
+            )
+        except Exception:
+            pass
+
+    # Clean old src folder if present
+    try:
+        api.delete_folder(
+            path_in_repo="src",
+            repo_id=space_repo_id,
+            repo_type="space",
+            commit_message="Clean src folder"
+        )
+    except Exception:
+        pass
+
     space_dir = DEPLOY_DIR / "hf_static_space"
 
-    print(f"  Uploading In-Browser Edge WASM Space application from {space_dir}...")
+    print(f"  Uploading clean Web App from {space_dir}...")
     api.upload_folder(
         folder_path=str(space_dir),
         repo_id=space_repo_id,
         repo_type="space",
-        commit_message="Deploy interactive in-browser edge plant leaf disease diagnostic PWA",
+        commit_message="Deploy clean in-browser WebAssembly plant leaf disease diagnostic app",
         ignore_patterns=["*__pycache__*", "*.pyc", ".pytest_cache*"]
     )
 
