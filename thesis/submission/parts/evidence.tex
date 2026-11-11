@@ -50,7 +50,8 @@ python scripts/run_all.py --check
 bash scripts/verify-submission-docs.sh
 
 # run leaf diagnosis with conformal risk bounding and XAI heatmap
-python scripts/diagnose_leaf.py --image samples/tomato_early_blight.jpg
+python scripts/diagnose_leaf.py \
+    --image samples/tomato_early_blight.jpg
 
 # launch interactive local Gradio agronomic interface
 python app.py

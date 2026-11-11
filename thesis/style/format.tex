@@ -29,7 +29,7 @@
 \newcommand{\MarginTop}{1in}
 \newcommand{\MarginBottom}{1in}
 
-\newcommand{\BodyFont}{Times New Roman}
+\newcommand{\BodyFont}{Liberation Serif}
 \newcommand{\BodySize}{12pt}
 \newcommand{\BodyLeading}{1.5}        % 1.0 single, 1.5 one-and-a-half, 2.0 double
 
@@ -54,10 +54,11 @@
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{array}
 \usepackage{ragged2e}
 
-\setmainfont{\BodyFont}[Ligatures=TeX]
+\IfFontExistsTF{\BodyFont}{\setmainfont{\BodyFont}[Ligatures=TeX]}{\setmainfont{Liberation Serif}[Ligatures=TeX]}
 \setsansfont{\BodyFont}[Ligatures=TeX]
 \onehalfspacing
 

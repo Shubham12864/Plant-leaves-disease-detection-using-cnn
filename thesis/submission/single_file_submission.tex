@@ -31,7 +31,7 @@
 \newcommand{\MarginTop}{1in}
 \newcommand{\MarginBottom}{1in}
 
-\newcommand{\BodyFont}{Times New Roman}
+\newcommand{\BodyFont}{Liberation Serif}
 \newcommand{\BodySize}{12pt}
 \newcommand{\BodyLeading}{1.5}        % 1.0 single, 1.5 one-and-a-half, 2.0 double
 
@@ -56,10 +56,11 @@
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{array}
 \usepackage{ragged2e}
 
-\setmainfont{\BodyFont}[Ligatures=TeX]
+\IfFontExistsTF{\BodyFont}{\setmainfont{\BodyFont}[Ligatures=TeX]}{\setmainfont{Liberation Serif}[Ligatures=TeX]}
 \setsansfont{\BodyFont}[Ligatures=TeX]
 \onehalfspacing
 
@@ -100,6 +101,7 @@
 
 % file paths use \path (url package, loaded by hyperref) so they can break at / and _
 \urlstyle{tt}
+\def\UrlBreaks{\do\/\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z\do\0\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\=\do\/\do\.\do\:\do\?\do\-\do\_}
 \graphicspath{{../figures/}{figures/}}
 \emergencystretch=3em
 
@@ -884,7 +886,8 @@ python scripts/run_all.py --check
 bash scripts/verify-submission-docs.sh
 
 # run leaf diagnosis with conformal risk bounding and XAI heatmap
-python scripts/diagnose_leaf.py --image samples/tomato_early_blight.jpg
+python scripts/diagnose_leaf.py \
+    --image samples/tomato_early_blight.jpg
 
 # launch interactive local Gradio agronomic interface
 python app.py
