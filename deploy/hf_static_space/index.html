@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, dynamic-viewport">
-  <title>Plant Leaf Disease Detection Using CNN | In-Browser Edge AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Plant Leaf Disease Detection Using CNN</title>
   <meta name="description" content="100% pure 2D CNN (ConvNeXt-V2 with GRN) with Differentiable Saliency Gating and Conformal Risk Control running in-browser via ONNX Runtime Web.">
   <meta name="theme-color" content="#16a34a">
-  <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://huggingface.co">
 
@@ -556,8 +558,8 @@
     const dropzone = document.getElementById('dropzone');
     const previewCanvas = document.getElementById('previewCanvas');
     const maskCanvas = document.getElementById('maskCanvas');
-    const pCtx = previewCanvas.getContext('2d');
-    const mCtx = maskCanvas.getContext('2d');
+    const pCtx = previewCanvas.getContext('2d', { willReadFrequently: true });
+    const mCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
     const opacitySlider = document.getElementById('opacitySlider');
     const opacityVal = document.getElementById('opacityVal');
 
@@ -575,19 +577,23 @@
     // 1. Initialize ONNX Runtime Session (Streaming Binary with Live Progress)
     async function initModel() {
       try {
-        ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 2);
+        // Enforce safe single-thread execution to prevent SharedArrayBuffer isolation crashes in iframe
+        ort.env.wasm.numThreads = 1;
+        ort.env.wasm.simd = true;
         statusText.innerText = "Downloading WebAssembly Neural Model (33.8 MB)...";
 
-        const primaryUrl = "https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_web.onnx";
-        const fallbackUrl = "./unified_gated_plant_cnn_web.onnx";
+        // Cache-busting URL parameter ensures fresh fetch across all browser caches
+        const cacheBuster = Date.now();
+        const primaryUrl = `https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_web.onnx?v=${cacheBuster}`;
+        const fallbackUrl = `./unified_gated_plant_cnn_web.onnx?v=${cacheBuster}`;
 
         let response = null;
         try {
-          response = await fetch(primaryUrl);
+          response = await fetch(primaryUrl, { cache: 'no-store' });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
         } catch (e) {
           console.warn("Primary CDN download failed, trying local fallback:", e);
-          response = await fetch(fallbackUrl);
+          response = await fetch(fallbackUrl, { cache: 'no-store' });
         }
 
         const contentLength = parseInt(response.headers.get('content-length')) || 35448320;
