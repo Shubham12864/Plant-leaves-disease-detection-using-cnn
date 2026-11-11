@@ -10,6 +10,7 @@
 \usepackage{tabularx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
+\usepackage{balance}
 
 \graphicspath{{../thesis/figures/}{thesis/figures/}}
 
@@ -21,37 +22,37 @@
 \title{Plant Leaf Disease Detection Using CNN}
 
 \author{
-\IEEEauthorblockN{Shubham Kumar\IEEEauthorrefmark{1}, Ujjwal Pratap Singh\IEEEauthorrefmark{2}, Vivek Kumar Prajapati\IEEEauthorrefmark{3}, Shubham Kumar\IEEEauthorrefmark{4}, and Dr. Harendra Singh\IEEEauthorrefmark{5}}
-\IEEEauthorblockA{Department of Computer Science and Engineering, IILM University, Greater Noida, Uttar Pradesh, India\\
-Email: \IEEEauthorrefmark{1}shubham1.kumar.cs27@iilm.edu,
+\IEEEauthorblockN{Shubham Kumar\IEEEauthorrefmark{1}, Ujjwal Pratap Singh\IEEEauthorrefmark{2}, Vivek Kumar Prajapati\IEEEauthorrefmark{3}, Shubham Kumar\IEEEauthorrefmark{4}, and Harendra Singh\IEEEauthorrefmark{5}}
+\IEEEauthorblockA{Department of Computer Science and Engineering, IILM University, Greater Noida, Uttar Pradesh, India}
+\IEEEauthorblockA{Email: \IEEEauthorrefmark{1}shubham1.kumar.cs27@iilm.edu,
 \IEEEauthorrefmark{2}ujjwal.singh.cs27@iilm.edu,
-\IEEEauthorrefmark{3}vivek.prajapati.cs27@iilm.edu,
-\IEEEauthorrefmark{4}kumar.shubham.cs27@iilm.edu,
+\IEEEauthorrefmark{3}vivek.prajapati.cs27@iilm.edu}
+\IEEEauthorblockA{\IEEEauthorrefmark{4}kumar.shubham.cs27@iilm.edu,
 \IEEEauthorrefmark{5}harendra.singh@iilm.edu}
 }
 
 \maketitle
 
 \begin{abstract}
-Convolutional Neural Networks (CNNs) trained on laboratory leaf pathology datasets (e.g., PlantVillage) frequently achieve exceeding $99\%$ nominal accuracy, yet catastrophically collapse to approximately $21\%$ when deployed in unconstrained agricultural field conditions. In this paper, we first conduct a pre-registered causal swap-intervention experiment ($n=298$) isolating foreground leaf laminas from background scenes, proving that naive classifiers derive $21.8\%$ of their predictive adoption signal directly from background clutter (soil, hands, sunlight glare) rather than disease lesions. Furthermore, a paired multi-seed augmentation benchmark establishes that naive background replacement fails to bridge this domain gap ($+1.24$\,pp, $p>0.05$). To solve this without the latency and annotation burden of two-stage object detectors (such as YOLO), we propose the \textbf{Unified Gated ConvNeXt-V2} architecture. Our method integrates Global Response Normalization (GRN), autonomous stage-2 differentiable spatial saliency gating ($M(x) = 0.182$, achieving $81.8\%$ background clutter attenuation without bounding-box labels), and hierarchical botanical conditioning ($P_{\text{joint}}(d) = P(d \mid x) \cdot P(\text{crop}(d) \mid x)$). To address rampant field overconfidence (where baseline expected calibration error reaches $0.5808$), we introduce distribution-free Split Conformal Prediction alongside Helmholtz Free Energy out-of-distribution (OOD) screening. Evaluated on an extended field corpus of $6{,}195$ real-world field images across 14 crop families, our unified architecture achieves \textbf{$85.59\%$} top-1 disease accuracy (a \textbf{$+64.74$\,pp} gain over baseline EfficientNet-B0), \textbf{$91.04\%$} crop family accuracy, \textbf{$93.83\%$} taxonomic consistency, and guaranteed \textbf{$96.61\%$} empirical conformal coverage ($\alpha=0.05$). Finally, we quantize the model to a $27.69$\,MB dynamic INT8 ONNX graph ($74.33\%$ storage reduction) and deploy a $33.8$\,MB WebAssembly engine executing real-time in-browser inference on mobile edge devices.
+Convolutional Neural Networks (CNNs) trained on laboratory leaf pathology datasets (e.g., PlantVillage) frequently achieve $>99\%$ nominal accuracy, yet catastrophically collapse to $\approx 21\%$ when deployed under unconstrained agricultural field conditions. In this paper, we first execute a pre-registered causal swap-intervention experiment ($n=298$), establishing that naive classifiers derive $21.8\%$ of their predictive adoption directly from background context (soil, hands, sunlight glare) rather than disease lesions. Furthermore, a paired multi-seed benchmark confirms that naive background replacement fails to bridge this domain gap ($+1.24$\,pp, $p>0.05$). To eliminate the latency and annotation burden of two-stage object detectors, we propose the \textbf{Unified Gated ConvNeXt-V2} architecture. Our method integrates Global Response Normalization (GRN), autonomous stage-2 differentiable spatial saliency gating ($M(x) = 0.182$, attenuating $81.8\%$ of background clutter without bounding-box labels), and hierarchical botanical conditioning ($P_{\text{joint}}(d) = P(d \mid x) \cdot P(\text{crop}(d) \mid x)$). To mitigate field overconfidence, we introduce distribution-free Split Conformal Prediction alongside Helmholtz Free Energy out-of-distribution (OOD) screening. Evaluated on $6{,}195$ real-world field images across 14 crop families, our architecture achieves \textbf{$85.59\%$} top-1 disease accuracy ($+64.74$\,pp over baseline EfficientNet-B0), \textbf{$91.04\%$} crop family accuracy, \textbf{$93.83\%$} taxonomic consistency, and guaranteed \textbf{$96.61\%$} conformal coverage ($\alpha=0.05$). Finally, we quantize the model to a $27.69$\,MB dynamic INT8 ONNX graph ($74.33\%$ storage reduction) and deploy a $33.8$\,MB client-side WebAssembly engine executing real-time in-browser inference on mobile edge devices.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Plant Disease Diagnosis, Domain Shift, ConvNeXt-V2, Spatial Saliency Gating, Conformal Prediction, Out-of-Distribution Detection, Edge AI.
+Conformal prediction, ConvNeXt-V2, domain shift, edge AI, out-of-distribution detection, plant disease diagnosis, spatial saliency gating.
 \end{IEEEkeywords}
 
 \section{Introduction}
-Early and accurate detection of foliar crop diseases is vital for global food security, agricultural yield preservation, and targeted fungicide application. Over the past decade, deep Convolutional Neural Networks (CNNs) and Vision Transformers (ViTs) have achieved remarkable reported accuracies ($>99\%$) on benchmark datasets such as PlantVillage~\cite{mohanty2016using}. Consequently, widespread literature has declared automated plant leaf disease diagnosis a largely solved computer vision task.
+Early and accurate detection of foliar crop diseases is vital for global food security, agricultural yield preservation, and targeted fungicide application. Over the past decade, deep Convolutional Neural Networks (CNNs) and Vision Transformers (ViTs) have achieved remarkable reported accuracies ($>99\%$) on benchmark datasets such as PlantVillage~\cite{mohanty2016using, ferentinos2018deep}. Consequently, widespread literature has declared automated plant leaf disease diagnosis a largely solved computer vision task.
 
-However, recent field deployment trials reveal a catastrophic disparity: when models trained on laboratory leaf imagery are evaluated on in-situ field photographs (e.g., PlantDoc~\cite{singh2019plantdoc}), classification accuracy collapses from $99.28\%$ to $20.85\%$, representing an absolute domain drop of over $78$ percentage points~\cite{barbedo2018factors}. In real agronomic environments, photographs contain complex unstructured backgrounds, severe shadows, multiple overlapping leaves, insect damage, farmer hands, and variable ambient illumination. Standard CNNs inadvertently learn spurious correlations between clean laboratory photographic backdrops and specific disease categories, leading to complete failure under distribution shift.
+However, recent field deployment trials reveal a catastrophic disparity: when models trained on laboratory leaf imagery are evaluated on in-situ field photographs (e.g., PlantDoc~\cite{singh2019plantdoc}), classification accuracy collapses from $99.28\%$ to $20.85\%$, representing an absolute domain drop of over $78$ percentage points~\cite{barbedo2018factors}. In real agronomic environments, photographs contain complex unstructured backgrounds, severe shadows, multiple overlapping leaves, insect damage, farmer hands, and variable ambient illumination. Standard CNNs inadvertently learn spurious correlations between clean laboratory photographic backdrops and specific disease categories, leading to complete failure under distribution shift~\cite{geirhos2020shortcut}.
 
 Conventional engineering attempts to mitigate this gap typically follow one of two paradigms:
 \begin{enumerate}
-    \item \textbf{Two-Stage Detection Pipelines:} An external object detector (e.g., Faster R-CNN or YOLOv8) is trained to predict leaf bounding boxes, cropping regions before classification. While intuitive, this approach doubles pipeline latency, introduces cascading error propagation when crops fail, and requires thousands of costly, manually annotated bounding boxes.
+    \item \textbf{Two-Stage Detection Pipelines:} An external object detector (such as YOLO~\cite{redmon2016you} or Faster R-CNN) is trained to predict leaf bounding boxes, cropping regions before classification. While intuitive, this approach doubles pipeline latency, introduces cascading error propagation when crops fail, and requires thousands of costly, manually annotated bounding boxes.
     \item \textbf{Naive Background Augmentation:} Segmented laboratory leaves are synthetically pasted onto random non-crop backdrops. However, as our empirical experiments demonstrate, synthetic cut-and-paste boundaries generate high-frequency edge artifacts that classifiers readily exploit without learning invariant lesion pathology.
 \end{enumerate}
 
-Moreover, deep neural networks exhibit severe overconfidence on out-of-domain imagery. When presented with field foliage or non-crop objects, standard softmax estimators output high confidence ($>95\%$) while being wrong over $70\%$ of the time, rendering heuristic confidence thresholding clinically useless in agricultural decision support.
+Moreover, deep neural networks exhibit severe overconfidence on out-of-domain imagery~\cite{guo2017calibration}. When presented with field foliage or non-crop objects, standard softmax estimators output high confidence ($>95\%$) while being wrong over $70\%$ of the time, rendering heuristic confidence thresholding clinically useless in agricultural decision support.
 
 \begin{figure}[t]
 \centering
@@ -63,8 +64,8 @@ Moreover, deep neural networks exhibit severe overconfidence on out-of-domain im
 In this paper, we address both the causal mechanism of the agricultural domain gap and its architectural solution. The contributions of this work are fourfold:
 \begin{itemize}
     \item \textbf{Causal Intervention Analysis:} Through a controlled leaf-versus-background donor swap experiment ($n=298$), we prove that background features alone account for $21.81\%$ of predictive label adoption (over 8$\times$ chance level). In a pre-registered 3-seed paired sweep, we establish that naive synthetic background pasting yields a statistically null improvement ($+1.24$\,pp, $p > 0.05$).
-    \item \textbf{Unified Gated ConvNeXt-V2 Architecture:} We propose a single-stage, pure 2D CNN incorporating Global Response Normalization (GRN), an autonomous differentiable Stage-2 Spatial Saliency Gate ($M(x) = \sigma(W_g * f_2(x))$), and Hierarchical Botanical Conditioning. Without external bounding boxes, the gate converges to $M(x) = 0.182$, autonomously attenuating $81.8\%$ of non-leaf background clutter.
-    \item \textbf{Distribution-Free Operational Safety:} We replace uncalibrated softmax thresholds with finite-sample Split Conformal Prediction, providing a mathematical guarantee of $\ge 95\%$ true-pathology coverage ($96.61\%$ empirical field coverage). In addition, we formulate a Helmholtz Free Energy OOD detection head ($E(x) < -3.50$) to reject non-leaf inputs before inference.
+    \item \textbf{Unified Gated ConvNeXt-V2 Architecture:} We propose a single-stage, pure 2D CNN incorporating Global Response Normalization (GRN)~\cite{woo2023convnext}, an autonomous differentiable Stage-2 Spatial Saliency Gate ($M(x) = \sigma(W_g * f_2(x))$)~\cite{selvaraju2017grad}, and Hierarchical Botanical Conditioning. Without external bounding boxes, the gate converges to $M(x) = 0.182$, autonomously attenuating $81.8\%$ of non-leaf background clutter.
+    \item \textbf{Distribution-Free Operational Safety:} We replace uncalibrated softmax thresholds with finite-sample Split Conformal Prediction~\cite{vovk2005algorithmic, angelopoulos2021gentle}, providing a mathematical guarantee of $\ge 95\%$ true-pathology coverage ($96.61\%$ empirical field coverage). In addition, we formulate a Helmholtz Free Energy OOD detection head ($E(x) < -3.50$)~\cite{liu2020energy} to reject non-leaf inputs before inference.
     \item \textbf{Empirical Field Generalization \& Edge Deployment:} On an extended field corpus of $6{,}195$ images across 14 crop families, our architecture achieves \textbf{$85.59\%$} top-1 disease accuracy ($+64.74$\,pp gain) and \textbf{$93.83\%$} taxonomic consistency. We compress the network to a $27.69$\,MB dynamic INT8 ONNX model ($74.33\%$ reduction) and a $33.8$\,MB WebAssembly engine running entirely client-side in edge browsers with zero server dependencies.
 \end{itemize}
 
@@ -88,20 +89,22 @@ We designed a pre-registered causal intervention protocol (\path{scripts/swap_lo
 
 Table~\ref{tab:swap-results} reports adoption rates (frequency at which the model prediction changes to the donor's class) evaluated on $298$ validation images.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
 \caption{Causal Intervention Results ($n=298$ Images)}
 \label{tab:swap-results}
-\begin{tabularx}{\columnwidth}{@{}lrrX@{}}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-\textbf{Intervention Type} & \textbf{Adoption Rate} & \textbf{95\% Conf. Interval} & \textbf{Interpretation} \\
+\textbf{Intervention} & \textbf{Adoption} & \textbf{95\% CI} & \textbf{Interpretation} \\
 \midrule
-Random Chance ($1/38$) & 0.0263 & --- & Theoretical baseline \\
-Same-Class Control & 0.0436 & [0.023, 0.067] & Edit artifact seam \\
+Random Chance & 0.0263 & --- & Baseline ($1/38$) \\
+Same-Class Control & 0.0436 & [0.023, 0.067] & Artifact seam \\
 Leaf Swap ($x_{\text{leaf}}$) & \textbf{0.5034} & [0.446, 0.557] & Foreground signal \\
 Background Swap ($x_{\text{bg}}$) & \textbf{0.2181} & [0.171, 0.268] & Contextual signal \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 The empirical background adoption rate of $21.81\%$ is more than eight times random chance ($2.63\%$). This demonstrates that standard models memorize background cues as discriminatory disease evidence.
@@ -137,7 +140,7 @@ $\longrightarrow$ \textbf{Hierarchical Coupling:} $P_{\text{joint}}(d) = P(d \mi
 \end{figure*}
 
 \subsection{ConvNeXt-V2 with Global Response Normalization}
-The backbone leverages ConvNeXt-V2 blocks equipped with Global Response Normalization (GRN). GRN computes feature L2-norms across spatial dimensions to adaptively modulate channel contrast:
+The backbone leverages ConvNeXt-V2 blocks equipped with Global Response Normalization (GRN)~\cite{woo2023convnext}. GRN computes feature L2-norms across spatial dimensions to adaptively modulate channel contrast:
 \begin{equation}
 \mathcal{G}(x)_c = x_c \cdot \left( \frac{\|x_c\|_2}{\frac{1}{C}\sum_{j=1}^C \|x_j\|_2 + \epsilon} \right) + x_c
 \end{equation}
@@ -180,17 +183,17 @@ where $\mathcal{L}_{\text{taxonomic}} = D_{\text{KL}}(P(\text{crop} \mid x) \,\|
 \section{Safety \& Uncertainty Quantification}
 
 \subsection{Distribution-Free Split Conformal Prediction}
-Heuristic softmax thresholding fails under distribution shift: baseline models exhibit an Expected Calibration Error (ECE) of $0.5808$ on field imagery, where selective abstention at $90\%$ coverage improves accuracy by a negligible $0.08$\,pp. 
+Heuristic softmax thresholding fails under distribution shift: baseline models exhibit an Expected Calibration Error (ECE) of $0.5808$ on field imagery~\cite{guo2017calibration}, where selective abstention at $90\%$ coverage improves accuracy by a negligible $0.08$\,pp. 
 
-To provide rigorous safety bounds for agricultural practitioners, we apply distribution-free Split Conformal Prediction~\cite{vovk2005algorithmic}. Using a held-out calibration set of real-world field images $\{(x_i, y_i)\}_{i=1}^n$, we define non-conformity scores:
+To provide rigorous safety bounds for agricultural practitioners, we apply distribution-free Split Conformal Prediction~\cite{vovk2005algorithmic, angelopoulos2021gentle}. Using a held-out calibration set of real-world field images $\{(x_i, y_i)\}_{i=1}^n$, we define non-conformity scores:
 \begin{equation}
 s_i = 1 - P_{\text{joint}}(y_i \mid x_i)
 \end{equation}
 Given a practitioner-specified risk tolerance $\alpha \in (0, 1)$ (e.g., $\alpha = 0.05$ for $95\%$ confidence), we compute the empirical conformal quantile:
 \begin{equation}
-\hat{q}_{1-\alpha} = \text{Quantile}\left( \frac{\lceil (n+1)(1-\alpha) \rceil}{n}; \{s_1, \ldots, s_n\} \right) = 0.9979
+\hat{q}_{1-\alpha} = \text{Quantile}\left( \frac{\lceil (n+1)(1-\alpha) \rceil}{n}; \{s_1, \ldots, s_n\} \right)
 \end{equation}
-For any unseen field query $x_{\text{new}}$, the system outputs a prediction set:
+Evaluating across our calibration set yields $\hat{q}_{0.95} = 0.9979$. For any unseen field query $x_{\text{new}}$, the system outputs a prediction set:
 \begin{equation}
 \mathcal{C}(x_{\text{new}}) = \left\{ k \in \{1, \ldots, 38\} : P_{\text{joint}}(k \mid x_{\text{new}}) \ge 1 - \hat{q}_{1-\alpha} \right\}
 \end{equation}
@@ -227,24 +230,24 @@ Experiments were conducted across three primary corpora:
 Training was executed on a unified pool of $12{,}000$ images utilizing Cosine Annealing learning rate schedules ($1\times10^{-4} \to 1\times10^{-6}$) on 2$\times$ NVIDIA Tesla T4 GPUs.
 
 \subsection{Comparative Performance Benchmark}
-Table~\ref{tab:main-results} presents a comprehensive quantitative comparison between baseline models, the synthetic augmentation intervention, and the proposed Unified Gated ConvNeXt-V2.
+Table~\ref{tab:main-results} presents a comprehensive quantitative comparison between baseline models~\cite{he2016deep, tan2019efficientnet}, the synthetic augmentation intervention, and the proposed Unified Gated ConvNeXt-V2.
 
 \begin{table*}[t]
 \centering
 \caption{Comprehensive Performance Benchmark Across Model Architectures and Operational Metrics}
 \label{tab:main-results}
-\begin{tabularx}{\textwidth}{@{}lrrrrrrX@{}}
+\begin{tabularx}{\textwidth}{@{}lccccccr@{}}
 \toprule
-\textbf{Model Architecture} & \textbf{Lab Macro-F1} & \textbf{Field Acc (Top-1)} & \textbf{Crop Family Acc} & \textbf{Consistency} & \textbf{Field ECE} & \textbf{Footprint} & \textbf{Inference Latency} \\
+\textbf{Model Architecture} & \textbf{Lab Macro-F1} & \textbf{Field Acc (Top-1)} & \textbf{Crop Acc} & \textbf{Consistency} & \textbf{Field ECE} & \textbf{Storage} & \textbf{CPU Latency} \\
 \midrule
-SmallCNN Baseline & 0.9160 & 0.0438 & 0.1820 & 0.5210 & 0.6941 & 1.6\,MB & 4.2\,ms (CPU) \\
-ResNet18 Baseline & 0.9846 & 0.1610 & 0.2840 & 0.6480 & 0.6120 & 44.8\,MB & 18.5\,ms (CPU) \\
-EfficientNet-B0 Baseline & 0.9895 & 0.2085 & 0.3432 & 0.6314 & 0.5808 & 16.2\,MB & 22.4\,ms (CPU) \\
-ConvNeXt-Tiny Baseline & 0.9895 & 0.3008 & 0.4280 & 0.7120 & 0.5210 & 111.4\,MB & 68.1\,ms (CPU) \\
+SmallCNN Baseline & 0.9160 & 0.0438 & 0.1820 & 0.5210 & 0.6941 & 1.6\,MB & 4.2\,ms \\
+ResNet18 Baseline~\cite{he2016deep} & 0.9846 & 0.1610 & 0.2840 & 0.6480 & 0.6120 & 44.8\,MB & 18.5\,ms \\
+EfficientNet-B0 Baseline~\cite{tan2019efficientnet} & 0.9895 & 0.2085 & 0.3432 & 0.6314 & 0.5808 & 16.2\,MB & 22.4\,ms \\
+ConvNeXt-Tiny Baseline & 0.9895 & 0.3008 & 0.4280 & 0.7120 & 0.5210 & 111.4\,MB & 68.1\,ms \\
 \midrule
-Paired Augmentation (Composite) & 0.9796 & 0.2356 & 0.3680 & 0.6720 & 0.5640 & 16.2\,MB & 22.4\,ms (CPU) \\
+Paired Augmentation (Composite) & 0.9796 & 0.2356 & 0.3680 & 0.6720 & 0.5640 & 16.2\,MB & 22.4\,ms \\
 \midrule
-\textbf{Unified Gated ConvNeXt-V2 (Ours)} & \textbf{0.9942} & \textbf{0.8559} & \textbf{0.9104} & \textbf{0.9383} & \textbf{0.0412} & \textbf{27.69\,MB} & \textbf{73.7\,ms (CPU)} \\
+\textbf{Unified Gated ConvNeXt-V2 (Ours)} & \textbf{0.9942} & \textbf{0.8559} & \textbf{0.9104} & \textbf{0.9383} & \textbf{0.0412} & \textbf{27.69\,MB} & \textbf{73.7\,ms} \\
 \bottomrule
 \end{tabularx}
 \end{table*}
@@ -264,26 +267,27 @@ To enable practical deployment in remote rural environments with limited cellula
 
 \textbf{2. Edge Benchmarking:} The quantized model achieves a \textbf{$74.33\%$} storage reduction ($107.8$\,MB $\to$ $27.69$\,MB), with an average CPU latency of $73.7$\,ms in PyTorch and $95.7$\,ms in ONNX Runtime. The model is deployed live on Hugging Face Spaces (\url{https://huggingface.co/spaces/Shubham12864/plant-leaf-disease-detection-using-cnn}), executing zero-server in-browser inference with real-time canvas-based spatial saliency overlays.
 
+\balance
+
 \section{Conclusion}
 This work examined the fundamental mechanisms underlying the catastrophic failure of laboratory-trained leaf pathology CNNs under natural agricultural field conditions. Through controlled swap-intervention experiments, we established that background scene entanglement accounts for over $21\%$ of predictive signal, and showed that naive synthetic background pasting is statistically ineffective. We proposed the Unified Gated ConvNeXt-V2 architecture, combining Global Response Normalization, autonomous stage-2 differentiable spatial gating, and hierarchical botanical conditioning to achieve $85.59\%$ field accuracy on $6{,}195$ diverse agricultural test images without requiring external YOLO object detectors. Furthermore, we integrated Split Conformal Prediction and Helmholtz Free Energy screening, delivering distribution-free mathematical safety guarantees ($\ge 95\%$ coverage) and out-of-distribution rejection. Finally, we demonstrated real-time edge execution via a $27.7$\,MB dynamic INT8 model and a zero-server WebAssembly in-browser application. Future work will investigate multi-spectral near-infrared sensor fusion and on-device federated adaptation across regional micro-climates.
 
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{00}
 \bibitem{mohanty2016using} S. P. Mohanty, D. P. Hughes, and M. Salath{\'e}, ``Using deep learning for image-based plant disease detection,'' \emph{Frontiers in Plant Science}, vol. 7, p. 1419, 2016.
+\bibitem{ferentinos2018deep} K. P. Ferentinos, ``Deep learning models for plant disease detection and diagnosis,'' \emph{Computers and Electronics in Agriculture}, vol. 145, pp. 311--318, 2018.
 \bibitem{singh2019plantdoc} D. Singh, N. Jain, P. Jain, P. Kayal, S. Kumawat, and N. Batra, ``PlantDoc: a dataset for visual plant disease detection in the wild,'' in \emph{Proc. ACM Conf. Comput. Hum. Support Learning}, 2019, pp. 249--253.
 \bibitem{barbedo2018factors} J. G. A. Barbedo, ``Factors influencing the use of deep learning for plant disease recognition,'' \emph{Biosystems Engineering}, vol. 172, pp. 84--91, 2018.
-\bibitem{ferentinos2018deep} K. P. Ferentinos, ``Deep learning models for plant disease detection and diagnosis,'' \emph{Computers and Electronics in Agriculture}, vol. 145, pp. 311--318, 2018.
+\bibitem{geirhos2020shortcut} R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. S. Zemel, W. Brendel, M. Bethge, and F. A. Wichmann, ``Shortcut learning in deep neural networks,'' \emph{Nature Machine Intelligence}, vol. 2, no. 11, pp. 665--673, 2020.
+\bibitem{redmon2016you} J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, ``You only look once: Unified, real-time object detection,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2016, pp. 779--788.
 \bibitem{woo2023convnext} S. Woo, S. Debnath, R. Hu, X. Chen, Z. Liu, I. S. Kweon, and S. Xie, ``ConvNeXt V2: Co-designing and scaling convnets with masked autoencoders,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2023, pp. 16133--16142.
-\bibitem{vovk2005algorithmic} V. Vovk, A. Gammerman, and G. Shafer, \emph{Algorithmic Learning in a Random World}. Springer Science \& Business Media, 2005.
+\bibitem{selvaraju2017grad} R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra, ``Grad-CAM: Visual explanations from deep networks via gradient-based localization,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp. 618--626.
+\bibitem{guo2017calibration} C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, ``On calibration of modern neural networks,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2017, pp. 1321--1330.
+\bibitem{vovk2005algorithmic} V. Vovk, A. Gammerman, and G. Shafer, \emph{Algorithmic Learning in a Random World}. New York, NY, USA: Springer, 2005.
 \bibitem{angelopoulos2021gentle} A. N. Angelopoulos and S. Bates, ``A gentle introduction to conformal prediction and distribution-free uncertainty quantification,'' \emph{arXiv preprint arXiv:2107.07511}, 2021.
 \bibitem{liu2020energy} W. Liu, X. Wang, J. Owens, and Y. Li, ``Energy-based out-of-distribution detection,'' in \emph{Adv. Neural Inf. Process. Syst. (NeurIPS)}, vol. 33, 2020, pp. 21464--21475.
-\bibitem{selvaraju2017grad} R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra, ``Grad-CAM: Visual explanations from deep networks via gradient-based localization,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp. 618--626.
 \bibitem{he2016deep} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2016, pp. 770--778.
 \bibitem{tan2019efficientnet} M. Tan and Q. Le, ``EfficientNet: Rethinking model scaling for convolutional neural networks,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2019, pp. 6105--6114.
-\bibitem{redmon2016you} J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, ``You only look once: Unified, real-time object detection,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2016, pp. 779--788.
-\bibitem{guo2017calibration} C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, ``On calibration of modern neural networks,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2017, pp. 1321--1330.
-\bibitem{geirhos2020shortcut} R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. S. Zemel, W. Brendel, M. Bethge, and F. A. Wichmann, ``Shortcut learning in deep neural networks,'' \emph{Nature Machine Intelligence}, vol. 2, no. 11, pp. 665--673, 2020.
-\bibitem{krizhevsky2012imagenet} A. Krizhevsky, I. Sutskever, and G. E. Hinton, ``ImageNet classification with deep convolutional neural networks,'' in \emph{Adv. Neural Inf. Process. Syst. (NeurIPS)}, vol. 25, 2012, pp. 1097--1105.
 \end{thebibliography}
 
 \end{document}
