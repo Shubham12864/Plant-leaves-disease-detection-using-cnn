@@ -7,9 +7,15 @@ Each heading below is the exact field name on the Google Form. Paste the text un
 Every number is backed by registered project artifacts and was produced by
 this project's own runs. Nothing here is an invented or unverified result.
 
+**Team Members & Official IILM Emails:**
+1. Shubham Kumar (Lead) – `shubham1.kumar.cs27@iilm.edu`
+2. Ujjwal Pratap Singh – `ujjwal.singh.cs27@iilm.edu`
+3. Vivek Kumar Prajapati – `vivek.prajapati.cs27@iilm.edu`
+4. Shubham Kumar – `kumar.shubham.cs27@iilm.edu`
+Project Guide: Dr. Harendra Singh – `harendra.singh@iilm.edu`
+
 **Fill before submitting (not recorded in the repository, do not guess):**
-enrolment numbers for all four members (two members are both named Shubham Kumar); the
-guide's official email; confirmation of the approved title; the week dates in `docs/WPR_1.md`
+enrolment numbers for all four members; the week dates in `docs/WPR_1.md`
 to `WPR_3.md`. The coordinator's mail requires at least three WPRs to have been sent to the
 guide before the form is filled.
 
