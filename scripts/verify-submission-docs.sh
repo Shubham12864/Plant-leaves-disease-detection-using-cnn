@@ -64,7 +64,7 @@ if [ -n "$wrong_gain" ]; then
 fi
 
 # Every GitHub link pasted into the form must point at a tracked file, or the evaluator gets a 404
-for p in $(grep -oE '(blob|tree)/main/[^ )]+' "$FORM" | sed -E 's#^(blob|tree)/main/##' | sort -u); do
+for p in $(grep -oE '(blob|tree)/main/[^ )]+' "$FORM" | sed -E 's#^(blob|tree)/main/##' | tr -d '\r' | sort -u); do
   if [ -z "$(git ls-files -- "$p")" ]; then
     echo "FAIL: form links to a path git does not track (404 on GitHub): $p"
     status=1
