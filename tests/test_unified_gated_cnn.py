@@ -99,3 +99,83 @@ def test_build_model_integration():
     assert isinstance(m, UnifiedGatedPlantCNN)
     assert m.num_diseases == 38
     assert m.num_crops == 14
+
+
+def test_load_pretrained_folds_layer_scale(tmp_path):
+    """Verify torchvision ConvNeXt-Tiny transfer folds layer_scale into pwconv2 and transfers heads."""
+    import torchvision.models as tv_models
+
+    tv_model = tv_models.convnext_tiny(num_classes=38)
+    with torch.no_grad():
+        # Set distinct non-zero layer_scale and head weights to verify folding
+        tv_model.features[1][0].layer_scale.fill_(0.25)
+        tv_model.features[1][0].block[5].weight.fill_(2.0)
+        tv_model.features[1][0].block[5].bias.fill_(4.0)
+        tv_model.classifier[2].weight.fill_(0.5)
+
+    ckpt_path = tmp_path / "convnext_tiny_mock.pt"
+    torch.save({"model_state_dict": tv_model.state_dict()}, ckpt_path)
+
+    gated = UnifiedGatedPlantCNN(num_crops=14, num_diseases=38)
+    stats = gated.load_pretrained_backbone(str(ckpt_path))
+
+    assert stats["folded_layer_scales"] == 18
+    assert torch.allclose(gated.stages[0][0].pwconv2.weight, torch.full_like(gated.stages[0][0].pwconv2.weight, 0.5))
+    assert torch.allclose(gated.stages[0][0].pwconv2.bias, torch.full_like(gated.stages[0][0].pwconv2.bias, 1.0))
+    assert torch.allclose(gated.head.disease_head.weight, torch.full_like(gated.head.disease_head.weight, 0.5))
+
+
+def test_taxonomy_and_pathogen_advisories():
+    try:
+        from plant_disease.taxonomy import (
+            CLASSES_38,
+            CROPS_14,
+            CLASS_TO_CROP_IDX,
+            get_treatment_for_disease,
+            preprocess_pil_image,
+        )
+    except ImportError:
+        from src.plant_disease.taxonomy import (
+            CLASSES_38,
+            CROPS_14,
+            CLASS_TO_CROP_IDX,
+            get_treatment_for_disease,
+            preprocess_pil_image,
+        )
+    from PIL import Image
+
+    assert len(CLASSES_38) == 38
+    assert len(CROPS_14) == 14
+    assert len(CLASS_TO_CROP_IDX) == 38
+
+    virus_adv = get_treatment_for_disease("Tomato___Tomato_Yellow_Leaf_Curl_Virus")
+    assert "fungicides are ineffective" in virus_adv["chemical"].lower()
+
+    mite_adv = get_treatment_for_disease("Tomato___Spider_mites Two-spotted_spider_mite")
+    assert "miticide" in mite_adv["chemical"].lower()
+
+    # Non-square photo preprocessing produces exact 224x224 center crop
+    wide_img = Image.new("RGB", (640, 360), color=(20, 120, 40))
+    cropped = preprocess_pil_image(wide_img, target_size=224, center_crop=True)
+    assert cropped.size == (224, 224)
+
+
+def test_diagnostic_engine_outputs(tmp_path):
+    try:
+        from plant_disease.diagnostic_engine import PlantDiagnosticEngine
+    except ImportError:
+        from src.plant_disease.diagnostic_engine import PlantDiagnosticEngine
+    from PIL import Image
+
+    model = UnifiedGatedPlantCNN(num_crops=14, num_diseases=38)
+    ckpt_path = tmp_path / "dummy_unified.pt"
+    torch.save({"model_state_dict": model.state_dict()}, ckpt_path)
+
+    engine = PlantDiagnosticEngine(checkpoint_path=ckpt_path, q_hat=0.9822)
+    res = engine.diagnose_image(Image.new("RGB", (400, 300), color=(40, 100, 30)))
+
+    assert res["saliency_mask"].shape == (224, 224)
+    assert 1 <= res["conformal_set_size"] <= 38
+    assert len(res["top3_candidates"]) == 3
+    assert res["inference_ms"] >= 0.0
+    assert "organic" in res["treatment_advisory"]

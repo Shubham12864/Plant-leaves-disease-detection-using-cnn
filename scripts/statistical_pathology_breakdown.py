@@ -9,6 +9,7 @@ Evaluates the Unified Gated Plant CNN on the field test benchmark:
 """
 from pathlib import Path
 import json
+import sys
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -17,66 +18,26 @@ import matplotlib.pyplot as plt
 import torch
 import torchvision.transforms.functional as TF
 
-from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.plant_disease.diagnostic_engine import compute_joint_probabilities
+from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+from src.plant_disease.taxonomy import (
+    CLASSES_38,
+    CLASS_TO_IDX,
+    CROPS_14,
+    CLASS_TO_CROP_IDX,
+    PLANTDOC_TO_PV_MAP,
+    IMAGENET_MEAN,
+    IMAGENET_STD,
+    preprocess_pil_image,
+)
+
 CHECKPOINT_PATH = ROOT / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt"
 OUTPUT_DIR = ROOT / "reports" / "unified_extended"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-CLASSES_38 = [
-    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
-    'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew', 'Cherry_(including_sour)___healthy',
-    'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', 'Corn_(maize)___Common_rust_',
-    'Corn_(maize)___Northern_Leaf_Blight', 'Corn_(maize)___healthy', 'Grape___Black_rot',
-    'Grape___Esca_(Black_Measles)', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 'Grape___healthy',
-    'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot', 'Peach___healthy',
-    'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 'Potato___Early_blight',
-    'Potato___Late_blight', 'Potato___healthy', 'Raspberry___healthy', 'Soybean___healthy',
-    'Squash___Powdery_mildew', 'Strawberry___Leaf_scorch', 'Strawberry___healthy',
-    'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight',
-    'Tomato___Leaf_Mold', 'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite',
-    'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus',
-    'Tomato___healthy'
-]
-CLASS_TO_IDX = {c: i for i, c in enumerate(CLASSES_38)}
-CROPS_14 = sorted(list(set(c.split('___')[0] for c in CLASSES_38)))
-CROP_TO_IDX = {cr: i for i, cr in enumerate(CROPS_14)}
-CLASS_TO_CROP_IDX = {i: CROP_TO_IDX[c.split('___')[0]] for i, c in enumerate(CLASSES_38)}
-
-PLANTDOC_TO_PV_MAP = {
-    'Apple Scab Leaf': 'Apple___Apple_scab',
-    'Apple leaf': 'Apple___healthy',
-    'Apple rust leaf': 'Apple___Cedar_apple_rust',
-    'Bell_pepper leaf': 'Pepper,_bell___healthy',
-    'Bell_pepper leaf spot': 'Pepper,_bell___Bacterial_spot',
-    'Blueberry leaf': 'Blueberry___healthy',
-    'Cherry leaf': 'Cherry_(including_sour)___healthy',
-    'Corn Gray leaf spot': 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot',
-    'Corn leaf blight': 'Corn_(maize)___Northern_Leaf_Blight',
-    'Corn rust leaf': 'Corn_(maize)___Common_rust_',
-    'Peach leaf': 'Peach___healthy',
-    'Potato leaf early blight': 'Potato___Early_blight',
-    'Potato leaf late blight': 'Potato___Late_blight',
-    'Potato leaf': 'Potato___healthy',
-    'Raspberry leaf': 'Raspberry___healthy',
-    'Soyabean leaf': 'Soybean___healthy',
-    'Squash Powdery mildew leaf': 'Squash___Powdery_mildew',
-    'Strawberry leaf': 'Strawberry___healthy',
-    'Tomato Early blight leaf': 'Tomato___Early_blight',
-    'Tomato Septoria leaf spot': 'Tomato___Septoria_leaf_spot',
-    'Tomato leaf': 'Tomato___healthy',
-    'Tomato leaf bacterial spot': 'Tomato___Bacterial_spot',
-    'Tomato leaf late blight': 'Tomato___Late_blight',
-    'Tomato leaf mosaic virus': 'Tomato___Tomato_mosaic_virus',
-    'Tomato leaf yellow virus': 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
-    'Tomato mold leaf': 'Tomato___Leaf_Mold',
-    'grape leaf': 'Grape___healthy',
-    'grape leaf black rot': 'Grape___Black_rot'
-}
-
-IMAGENET_MEAN = [0.485, 0.456, 0.406]
-IMAGENET_STD = [0.229, 0.224, 0.225]
 
 
 def load_model():
@@ -111,6 +72,7 @@ def main():
     y_true_d = []
     y_true_c = []
     y_pred_d = []
+    y_pred_joint = []
     y_pred_c = []
     top3_correct = 0
     top5_correct = 0
@@ -118,7 +80,7 @@ def main():
     for img_p, d_idx, c_idx, _, _ in samples:
         try:
             with Image.open(img_p) as raw:
-                img_rgb = raw.convert("RGB").resize((224, 224))
+                img_rgb = preprocess_pil_image(raw, target_size=224, center_crop=True)
             tensor = TF.to_tensor(img_rgb)
             tensor = TF.normalize(tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD).unsqueeze(0)
 
@@ -127,16 +89,19 @@ def main():
                 d_probs = torch.softmax(d_logits, dim=-1)[0].numpy()
                 c_probs = torch.softmax(c_logits, dim=-1)[0].numpy()
 
+            joint_probs = compute_joint_probabilities(d_probs, c_probs)
             pred_d = int(np.argmax(d_probs))
+            pred_j = int(np.argmax(joint_probs))
             pred_c = int(np.argmax(c_probs))
 
             y_true_d.append(d_idx)
             y_true_c.append(c_idx)
             y_pred_d.append(pred_d)
+            y_pred_joint.append(pred_j)
             y_pred_c.append(pred_c)
 
-            top3 = np.argsort(d_probs)[::-1][:3]
-            top5 = np.argsort(d_probs)[::-1][:5]
+            top3 = np.argsort(joint_probs)[::-1][:3]
+            top5 = np.argsort(joint_probs)[::-1][:5]
             if d_idx in top3:
                 top3_correct += 1
             if d_idx in top5:
@@ -147,10 +112,12 @@ def main():
     y_true_d = np.array(y_true_d)
     y_true_c = np.array(y_true_c)
     y_pred_d = np.array(y_pred_d)
+    y_pred_joint = np.array(y_pred_joint)
     y_pred_c = np.array(y_pred_c)
     n = len(y_true_d)
 
     top1_acc = np.mean(y_true_d == y_pred_d)
+    joint_top1_acc = np.mean(y_true_d == y_pred_joint)
     top3_acc = top3_correct / n
     top5_acc = top5_correct / n
     crop_acc = np.mean(y_true_c == y_pred_c)
@@ -222,7 +189,9 @@ def main():
 
     # Save summary
     benchmark_summary = {
+        "evaluated_samples": int(n),
         "top1_disease_accuracy": float(top1_acc),
+        "joint_conditioned_top1_accuracy": float(joint_top1_acc),
         "top3_disease_accuracy": float(top3_acc),
         "top5_disease_accuracy": float(top5_acc),
         "crop_family_accuracy": float(crop_acc),

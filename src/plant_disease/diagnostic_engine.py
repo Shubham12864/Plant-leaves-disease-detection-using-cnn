@@ -1,10 +1,12 @@
 """Interactive Diagnostic Engine for Unified Gated Plant CNN.
 
-Provides single-image inference, hierarchical diagnosis, conformal prediction set
-computation, and Free Helmholtz Energy out-of-distribution verification.
+Provides single-image inference, hierarchical diagnosis, calibrated conformal
+prediction set computation, Helmholtz Free Energy OOD checks, and pathogen-accurate
+agronomic advisories.
 """
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+import time
+from typing import Dict, Optional
 import numpy as np
 from PIL import Image
 
@@ -12,110 +14,145 @@ import torch
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 
-from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+try:
+    from .models.unified_gated_cnn import build_unified_plant_cnn
+    from .taxonomy import (
+        CLASSES_38,
+        CLASS_TO_CROP_IDX,
+        CROPS_14,
+        IMAGENET_MEAN,
+        IMAGENET_STD,
+        get_treatment_for_disease,
+        preprocess_pil_image,
+    )
+except ImportError:
+    from src.plant_disease.models.unified_gated_cnn import build_unified_plant_cnn
+    from src.plant_disease.taxonomy import (
+        CLASSES_38,
+        CLASS_TO_CROP_IDX,
+        CROPS_14,
+        IMAGENET_MEAN,
+        IMAGENET_STD,
+        get_treatment_for_disease,
+        preprocess_pil_image,
+    )
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CHECKPOINT = ROOT / "reports" / "unified_extended" / "unified_gated_plant_cnn_extended_best.pt"
+CROP_IDX_LIST = [CLASS_TO_CROP_IDX[i] for i in range(len(CLASSES_38))]
 
-CLASSES_38 = [
-    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
-    'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew', 'Cherry_(including_sour)___healthy',
-    'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', 'Corn_(maize)___Common_rust_',
-    'Corn_(maize)___Northern_Leaf_Blight', 'Corn_(maize)___healthy', 'Grape___Black_rot',
-    'Grape___Esca_(Black_Measles)', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 'Grape___healthy',
-    'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot', 'Peach___healthy',
-    'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 'Potato___Early_blight',
-    'Potato___Late_blight', 'Potato___healthy', 'Raspberry___healthy', 'Soybean___healthy',
-    'Squash___Powdery_mildew', 'Strawberry___Leaf_scorch', 'Strawberry___healthy',
-    'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight',
-    'Tomato___Leaf_Mold', 'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite',
-    'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus',
-    'Tomato___healthy'
-]
-CLASS_TO_IDX = {c: i for i, c in enumerate(CLASSES_38)}
-CROPS_14 = sorted(list(set(c.split('___')[0] for c in CLASSES_38)))
-CROP_TO_IDX = {cr: i for i, cr in enumerate(CROPS_14)}
-CLASS_TO_CROP_IDX = {i: CROP_TO_IDX[c.split('___')[0]] for i, c in enumerate(CLASSES_38)}
 
-IMAGENET_MEAN = [0.485, 0.456, 0.406]
-IMAGENET_STD = [0.229, 0.224, 0.225]
+def compute_joint_probabilities(disease_probs: np.ndarray, crop_probs: np.ndarray) -> np.ndarray:
+    """Apply hierarchical botanical conditioning: P_joint(d) proportional to P(d|x) * P(crop(d)|x)."""
+    joint = disease_probs * crop_probs[CROP_IDX_LIST]
+    total = float(joint.sum())
+    if total > 0.0:
+        return joint / total
+    return disease_probs
 
 
 class PlantDiagnosticEngine:
     """Production Diagnostic Engine for Agricultural Field Pathology."""
 
-    def __init__(self, checkpoint_path: Optional[Path] = None, q_hat: float = 0.9822, energy_threshold: float = -3.5):
-        self.checkpoint_path = checkpoint_path or DEFAULT_CHECKPOINT
-        self.q_hat = q_hat
-        self.energy_threshold = energy_threshold
+    def __init__(
+        self,
+        checkpoint_path: Optional[Path] = None,
+        q_hat: float = 0.9822,
+        energy_threshold: float = -3.5,
+        center_crop: bool = True,
+    ):
+        self.checkpoint_path = Path(checkpoint_path) if checkpoint_path else DEFAULT_CHECKPOINT
+        self.q_hat = float(q_hat)
+        self.energy_threshold = float(energy_threshold)
+        self.center_crop = center_crop
 
         self.model = build_unified_plant_cnn(num_crops=len(CROPS_14), num_diseases=len(CLASSES_38))
-        ckpt = torch.load(self.checkpoint_path, map_location="cpu", weights_only=False)
-        state = ckpt.get("model_state_dict", ckpt)
+        try:
+            ckpt = torch.load(self.checkpoint_path, map_location="cpu", weights_only=True)
+        except Exception:
+            ckpt = torch.load(self.checkpoint_path, map_location="cpu", weights_only=False)
+        state = ckpt.get("model_state_dict", ckpt.get("model", ckpt)) if isinstance(ckpt, dict) else ckpt
         state = {(k[7:] if k.startswith("module.") else k): v for k, v in state.items()}
         self.model.load_state_dict(state)
         self.model.eval()
 
     def diagnose_image(self, img_pil: Image.Image) -> Dict:
         """Run single-pass unified inference on an image."""
-        img_rgb = img_pil.convert("RGB").resize((224, 224))
+        img_rgb = preprocess_pil_image(img_pil, target_size=224, center_crop=self.center_crop)
         tensor = TF.to_tensor(img_rgb)
         tensor = TF.normalize(tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD).unsqueeze(0)
 
+        t0 = time.perf_counter()
         with torch.no_grad():
             d_logits, c_logits, mask = self.model(tensor)
             d_probs = torch.softmax(d_logits, dim=-1)[0].numpy()
             c_probs = torch.softmax(c_logits, dim=-1)[0].numpy()
             energy = self.model.compute_energy(d_logits).item()
+        inference_ms = (time.perf_counter() - t0) * 1000.0
 
-        # Upsample mask to image size
+        # Upsample 14x14 mask to image size
         mask_high = F.interpolate(mask, size=(224, 224), mode="bilinear", align_corners=False)[0, 0].numpy()
 
-        # Top predictions
-        top_d_idx = int(np.argmax(d_probs))
+        # Hierarchical joint conditioning
+        joint_probs = compute_joint_probabilities(d_probs, c_probs)
+        top_d_idx = int(np.argmax(joint_probs))
         top_c_idx = int(np.argmax(c_probs))
 
-        # Conformal Prediction Set (APS)
-        sorted_d = np.argsort(d_probs)[::-1]
-        sorted_probs = d_probs[sorted_d]
-        cum_probs = np.cumsum(sorted_probs)
-        cutoff = np.searchsorted(cum_probs, self.q_hat)
-        conformal_indices = sorted_d[:cutoff + 1]
+        # Calibrated Adaptive Prediction Set (APS) over conditioned joint probabilities
+        sorted_d = np.argsort(joint_probs)[::-1]
+        cum_probs = np.cumsum(joint_probs[sorted_d])
+        cutoff = min(int(np.searchsorted(cum_probs, self.q_hat)), len(sorted_d) - 1)
+        conformal_indices = sorted_d[: cutoff + 1]
 
         conformal_set = [
             {
                 "disease": CLASSES_38[idx],
                 "clean_name": CLASSES_38[idx].split("___")[-1].replace("_", " "),
                 "crop": CROPS_14[CLASS_TO_CROP_IDX[idx]].replace("_", " "),
-                "confidence": float(d_probs[idx])
+                "confidence": float(joint_probs[idx]),
             }
-            for idx in conformal_indices[:5]  # Top 5 in set
+            for idx in conformal_indices[:5]
         ]
 
-        # Top 3 Candidates
-        top3_indices = sorted_d[:3]
         top3 = [
             {
                 "disease": CLASSES_38[idx],
                 "clean_name": CLASSES_38[idx].split("___")[-1].replace("_", " "),
-                "confidence": float(d_probs[idx])
+                "crop": CROPS_14[CLASS_TO_CROP_IDX[idx]].replace("_", " "),
+                "confidence": float(joint_probs[idx]),
             }
-            for idx in top3_indices
+            for idx in sorted_d[:3]
         ]
 
-        # OOD Status via Helmholtz Free Energy
+        top5 = [
+            {
+                "disease": CLASSES_38[idx],
+                "clean_name": CLASSES_38[idx].split("___")[-1].replace("_", " "),
+                "crop": CROPS_14[CLASS_TO_CROP_IDX[idx]].replace("_", " "),
+                "confidence": float(joint_probs[idx]),
+            }
+            for idx in sorted_d[:5]
+        ]
+
+        pred_disease = CLASSES_38[top_d_idx]
         is_in_distribution = bool(energy < self.energy_threshold)
 
         return {
-            "predicted_disease": CLASSES_38[top_d_idx],
-            "disease_clean_name": CLASSES_38[top_d_idx].split("___")[-1].replace("_", " "),
-            "disease_confidence": float(d_probs[top_d_idx]),
+            "preprocessed_image": img_rgb,
+            "predicted_disease": pred_disease,
+            "disease_clean_name": pred_disease.split("___")[-1].replace("_", " "),
+            "disease_confidence": float(joint_probs[top_d_idx]),
+            "marginal_disease_confidence": float(d_probs[top_d_idx]),
             "predicted_crop": CROPS_14[top_c_idx].replace("_", " "),
             "crop_confidence": float(c_probs[top_c_idx]),
             "conformal_prediction_set": conformal_set,
+            "conformal_set_size": int(len(conformal_indices)),
             "top3_candidates": top3,
+            "top5_candidates": top5,
             "free_energy": float(energy),
             "is_foliar_leaf": is_in_distribution,
             "saliency_mean": float(mask_high.mean()),
-            "saliency_mask": mask_high
+            "saliency_mask": mask_high,
+            "inference_ms": float(inference_ms),
+            "treatment_advisory": get_treatment_for_disease(pred_disease),
         }

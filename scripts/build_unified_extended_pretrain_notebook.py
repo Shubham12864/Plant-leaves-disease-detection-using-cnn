@@ -63,8 +63,9 @@ from PIL import Image
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 import torchvision.models as tv_models
+from torchvision import transforms
 import torchvision.transforms.functional as TF
 
 print(f"PyTorch Version: {torch.__version__}")
@@ -326,6 +327,7 @@ class UnifiedGatedPlantCNN(nn.Module):
 
         model_dict = self.state_dict()
         matched = {}
+        layer_scales = {}
         for k, v in state.items():
             if k in model_dict and model_dict[k].shape == v.shape:
                 matched[k] = v
@@ -347,6 +349,20 @@ class UnifiedGatedPlantCNN(nn.Module):
                 m_k = k.replace("features.6.", "downsample_layers.3.")
             elif k.startswith("features.7."):
                 m_k = k.replace("features.7.", "stages.3.")
+            elif k.startswith("classifier.0."):
+                m_k = k.replace("classifier.0.", "head.norm.")
+            elif k.startswith("classifier.2."):
+                m_k = k.replace("classifier.2.", "head.disease_head.")
+            elif k.startswith("norm."):
+                m_k = k.replace("norm.", "head.norm.")
+            elif k.startswith("disease_head."):
+                m_k = k.replace("disease_head.", "head.disease_head.")
+            elif k.startswith("crop_head."):
+                m_k = k.replace("crop_head.", "head.crop_head.")
+
+            if m_k.endswith(".layer_scale"):
+                layer_scales[m_k[: -len(".layer_scale")]] = v.reshape(-1)
+                continue
 
             m_k = (m_k.replace(".block.0.", ".dwconv.")
                       .replace(".block.2.", ".norm.")
@@ -356,9 +372,17 @@ class UnifiedGatedPlantCNN(nn.Module):
             if m_k in model_dict and model_dict[m_k].shape == v.shape:
                 matched[m_k] = v
 
+        for prefix, gamma in layer_scales.items():
+            w_key = f"{prefix}.pwconv2.weight"
+            b_key = f"{prefix}.pwconv2.bias"
+            if w_key in matched and matched[w_key].shape[0] == gamma.shape[0]:
+                matched[w_key] = matched[w_key] * gamma.view(-1, 1)
+            if b_key in matched and matched[b_key].shape[0] == gamma.shape[0]:
+                matched[b_key] = matched[b_key] * gamma
+
         model_dict.update(matched)
         self.load_state_dict(model_dict)
-        print(f"Loaded pretrained weights: matched {len(matched)} / {len(model_dict)} tensors.")
+        print(f"Loaded pretrained weights: matched {len(matched)} / {len(model_dict)} tensors (folded {len(layer_scales)} layer_scale tensors).")
         return len(matched)
 """)
 
@@ -370,21 +394,23 @@ if init_ckpt:
 model = model.to(device)
 
 class UnifiedGatedLoss(nn.Module):
-    def __init__(self, crop_weight=0.35, mask_l1_weight=0.05, energy_var_weight=0.02, label_smoothing=0.05):
+    def __init__(self, crop_weight=0.35, mask_reg_weight=0.08, energy_var_weight=0.02, target_area=0.35, label_smoothing=0.05):
         super().__init__()
         self.crop_weight = crop_weight
-        self.mask_l1_weight = mask_l1_weight
+        self.mask_reg_weight = mask_reg_weight
         self.energy_var_weight = energy_var_weight
+        self.target_area = target_area
         self.disease_ce = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
         self.crop_ce = nn.CrossEntropyLoss()
 
     def forward(self, d_logits, c_logits, mask, y_d, y_c):
         l_d = self.disease_ce(d_logits, y_d)
         l_c = self.crop_ce(c_logits, y_c)
-        l_mask = mask.mean()
+        # Encourage targeted leaf foreground sparsity + spatial contrast (prevents uniform zero collapse)
+        l_mask = torch.abs(mask.mean() - self.target_area) + 0.25 * F.relu(0.05 - mask.std())
         energy = -1.0 * torch.logsumexp(d_logits, dim=-1)
         l_energy = torch.var(energy)
-        total = l_d + self.crop_weight * l_c + self.mask_l1_weight * l_mask + self.energy_var_weight * l_energy
+        total = l_d + self.crop_weight * l_c + self.mask_reg_weight * l_mask + self.energy_var_weight * l_energy
         return total, l_d, l_c, l_mask
 
 criterion = UnifiedGatedLoss()
@@ -396,7 +422,7 @@ scaler = torch.amp.GradScaler('cuda') if torch.cuda.is_available() else None
 print("Model and loss initialized.")
 """)
 
-# 7. Fast Multi-Dataset Loader
+# 7. Domain-Balanced Multi-Dataset Loader (Strict PlantDoc vs PlantVillage Separation)
 add_code("""IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
@@ -417,6 +443,7 @@ class MultiDatasetLoader(Dataset):
         self.samples = samples
         self.is_train = is_train
         self.cc = FastMinkowskiColorConstancy(p=6.0)
+        self.train_jitter = transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.2, hue=0.05)
 
     def __len__(self):
         return len(self.samples)
@@ -426,71 +453,101 @@ class MultiDatasetLoader(Dataset):
         with Image.open(s["path"]) as raw:
             img = raw.convert("RGB")
 
-        # Fast pre-resize downscale for large field images (eliminates CPU bottlenecks)
-        if img.size[0] > 512 or img.size[1] > 512:
-            img = img.resize((256, 256), Image.BILINEAR)
-
         if self.is_train:
             if random.random() < 0.5:
                 img = self.cc(img)
+            img = self.train_jitter(img)
+            i, j, h, w = transforms.RandomResizedCrop.get_params(img, scale=(0.65, 1.0), ratio=(0.85, 1.15))
+            img = TF.resized_crop(img, i, j, h, w, [224, 224], interpolation=TF.InterpolationMode.BILINEAR)
             if random.random() < 0.5:
                 img = TF.hflip(img)
             if random.random() < 0.3:
                 img = TF.rotate(img, random.uniform(-15, 15))
+        else:
+            # Aspect-ratio preserving Resize(256) + CenterCrop(224)
+            img = TF.resize(img, 256, interpolation=TF.InterpolationMode.BILINEAR)
+            img = TF.center_crop(img, [224, 224])
 
-        img = img.resize((224, 224), Image.BILINEAR)
         tensor = TF.to_tensor(img)
         tensor = TF.normalize(tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD)
         return tensor, s["target_idx"], s["crop_idx"]
 
-# Fast Path Scanning
+# Strictly isolate PlantDoc real field test images from PlantVillage lab test images
 field_test = []
+lab_test = []
 seen_test = set()
 for root, _, files in os.walk("/kaggle/input"):
-    if "test" in root.lower():
-        for fname in files:
-            if fname.lower().endswith((".jpg", ".jpeg", ".png")):
-                fpath = os.path.join(root, fname)
-                parent_dir = os.path.basename(root)
-                target = resolve_plantdoc_class(parent_dir)
-                if target and target in CLASS_TO_IDX and fpath not in seen_test:
-                    seen_test.add(fpath)
-                    d_idx = CLASS_TO_IDX[target]
-                    field_test.append({
-                        "path": fpath,
-                        "target_class": target,
-                        "target_idx": d_idx,
-                        "crop_idx": CLASS_TO_CROP_IDX[d_idx]
-                    })
+    low = root.lower()
+    if "test" not in low:
+        continue
+    is_plantdoc = "plantdoc" in low
+    is_plantvillage = "plantvillage" in low
+    for fname in files:
+        if not fname.lower().endswith((".jpg", ".jpeg", ".png")):
+            continue
+        fpath = os.path.join(root, fname)
+        if fpath in seen_test:
+            continue
+        parent_dir = os.path.basename(root)
+        target = resolve_plantdoc_class(parent_dir) if is_plantdoc else (parent_dir if parent_dir in CLASS_TO_IDX else None)
+        if target and target in CLASS_TO_IDX:
+            seen_test.add(fpath)
+            d_idx = CLASS_TO_IDX[target]
+            item = {
+                "path": fpath,
+                "target_class": target,
+                "target_idx": d_idx,
+                "crop_idx": CLASS_TO_CROP_IDX[d_idx],
+            }
+            if is_plantdoc:
+                field_test.append(item)
+            elif is_plantvillage:
+                lab_test.append(item)
 
-train_pool = []
+train_field, train_lab = [], []
 seen_train = set()
 for root, _, files in os.walk("/kaggle/input"):
-    if "test" not in root.lower() and ("train" in root.lower() or "plantvillage" in root.lower()):
-        for fname in files:
-            if fname.lower().endswith((".jpg", ".jpeg", ".png")):
-                fpath = os.path.join(root, fname)
-                if fpath in seen_train:
-                    continue
-                parent_dir = os.path.basename(root)
-                target = resolve_plantdoc_class(parent_dir) or (parent_dir if parent_dir in CLASS_TO_IDX else None)
-                if target and target in CLASS_TO_IDX:
-                    seen_train.add(fpath)
-                    d_idx = CLASS_TO_IDX[target]
-                    train_pool.append({
-                        "path": fpath,
-                        "target_class": target,
-                        "target_idx": d_idx,
-                        "crop_idx": CLASS_TO_CROP_IDX[d_idx]
-                    })
+    low = root.lower()
+    if "test" in low:
+        continue
+    is_plantdoc = "plantdoc" in low and "train" in low
+    is_plantvillage = "plantvillage" in low and "train" in low
+    if not (is_plantdoc or is_plantvillage):
+        continue
+    for fname in files:
+        if not fname.lower().endswith((".jpg", ".jpeg", ".png")):
+            continue
+        fpath = os.path.join(root, fname)
+        if fpath in seen_train:
+            continue
+        parent_dir = os.path.basename(root)
+        target = resolve_plantdoc_class(parent_dir) if is_plantdoc else (parent_dir if parent_dir in CLASS_TO_IDX else None)
+        if target and target in CLASS_TO_IDX:
+            seen_train.add(fpath)
+            d_idx = CLASS_TO_IDX[target]
+            item = {
+                "path": fpath,
+                "target_class": target,
+                "target_idx": d_idx,
+                "crop_idx": CLASS_TO_CROP_IDX[d_idx],
+            }
+            if is_plantdoc:
+                train_field.append(item)
+            else:
+                train_lab.append(item)
 
-random.shuffle(train_pool)
-# Balanced 12,000 image pool
-train_subset = train_pool[:min(len(train_pool), 12000)]
-print(f"Total Unified Training Pool: {len(train_subset)}, Field Test Set: {len(field_test)}")
+train_pool = train_field + train_lab
+n_f, n_l = max(1, len(train_field)), max(1, len(train_lab))
+# 50/50 Domain-balanced weights so field photos are never drowned out by PlantVillage
+sample_weights = [0.5 / n_f] * len(train_field) + [0.5 / n_l] * len(train_lab)
+sampler = WeightedRandomSampler(sample_weights, num_samples=min(len(train_pool), 12000), replacement=True)
 
-train_loader = DataLoader(MultiDatasetLoader(train_subset, is_train=True), batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
+print(f"Train Pool -> Field: {len(train_field)}, Lab: {len(train_lab)} (50/50 Domain-Balanced Sampler)")
+print(f"Pure Field Test Set (PlantDoc): {len(field_test)} | Lab Test Set (PlantVillage): {len(lab_test)}")
+
+train_loader = DataLoader(MultiDatasetLoader(train_pool, is_train=True), batch_size=64, sampler=sampler, num_workers=2, pin_memory=True)
 test_loader = DataLoader(MultiDatasetLoader(field_test, is_train=False), batch_size=64, shuffle=False, num_workers=2, pin_memory=True)
+lab_loader = DataLoader(MultiDatasetLoader(lab_test[:1000], is_train=False), batch_size=64, shuffle=False, num_workers=2, pin_memory=True)
 """)
 
 # 8. Evaluation Engine
@@ -514,11 +571,12 @@ add_code("""def evaluate_unified(model, loader):
                     consistent += 1
             total += y_d.size(0)
 
-    return correct_d / max(1, total), correct_c / max(1, total), consistent / max(1, total), np.mean(mask_means)
+    return correct_d / max(1, total), correct_c / max(1, total), consistent / max(1, total), float(np.mean(mask_means)) if mask_means else 0.0
 
 acc_d_0, acc_c_0, cons_0, mask_m_0 = evaluate_unified(model, test_loader)
-print(f"Initial Warm-Start Field Metrics (Unified Architecture):")
-print(f"  Disease Accuracy:        {acc_d_0*100:.2f}%")
+lab_d_0, _, _, _ = evaluate_unified(model, lab_loader) if len(lab_test) > 0 else (0.0, 0.0, 0.0, 0.0)
+print(f"Initial Warm-Start Pure PlantDoc Field Metrics (n={len(field_test)}):")
+print(f"  Field Disease Accuracy:  {acc_d_0*100:.2f}% (Lab PV Sample: {lab_d_0*100:.2f}%)")
 print(f"  Crop Family Accuracy:    {acc_c_0*100:.2f}%")
 print(f"  Cross-Crop Consistency:  {cons_0*100:.2f}%")
 print(f"  Mean Saliency Gating:    {mask_m_0:.3f}")
@@ -528,6 +586,11 @@ print(f"  Mean Saliency Gating:    {mask_m_0:.3f}")
 add_code("""best_acc = acc_d_0
 history = []
 save_path = "/kaggle/working/unified_gated_plant_cnn_extended_best.pt"
+torch.save({
+    "model_state_dict": model.state_dict(),
+    "best_acc": best_acc,
+    "epoch": 0
+}, save_path)
 
 print("==================================================")
 print("EXTENDED TRAINING: UNIFIED GATED CONVNEXT-V2 (10 EPOCHS)")
@@ -562,13 +625,15 @@ for epoch in range(1, EPOCHS + 1):
     avg_loss = running_loss / len(train_loader)
 
     acc_d, acc_c, cons, mask_m = evaluate_unified(model, test_loader)
+    lab_d, _, _, _ = evaluate_unified(model, lab_loader) if len(lab_test) > 0 else (0.0, 0.0, 0.0, 0.0)
     lr_curr = optimizer.param_groups[0]["lr"]
-    print(f"Epoch [{epoch:02d}/{EPOCHS}] ({ep_time:.1f}s | lr={lr_curr:.1e}) - Loss: {avg_loss:.4f} | Disease Acc: {acc_d*100:.2f}% | Crop Acc: {acc_c*100:.2f}% | Consistency: {cons*100:.2f}% | Saliency: {mask_m:.3f}")
+    print(f"Epoch [{epoch:02d}/{EPOCHS}] ({ep_time:.1f}s | lr={lr_curr:.1e}) - Loss: {avg_loss:.4f} | Field Disease Acc: {acc_d*100:.2f}% | Lab Acc: {lab_d*100:.2f}% | Crop Acc: {acc_c*100:.2f}% | Consistency: {cons*100:.2f}% | Saliency: {mask_m:.3f}")
 
     history.append({
         "epoch": epoch,
         "loss": avg_loss,
         "disease_acc": acc_d,
+        "lab_disease_acc": lab_d,
         "crop_acc": acc_c,
         "consistency": cons,
         "saliency_mean": mask_m,

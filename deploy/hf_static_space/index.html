@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Plant Leaf Disease Detection Using CNN</title>
-  <meta name="description" content="100% pure 2D CNN (ConvNeXt-V2 with GRN) with Differentiable Saliency Gating and Conformal Risk Control running in-browser via ONNX Runtime Web.">
+  <meta name="description" content="Pure 2D CNN (ConvNeXt-V2 with GRN) with Differentiable Saliency Gating and Conformal Risk Control running offline in-browser via WebGPU/WebAssembly.">
   <meta name="theme-color" content="#16a34a">
+  <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://huggingface.co">
 
-  <!-- ONNX Runtime Web (WebAssembly / WebGL) -->
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.min.js"></script>
+  <!-- Pinned ONNX Runtime Web (v1.21.0) with verified SHA-384 Subresource Integrity -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.min.js"
+    integrity="sha384-ptI8iyyOcINc8kC8ZGnLexw29V7PfIaX46b1GMjaX2QKGvUPH8Jrp5U81Mh4TDp4"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
 
   <style>
     :root {
+      color-scheme: dark;
       --bg: #090d16;
       --card-bg: #111827;
       --card-border: #1f2937;
@@ -41,6 +47,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
+      accent-color: var(--accent);
       font-family: var(--font-sans);
       line-height: 1.5;
       min-height: 100dvh;
@@ -49,11 +56,23 @@
       padding: 1rem;
     }
 
+    .visually-hidden {
+      position: absolute !important;
+      clip-path: inset(50%) !important;
+      overflow: hidden !important;
+      width: 1px !important;
+      height: 1px !important;
+      margin: -1px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      white-space: nowrap !important;
+    }
+
     header {
       text-align: center;
       max-width: 900px;
-      margin: 0 auto 1.5rem auto;
-      padding-top: 1rem;
+      margin: 0 auto 1.25rem auto;
+      padding-top: 0.75rem;
     }
 
     h1 {
@@ -62,15 +81,7 @@
       background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #10b981 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-bar {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.4rem;
     }
 
     .badge {
@@ -98,7 +109,6 @@
       margin: 0 auto;
     }
 
-    /* Container Query Layout */
     .app-container {
       max-width: 1200px;
       width: 100%;
@@ -134,18 +144,24 @@
       color: var(--text);
     }
 
-    /* Drop Zone / Camera */
+    h3.section-subtitle {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 0.25rem;
+    }
+
     .dropzone {
       border: 2px dashed #374151;
       border-radius: var(--radius);
       padding: 1.5rem 1rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
       background: rgba(17, 24, 39, 0.5);
       position: relative;
     }
-    .dropzone:hover, .dropzone.dragover {
+    .dropzone:hover, .dropzone.dragover, .dropzone:focus-within {
       border-color: var(--accent);
       background: var(--accent-dim);
     }
@@ -159,7 +175,6 @@
       height: 100%;
     }
 
-    /* Samples section */
     .samples-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -172,14 +187,19 @@
       padding: 0.35rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      color: inherit;
+      font: inherit;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
-    .sample-btn:hover {
+    .sample-btn:hover, .sample-btn:focus-visible {
       border-color: var(--accent);
       transform: translateY(-2px);
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
     .sample-btn img {
       width: 100%;
+      height: auto;
       aspect-ratio: 1;
       object-fit: cover;
       border-radius: 6px;
@@ -195,7 +215,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Image Preview & Canvas */
     .preview-box {
       position: relative;
       width: 100%;
@@ -235,8 +254,27 @@
       flex: 1;
       accent-color: var(--accent);
     }
+    @supports not (accent-color: auto) {
+      .slider-row input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+      }
+      .slider-row input[type="range"]::-webkit-slider-runnable-track {
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(to right, var(--accent) var(--progress, 75%), #374151 var(--progress, 75%));
+      }
+      .slider-row input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-top: -4px;
+      }
+    }
 
-    /* Diagnostics Output */
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -257,12 +295,36 @@
       margin-bottom: 0.25rem;
     }
     .metric-val {
-      font-size: 1.2rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text);
     }
+    .metric-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
-    /* Progress bars */
+    .conformal-box {
+      background: #1f2937;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #374151;
+    }
+    .conformal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .conformal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
     .bar-row {
       display: flex;
       flex-direction: column;
@@ -273,6 +335,11 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
+      color: #d1d5db;
+    }
+    .bar-pct {
+      font-weight: 600;
+      color: #86efac;
     }
     .bar-track {
       height: 8px;
@@ -287,7 +354,6 @@
       transition: width 0.3s ease;
     }
 
-    /* Advisory section */
     .advisory-box {
       background: rgba(31, 41, 55, 0.5);
       border-left: 4px solid var(--accent);
@@ -298,21 +364,59 @@
     .advisory-row {
       margin-bottom: 0.5rem;
     }
+    .advisory-row:last-child {
+      margin-bottom: 0;
+    }
     .advisory-row strong {
       color: #86efac;
     }
 
-    /* Status bar */
     #statusBanner {
-      padding: 0.6rem 1rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0.65rem 1rem;
       border-radius: 8px;
       font-size: 0.85rem;
       font-weight: 600;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
       gap: 0.5rem;
       background: #1e293b;
       color: #94a3b8;
+    }
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex: 1;
+      min-width: 240px;
+    }
+    .status-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-small {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-small:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    #downloadProgress {
+      width: 140px;
+      height: 8px;
+      border-radius: 4px;
+      border: none;
     }
     .spinner {
       width: 14px;
@@ -321,6 +425,7 @@
       border-top-color: transparent;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -345,121 +450,125 @@
   <header>
     <h1>🌿 Plant Leaf Disease Detection</h1>
     <p class="subtitle">
-      Instant plant leaf pathology diagnosis and actionable treatment protocols.
+      In-browser plant pathology diagnosis, spatial lesion saliency gating, and pathogen-specific treatment protocols.
     </p>
   </header>
 
-  <div id="statusBanner">
-    <div class="spinner" id="statusSpinner"></div>
-    <span id="statusText">Initializing ONNX Runtime WebAssembly engine & downloading model (27.7 MB)...</span>
+  <div id="statusBanner" role="status" aria-live="polite">
+    <div class="status-left">
+      <div class="spinner" id="statusSpinner" aria-hidden="true"></div>
+      <span id="statusText">Initializing ONNX Runtime engine &amp; checking offline IndexedDB cache...</span>
+    </div>
+    <div class="status-controls">
+      <progress id="downloadProgress" value="0" max="100" hidden></progress>
+      <span class="badge" id="backendBadge">Provider: initializing</span>
+      <button type="button" class="btn-small" id="retryBtn" hidden>Retry Download</button>
+      <button type="button" class="btn-small" id="refreshCacheBtn" title="Clear IndexedDB cached model and re-download">Clear Cache</button>
+    </div>
   </div>
 
   <main class="app-container" style="margin-top: 1rem;">
     <!-- LEFT COLUMN: Input & Leaf Controls -->
-    <section class="card">
-      <div class="card-title">
-        <span>📸 Capture or Upload Leaf</span>
-      </div>
+    <section class="card" aria-labelledby="inputCardHeading">
+      <h2 class="card-title" id="inputCardHeading">
+        <span aria-hidden="true">📸</span> Capture or Upload Leaf
+      </h2>
 
       <div class="dropzone" id="dropzone">
+        <label for="fileInput" class="visually-hidden">Upload leaf image or take a camera photo</label>
         <input type="file" id="fileInput" accept="image/*" capture="environment">
         <p style="font-weight:600; font-size:0.95rem; margin-bottom:0.25rem;">Tap to take photo or drop leaf image</p>
-        <p style="color:var(--text-muted); font-size:0.8rem;">Supports smartphone cameras, JPEG, PNG, WebP</p>
+        <p style="color:var(--text-muted); font-size:0.8rem;">Center-cropped automatically to preserve aspect ratio</p>
       </div>
 
-      <div class="card-title" style="font-size:0.95rem; margin-top:0.5rem;">
-        <span>🧪 Or Try Benchmark Leaf Samples:</span>
-      </div>
-      <div class="samples-grid">
-        <div class="sample-btn" onclick="loadSample('samples/tomato_early_blight.jpg')">
-          <img src="samples/tomato_early_blight.jpg" alt="Tomato Early Blight">
+      <h3 class="section-subtitle">🧪 Or Try Benchmark Leaf Samples:</h3>
+      <div class="samples-grid" id="samplesGrid">
+        <button type="button" class="sample-btn" data-sample="samples/tomato_early_blight.jpg">
+          <img src="samples/tomato_early_blight.jpg" alt="Tomato Early Blight" width="120" height="120">
           <span>🍅 Tomato Blight</span>
-        </div>
-        <div class="sample-btn" onclick="loadSample('samples/corn_common_rust.jpg')">
-          <img src="samples/corn_common_rust.jpg" alt="Corn Common Rust">
+        </button>
+        <button type="button" class="sample-btn" data-sample="samples/corn_common_rust.jpg">
+          <img src="samples/corn_common_rust.jpg" alt="Corn Common Rust" width="120" height="120">
           <span>🌽 Corn Rust</span>
-        </div>
-        <div class="sample-btn" onclick="loadSample('samples/apple_scab.jpg')">
-          <img src="samples/apple_scab.jpg" alt="Apple Scab">
+        </button>
+        <button type="button" class="sample-btn" data-sample="samples/apple_scab.jpg">
+          <img src="samples/apple_scab.jpg" alt="Apple Scab" width="120" height="120">
           <span>🍏 Apple Scab</span>
-        </div>
-        <div class="sample-btn" onclick="loadSample('samples/potato_late_blight.jpg')">
-          <img src="samples/potato_late_blight.jpg" alt="Potato Late Blight">
+        </button>
+        <button type="button" class="sample-btn" data-sample="samples/potato_late_blight.jpg">
+          <img src="samples/potato_late_blight.jpg" alt="Potato Late Blight" width="120" height="120">
           <span>🥔 Potato Blight</span>
-        </div>
-        <div class="sample-btn" onclick="loadSample('samples/apple_healthy.jpg')">
-          <img src="samples/apple_healthy.jpg" alt="Apple Healthy">
+        </button>
+        <button type="button" class="sample-btn" data-sample="samples/apple_healthy.jpg">
+          <img src="samples/apple_healthy.jpg" alt="Apple Healthy" width="120" height="120">
           <span>🍏 Apple Healthy</span>
-        </div>
+        </button>
       </div>
 
-      <!-- Preview + Gating Mask Overlay -->
       <div class="preview-box">
-        <canvas id="previewCanvas" width="224" height="224"></canvas>
-        <canvas id="maskCanvas" width="224" height="224"></canvas>
+        <canvas id="previewCanvas" width="224" height="224" aria-label="Preprocessed leaf preview"></canvas>
+        <canvas id="maskCanvas" width="224" height="224" aria-hidden="true"></canvas>
       </div>
 
       <div class="slider-row">
-        <span>Saliency Mask Opacity:</span>
-        <input type="range" id="opacitySlider" min="0" max="100" value="75">
+        <label for="opacitySlider">Saliency Mask Opacity:</label>
+        <input type="range" id="opacitySlider" min="0" max="100" value="75" style="--progress: 75%;">
         <span id="opacityVal">75%</span>
       </div>
     </section>
 
     <!-- RIGHT COLUMN: Scientific Diagnostics & Treatment Advisory -->
-    <section class="card">
-      <div class="card-title">
-        <span>🔬 Real-Time Diagnostic Engine</span>
+    <section class="card" aria-labelledby="diagCardHeading">
+      <div class="conformal-header" style="margin-bottom:0;">
+        <h2 class="card-title" id="diagCardHeading">
+          <span aria-hidden="true">🔬</span> Real-Time Diagnostic Engine
+        </h2>
+        <span class="badge" id="latencyBadge">Latency: — ms</span>
       </div>
 
       <div class="metric-grid">
         <div class="metric-tile">
           <div class="metric-label">Predicted Pathology</div>
-          <div class="metric-val" id="topDiseaseName" style="font-size:1.05rem; color:#86efac;">—</div>
+          <div class="metric-val" id="topDiseaseName" style="color:#86efac;">—</div>
         </div>
         <div class="metric-tile">
           <div class="metric-label">Botanical Crop Family</div>
-          <div class="metric-val" id="topCropName" style="font-size:1.05rem;">—</div>
+          <div class="metric-val" id="topCropName">—</div>
         </div>
         <div class="metric-tile">
           <div class="metric-label">Autonomous Saliency Gate</div>
-          <div class="metric-val" id="gatingVal" style="font-size:1.05rem;">—</div>
-          <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;" id="gatingSubtext">Background clutter suppressed</div>
+          <div class="metric-val" id="gatingVal">—</div>
+          <div class="metric-sub" id="gatingSubtext">Background clutter suppressed</div>
         </div>
         <div class="metric-tile">
           <div class="metric-label">Helmholtz Free Energy</div>
-          <div class="metric-val" id="energyVal" style="font-size:1.05rem;">—</div>
-          <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;" id="energySubtext">OOD Non-Plant Detection</div>
+          <div class="metric-val" id="energyVal">—</div>
+          <div class="metric-sub" id="energySubtext">OOD Non-Plant Detection</div>
         </div>
       </div>
 
-      <!-- Conformal Prediction Set -->
-      <div style="background:#1f2937; padding:0.75rem 1rem; border-radius:8px; border:1px solid #374151;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+      <div class="conformal-box">
+        <div class="conformal-header">
           <strong style="font-size:0.85rem; color:#f3f4f6;">🛡️ Split Conformal Safe Set (95% Safety Guarantee)</strong>
           <span class="badge badge-accent" id="conformalBadge">q̂ = 0.9822</span>
         </div>
         <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.5rem;" id="conformalExplanation">
-          Mathematically guaranteed prediction set that contains the true pathology with 95% statistical coverage.
+          Adaptive Prediction Set using calibrated quantile q̂ = 0.9822 (showing up to top 5 candidates).
         </p>
-        <div id="conformalTags" style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+        <div id="conformalTags" class="conformal-tags">
           <span style="font-size:0.8rem; color:var(--text-muted);">No diagnosis yet.</span>
         </div>
       </div>
 
-      <!-- Top Disease Probabilities -->
       <div>
-        <div style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">Diagnostic Probability Distribution:</div>
-        <div id="probBars">
-          <!-- Populated dynamically -->
-        </div>
+        <h3 class="section-subtitle" style="margin-bottom:0.5rem;">Diagnostic Probability Distribution</h3>
+        <div id="probBars"></div>
       </div>
 
-      <!-- Agronomic Treatment Protocol -->
       <div>
-        <div style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">🌱 Agronomic Treatment Advisory:</div>
+        <h3 class="section-subtitle" style="margin-bottom:0.5rem;">🌱 Agronomic Treatment Advisory</h3>
         <div class="advisory-box" id="advisoryBox">
-          <p style="color:var(--text-muted);">Select or photograph a leaf to generate disease management recommendations.</p>
+          <p style="color:var(--text-muted);">Select or photograph a leaf to generate pathogen-specific treatment recommendations.</p>
         </div>
       </div>
     </section>
@@ -467,14 +576,13 @@
 
   <footer>
     <p>
-      Capstone Research Benchmark: <strong>Plant leaf disease detection using CNN</strong> | 
-      <a href="https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn" target="_blank" rel="noopener">Model Hub Repository</a> | 
-      Author: Shubham Kumar (<code>Shubham12864</code>)
+      <strong>Plant Leaf Disease Detection Using CNN</strong> |
+      <a href="https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn" target="_blank" rel="noopener noreferrer">Model Hub Repository</a> |
+      Offline-Ready WebAssembly / WebGPU Edge Client
     </p>
   </footer>
 
   <script>
-    // 38 Disease Classes
     const CLASSES_38 = [
       'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
       'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew', 'Cherry_(including_sour)___healthy',
@@ -497,63 +605,99 @@
       'Squash', 'Strawberry', 'Tomato'
     ];
 
-    const CLASS_TO_CROP_IDX = CLASSES_38.map(c => CROPS_14.indexOf(c.split('___')[0]));
+    const CLASS_TO_CROP_IDX = CLASSES_38.map((c) => CROPS_14.indexOf(c.split('___')[0]));
 
-    const TREATMENT_ADVISORY = {
-      "Early_blight": {
-        "organic": "Apply Bacillus subtilis or bio-fungicide Serenade at 7-day intervals; spray copper octanoate.",
-        "chemical": "Chlorothalonil (Bravo) or Azoxystrobin (Quadris) at first symptom appearance.",
-        "cultural": "Prune lower 12 inches of foliage, mulch soil to prevent rain-splash spores, switch to drip irrigation."
-      },
-      "Late_blight": {
-        "organic": "Fixed copper hydroxide or copper sulfate pentahydrate before rainfall events.",
-        "chemical": "Mefenoxam + Mancozeb (Ridomil Gold MZ) or Mandipropamid (Revus).",
-        "cultural": "Destroy volunteer host plants, ensure 36-inch row spacing for rapid leaf drying, avoid overhead sprinkler watering."
-      },
-      "Apple_scab": {
-        "organic": "Sulfur or liquid lime-sulfur sprays applied between green-tip and petal fall stages.",
-        "chemical": "Myclobutanil (Rally 40WSP) or Difenoconazole (Inspire Super).",
-        "cultural": "Rake and burn/compost fallen autumn leaves to eliminate overwintering ascospores."
-      },
-      "Black_rot": {
-        "organic": "Copper-based fungicidal sprays at bud swell and pre-bloom intervals.",
-        "chemical": "Captan 50WP or Mancozeb applied every 10 to 14 days during wet spring flushes.",
-        "cultural": "Prune out dead mummified fruit, dead wood, and cankers during dormant winter pruning."
-      },
-      "Cedar_apple_rust": {
-        "organic": "Sulfur sprays every 7-10 days from pink stage until 30 days after petal fall.",
-        "chemical": "Myclobutanil or Immunox starting when cedar galls begin to produce orange telial horns.",
-        "cultural": "Eradicate Eastern red cedar trees within 1-2 miles of the orchard if feasible."
-      },
-      "Common_rust_": {
-        "organic": "Potassium bicarbonate or neem oil sprays at earliest pustule development.",
-        "chemical": "Pyraclostrobin (Headline) or Azoxystrobin when pustules appear on upper leaves before silking.",
-        "cultural": "Plant resistant hybrid corn cultivars and maintain balanced crop nitrogen levels."
-      },
-      "Bacterial_spot": {
-        "organic": "Fixed copper combined with agricultural-grade copper hydroxide sprays.",
-        "chemical": "Streptomycin sulfate sprays (where approved) or copper-mancozeb tank mixes.",
-        "cultural": "Use certified pathogen-free seeds, avoid working in fields when foliage is wet, sterilize pruning shears."
-      },
-      "Powdery_mildew": {
-        "organic": "Potassium bicarbonate (MilStop), horticultural oils, or dilute milk spray (1:9 ratio).",
-        "chemical": "Sulfur-based fungicides or Trifloxystrobin applied at canopy closing.",
-        "cultural": "Improve air circulation through selective canopy pruning and avoid heavy late-season nitrogen."
-      },
-      "healthy": {
-        "organic": "Foliage exhibits vigorous chlorophyll density; maintain routine preventative compost tea feeds.",
-        "chemical": "No chemical intervention needed; avoid unnecessary pesticide drift.",
-        "cultural": "Maintain consistent soil moisture and inspect weekly during high-humidity periods."
-      }
-    };
+    // Ordered from specific pathogen types (viruses, mites, HLB, bacteria) to fungal classes
+    const TREATMENT_ADVISORY = [
+      ['healthy', {
+        organic: 'Foliage appears healthy. Maintain compost tea soil feeds and beneficial microbial inoculants.',
+        chemical: 'No fungicide or pesticide required; maintain balanced micronutrient (Ca/B/Zn) sprays.',
+        cultural: 'Continue weekly field scouting and drip irrigation at root zones.',
+      }],
+      ['virus', {
+        organic: 'Viruses cannot be cured chemically; remove infected plants promptly and suppress whitefly/aphid vectors with neem oil or insecticidal soap.',
+        chemical: 'Fungicides are ineffective against viruses. Apply vector-targeted insecticide only where whitefly/aphid thresholds are exceeded.',
+        cultural: 'Plant virus-free certified seedlings, use reflective mulches/netting, and sanitize hands & pruners.',
+      }],
+      ['spider_mites', {
+        organic: 'Apply horticultural oil or insecticidal soap thoroughly on leaf undersides; release predatory mites.',
+        chemical: 'Do not apply fungicides. Use a labeled miticide/acaricide rotating IRAC modes of action.',
+        cultural: 'Reduce leaf dust and avoid drought stress that accelerates spider mite outbreaks.',
+      }],
+      ['haunglongbing', {
+        organic: 'No chemical cure exists for Citrus Greening (HLB). Suppress Asian citrus psyllids using kaolin clay or horticultural oil.',
+        chemical: 'Follow regional psyllid vector control programs alongside foliar Zn/Mn/Fe micronutrient therapy.',
+        cultural: 'Use disease-free nursery stock and remove severely declined trees to protect adjacent blocks.',
+      }],
+      ['bacterial', {
+        organic: 'Apply fixed copper hydroxide plus Bacillus amyloliquefaciens bio-bactericide every 7-10 days in wet periods.',
+        chemical: 'Copper-mancozeb tank mixes or approved bactericides to halt water-soaked lesion spread.',
+        cultural: 'Use pathogen-free treated seed, avoid overhead watering, and stay out of wet canopies.',
+      }],
+      ['scab', {
+        organic: 'Apply wettable sulfur or liquid lime-sulfur between green tip and petal fall.',
+        chemical: 'Myclobutanil or difenoconazole rotated with captan/mancozeb protectants.',
+        cultural: 'Rake and compost/shred fallen leaves to remove overwintering ascospores.',
+      }],
+      ['blight', {
+        organic: 'Fixed copper or Bacillus subtilis bio-fungicide before humid rain events.',
+        chemical: 'Protectant chlorothalonil/mancozeb; systemic mandipropamid for active late blight.',
+        cultural: 'Use 3-year non-solanaceous crop rotation and prune lower splashed foliage.',
+      }],
+      ['rust', {
+        organic: 'Sulfur or neem oil sprays at initial pustule detection.',
+        chemical: 'Azoxystrobin or tebuconazole applied upon early pustule emergence.',
+        cultural: 'Plant rust-resistant cultivars and orient rows for rapid morning dew drying.',
+      }],
+      ['mildew', {
+        organic: 'Potassium bicarbonate (3 g/L) or wettable sulfur across upper and lower leaf surfaces.',
+        chemical: 'Systemic myclobutanil or trifloxystrobin rotated across FRAC groups.',
+        cultural: 'Maximize sunlight penetration and avoid excess nitrogen fertilization.',
+      }],
+      ['esca', {
+        organic: 'Protect fresh pruning wounds with Trichoderma bio-protectants.',
+        chemical: 'Foliar sprays cannot reverse vascular wood rot; seal pruning cuts promptly.',
+        cultural: 'Prune during dry winter weather and burn symptomatic dead wood.',
+      }],
+      ['black_rot', {
+        organic: 'Copper sprays during early shoot elongation and remove mummified fruit.',
+        chemical: 'Captan or mancozeb every 10-14 days during wet spring growth.',
+        cultural: 'Remove all mummies, tendrils, and infected canes during dormant pruning.',
+      }],
+      ['mold', {
+        organic: 'Lower canopy humidity below 85% and spray copper or Bacillus subtilis.',
+        chemical: 'Chlorothalonil or mancozeb protectants under sustained humid conditions.',
+        cultural: 'Increase plant spacing and irrigate early in the morning.',
+      }],
+      ['scorch', {
+        organic: 'Fixed copper sprays during spring leaf expansion.',
+        chemical: 'Captan or broad-spectrum protectants post-renovation.',
+        cultural: 'Remove infected older foliage post-harvest and avoid overhead sprinklers.',
+      }],
+      ['spot', {
+        organic: 'Fixed copper or Bacillus subtilis sprays; mulch soil against rain splash.',
+        chemical: 'Chlorothalonil or mancozeb on 7-10 day intervals during rainy stretches.',
+        cultural: 'Prune lower leaves and sanitize stakes and pruning shears.',
+      }],
+    ];
+
+    const MODEL_DB_NAME = 'plantcnn-model-cache';
+    const MODEL_STORE_NAME = 'binaries';
+    const MODEL_CACHE_KEY = 'unified_gated_plant_cnn_web_v1';
+    const Q_HAT_95 = 0.9822;
 
     let session = null;
-    const Q_HAT_95 = 0.9822; // Split conformal calibration cutoff
+    let activeProvider = 'wasm';
 
-    // Elements
     const statusBanner = document.getElementById('statusBanner');
     const statusSpinner = document.getElementById('statusSpinner');
     const statusText = document.getElementById('statusText');
+    const downloadProgress = document.getElementById('downloadProgress');
+    const backendBadge = document.getElementById('backendBadge');
+    const latencyBadge = document.getElementById('latencyBadge');
+    const retryBtn = document.getElementById('retryBtn');
+    const refreshCacheBtn = document.getElementById('refreshCacheBtn');
+
     const fileInput = document.getElementById('fileInput');
     const dropzone = document.getElementById('dropzone');
     const previewCanvas = document.getElementById('previewCanvas');
@@ -563,7 +707,6 @@
     const opacitySlider = document.getElementById('opacitySlider');
     const opacityVal = document.getElementById('opacityVal');
 
-    // Diagnostic displays
     const topDiseaseName = document.getElementById('topDiseaseName');
     const topCropName = document.getElementById('topCropName');
     const gatingVal = document.getElementById('gatingVal');
@@ -574,89 +717,184 @@
     const probBars = document.getElementById('probBars');
     const advisoryBox = document.getElementById('advisoryBox');
 
-    // 1. Initialize ONNX Runtime Session (Streaming Binary with Live Progress)
-    async function initModel() {
-      try {
-        // Enforce safe single-thread execution to prevent SharedArrayBuffer isolation crashes in iframe
-        ort.env.wasm.numThreads = 1;
-        ort.env.wasm.simd = true;
-        statusText.innerText = "Downloading WebAssembly Neural Model (33.8 MB)...";
-
-        // Cache-busting URL parameter ensures fresh fetch across all browser caches
-        const cacheBuster = Date.now();
-        const primaryUrl = `https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_web.onnx?v=${cacheBuster}`;
-        const fallbackUrl = `./unified_gated_plant_cnn_web.onnx?v=${cacheBuster}`;
-
-        let response = null;
-        try {
-          response = await fetch(primaryUrl, { cache: 'no-store' });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        } catch (e) {
-          console.warn("Primary CDN download failed, trying local fallback:", e);
-          response = await fetch(fallbackUrl, { cache: 'no-store' });
+    function openModelDb() {
+      return new Promise((resolve, reject) => {
+        if (!('indexedDB' in window)) {
+          resolve(null);
+          return;
         }
-
-        const contentLength = parseInt(response.headers.get('content-length')) || 35448320;
-        const reader = response.body.getReader();
-        let received = 0;
-        const chunks = [];
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          received += value.length;
-          const pct = Math.min(100, Math.round((received / contentLength) * 100));
-          statusText.innerText = `Downloading Model: ${pct}% (${(received / (1024 * 1024)).toFixed(1)} MB / 33.8 MB)...`;
-        }
-
-        statusText.innerText = "Compiling WebAssembly SIMD kernel and optimizing neural graph...";
-        const modelBuffer = new Uint8Array(received);
-        let offset = 0;
-        for (const chunk of chunks) {
-          modelBuffer.set(chunk, offset);
-          offset += chunk.length;
-        }
-
-        // Verify it is not a 133-byte git-lfs text file
-        if (received < 1000) {
-          const text = new TextDecoder().decode(modelBuffer);
-          if (text.includes("git-lfs")) {
-            throw new Error("Hugging Face served Git LFS text pointer instead of binary. Please load via primary Model Hub CDN.");
+        const req = indexedDB.open(MODEL_DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(MODEL_STORE_NAME)) {
+            db.createObjectStore(MODEL_STORE_NAME);
           }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function readCachedModel() {
+      const db = await openModelDb();
+      if (!db) return null;
+      return new Promise((resolve) => {
+        const tx = db.transaction(MODEL_STORE_NAME, 'readonly');
+        const req = tx.objectStore(MODEL_STORE_NAME).get(MODEL_CACHE_KEY);
+        req.onsuccess = () => resolve(req.result instanceof ArrayBuffer ? req.result : null);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function writeCachedModel(buffer) {
+      const db = await openModelDb();
+      if (!db) return;
+      return new Promise((resolve) => {
+        const tx = db.transaction(MODEL_STORE_NAME, 'readwrite');
+        tx.objectStore(MODEL_STORE_NAME).put(buffer, MODEL_CACHE_KEY);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      });
+    }
+
+    async function clearCachedModel() {
+      const db = await openModelDb();
+      if (!db) return;
+      return new Promise((resolve) => {
+        const tx = db.transaction(MODEL_STORE_NAME, 'readwrite');
+        tx.objectStore(MODEL_STORE_NAME).delete(MODEL_CACHE_KEY);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      });
+    }
+
+    async function fetchModelBytes() {
+      const primaryUrl = 'https://huggingface.co/Shubham12864/plant-leaf-disease-detection-using-cnn/resolve/main/unified_gated_plant_cnn_web.onnx';
+      const fallbackUrl = './unified_gated_plant_cnn_web.onnx';
+
+      let response = null;
+      try {
+        response = await fetch(primaryUrl, { mode: 'cors', credentials: 'omit' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      } catch (e) {
+        console.warn('Primary CDN fetch failed, trying local Space asset:', e);
+        response = await fetch(fallbackUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      }
+
+      const contentLength = parseInt(response.headers.get('content-length'), 10) || 35448320;
+      const reader = response.body.getReader();
+      let received = 0;
+      const chunks = [];
+      downloadProgress.hidden = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        const pct = Math.min(100, Math.round((received / contentLength) * 100));
+        downloadProgress.value = pct;
+        statusText.textContent = `Downloading model: ${pct}% (${(received / (1024 * 1024)).toFixed(1)} MB)...`;
+      }
+      downloadProgress.hidden = true;
+
+      const modelBuffer = new Uint8Array(received);
+      let offset = 0;
+      for (const chunk of chunks) {
+        modelBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      if (received < 1000) {
+        const text = new TextDecoder().decode(modelBuffer);
+        if (text.includes('git-lfs')) {
+          throw new Error('Server returned a Git LFS pointer instead of ONNX binary.');
+        }
+      }
+      return modelBuffer.buffer;
+    }
+
+    async function createOrtSession(arrayBuffer) {
+      ort.env.wasm.numThreads = 1;
+      ort.env.wasm.simd = true;
+
+      if ('gpu' in navigator) {
+        try {
+          const adapter = await navigator.gpu.requestAdapter();
+          if (adapter) {
+            const gpuSess = await ort.InferenceSession.create(arrayBuffer, {
+              executionProviders: ['webgpu', 'wasm'],
+              graphOptimizationLevel: 'all',
+            });
+            activeProvider = 'WebGPU / WASM';
+            return gpuSess;
+          }
+        } catch (gpuErr) {
+          console.warn('WebGPU session init fell back to WASM:', gpuErr);
+        }
+      }
+
+      const wasmSess = await ort.InferenceSession.create(arrayBuffer, {
+        executionProviders: ['wasm'],
+        graphOptimizationLevel: 'all',
+      });
+      activeProvider = 'WASM SIMD';
+      return wasmSess;
+    }
+
+    async function initModel() {
+      retryBtn.hidden = true;
+      statusSpinner.style.display = 'inline-block';
+      statusBanner.style.background = '#1e293b';
+      statusBanner.style.color = '#94a3b8';
+
+      try {
+        let modelBuffer = await readCachedModel();
+        let cacheSource = 'Offline Cache';
+        if (!modelBuffer) {
+          cacheSource = 'Network';
+          statusText.textContent = 'Downloading WebAssembly neural model (33.8 MB, cached after first run)...';
+          modelBuffer = await fetchModelBytes();
+          await writeCachedModel(modelBuffer);
+        } else {
+          statusText.textContent = 'Loaded ONNX model from local IndexedDB cache. Initializing runtime...';
         }
 
-        session = await ort.InferenceSession.create(modelBuffer.buffer, {
-          executionProviders: ['wasm'],
-          graphOptimizationLevel: 'all'
-        });
+        session = await createOrtSession(modelBuffer);
+        backendBadge.textContent = `Provider: ${activeProvider} (${cacheSource})`;
 
         statusSpinner.style.display = 'none';
         statusBanner.style.background = '#064e3b';
         statusBanner.style.color = '#a7f3d0';
-        statusText.innerHTML = "✅ Model Ready! Tap a sample below or upload a leaf photo to diagnose.";
+        statusText.textContent = 'Model Ready! Works offline after initial cache. Select a sample or upload a leaf photo.';
 
-        // Automatically load first sample
         loadSample('samples/tomato_early_blight.jpg');
       } catch (err) {
-        console.error("Model load error:", err);
+        console.error('Model load error:', err);
+        downloadProgress.hidden = true;
         statusSpinner.style.display = 'none';
         statusBanner.style.background = '#7f1d1d';
         statusBanner.style.color = '#fecaca';
-        statusText.innerText = `Failed loading model: ${err.message}.`;
+        statusText.textContent = `Failed loading model: ${err.message}`;
+        retryBtn.hidden = false;
       }
     }
 
-    // 2. Handle Image Loading & Preprocessing
+    // Preserve aspect ratio by scaling shortest side and center-cropping to 224x224
     function processImage(img) {
       previewCanvas.width = 224;
       previewCanvas.height = 224;
-      pCtx.drawImage(img, 0, 0, 224, 224);
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const side = Math.min(iw, ih);
+      const sx = Math.max(0, (iw - side) / 2);
+      const sy = Math.max(0, (ih - side) / 2);
+      pCtx.drawImage(img, sx, sy, side, side, 0, 0, 224, 224);
 
       const imgData = pCtx.getImageData(0, 0, 224, 224);
       const data = imgData.data;
 
-      // ImageNet Normalization NCHW Float32
       const floatData = new Float32Array(1 * 3 * 224 * 224);
       const mean = [0.485, 0.456, 0.406];
       const std = [0.229, 0.224, 0.225];
@@ -678,7 +916,6 @@
       runInference(floatData);
     }
 
-    // 3. Run Inference with ONNX Runtime
     async function runInference(floatData) {
       if (!session) return;
       const t0 = performance.now();
@@ -689,130 +926,132 @@
 
         const dLogits = Array.from(results.disease_logits.data);
         const cLogits = Array.from(results.crop_logits.data);
-        const maskData = Array.from(results.saliency_mask.data); // 1x1x14x14
+        const maskData = Array.from(results.saliency_mask.data);
 
         renderDiagnostics(dLogits, cLogits, maskData, latency);
       } catch (err) {
-        console.error("Inference failure:", err);
+        console.error('Inference failure:', err);
       }
     }
 
-    // Softmax helper
     function softmax(arr) {
       const maxVal = Math.max(...arr);
-      const exp = arr.map(v => Math.exp(v - maxVal));
+      const exp = arr.map((v) => Math.exp(v - maxVal));
       const sum = exp.reduce((a, b) => a + b, 0);
-      return exp.map(v => v / sum);
+      return exp.map((v) => v / sum);
     }
 
-    // Render Diagnostics & Science Indicators
     function renderDiagnostics(dLogits, cLogits, maskData, latency) {
+      latencyBadge.textContent = `Latency: ${latency} ms`;
+
       const dProbs = softmax(dLogits);
       const cProbs = softmax(cLogits);
 
-      // Hierarchical Joint Conditioning: P_joint(disease) = P(disease) * P(crop)
       const jointProbs = new Float32Array(dProbs.length);
       let jointSum = 0;
       for (let i = 0; i < dProbs.length; i++) {
-        const cropIdx = CLASS_TO_CROP_IDX[i];
-        jointProbs[i] = dProbs[i] * cProbs[cropIdx];
+        jointProbs[i] = dProbs[i] * cProbs[CLASS_TO_CROP_IDX[i]];
         jointSum += jointProbs[i];
       }
       for (let i = 0; i < jointProbs.length; i++) {
-        jointProbs[i] = jointSum > 0 ? (jointProbs[i] / jointSum) : dProbs[i];
+        jointProbs[i] = jointSum > 0 ? jointProbs[i] / jointSum : dProbs[i];
       }
 
-      // Top Crop
       let maxCIdx = 0;
       for (let i = 1; i < cProbs.length; i++) {
         if (cProbs[i] > cProbs[maxCIdx]) maxCIdx = i;
       }
       const cropName = CROPS_14[maxCIdx].replace(/_/g, ' ');
 
-      // Top Disease based on Joint Probability
       let maxDIdx = 0;
       for (let i = 1; i < jointProbs.length; i++) {
         if (jointProbs[i] > jointProbs[maxDIdx]) maxDIdx = i;
       }
-      const topDiseaseRaw = CLASSES_38[maxDIdx];
-      const diseaseParts = topDiseaseRaw.split('___');
+      const diseaseParts = CLASSES_38[maxDIdx].split('___');
       const diseaseName = diseaseParts[1].replace(/_/g, ' ');
       const topDProb = (jointProbs[maxDIdx] * 100).toFixed(1);
 
-      topDiseaseName.innerText = `${diseaseName} (${topDProb}%)`;
-      topCropName.innerText = `${cropName} (${(cProbs[maxCIdx]*100).toFixed(1)}%)`;
+      topDiseaseName.textContent = `${diseaseName} (${topDProb}%)`;
+      topCropName.textContent = `${cropName} (${(cProbs[maxCIdx] * 100).toFixed(1)}%)`;
 
-      // Mean Gating Score M(x)
       const meanM = maskData.reduce((a, b) => a + b, 0) / maskData.length;
       const bgSuppression = ((1 - meanM) * 100).toFixed(1);
-      gatingVal.innerText = `M(x) = ${meanM.toFixed(3)}`;
-      gatingSubtext.innerText = `Autonomously suppressed ${bgSuppression}% background clutter`;
+      gatingVal.textContent = `M(x) = ${meanM.toFixed(3)}`;
+      gatingSubtext.textContent = `Attenuated ~${bgSuppression}% non-foliar clutter`;
 
-      // Free Helmholtz Energy E(x) = -T * logsumexp(logits / T)
       const maxLogit = Math.max(...dLogits);
       const sumExp = dLogits.reduce((acc, z) => acc + Math.exp(z - maxLogit), 0);
       const freeEnergy = -(maxLogit + Math.log(sumExp));
-      energyVal.innerText = freeEnergy.toFixed(2);
+      energyVal.textContent = freeEnergy.toFixed(2);
       if (freeEnergy < -3.5) {
-        energySubtext.innerText = "In-Distribution Foliage (Pass)";
-        energyVal.style.color = "#86efac";
+        energySubtext.textContent = 'In-Distribution Foliage (Pass)';
+        energyVal.style.color = '#86efac';
       } else {
-        energySubtext.innerText = "⚠️ High Energy / Ambiguous Foliage";
-        energyVal.style.color = "#f59e0b";
+        energySubtext.textContent = 'High Energy / Ambiguous Input';
+        energyVal.style.color = '#f59e0b';
       }
 
-      // Conformal Prediction Set (APS)
-      const sortedIdxs = Array.from(jointProbs).map((p, i) => ({ prob: p, idx: i }))
-                              .sort((a, b) => b.prob - a.prob);
+      // Split Conformal APS Safe Set using calibrated Q_HAT_95
+      const sortedIdxs = Array.from(jointProbs)
+        .map((prob, idx) => ({ prob, idx }))
+        .sort((a, b) => b.prob - a.prob);
       let cumSum = 0;
       const safeSet = [];
       for (const item of sortedIdxs) {
         safeSet.push(item);
         cumSum += item.prob;
-        if (cumSum >= 0.95) break; // 95% guaranteed coverage
+        if (cumSum >= Q_HAT_95) break;
       }
 
-      conformalTags.innerHTML = safeSet.map(item => {
-        const raw = CLASSES_38[item.idx];
-        const cropPrefix = raw.split('___')[0].replace(/_/g, ' ');
-        const label = raw.split('___')[1].replace(/_/g, ' ');
-        const pct = (item.prob * 100).toFixed(1);
-        return `<span class="badge badge-accent">${cropPrefix}: ${label} (${pct}%)</span>`;
-      }).join('');
+      conformalTags.replaceChildren(
+        ...safeSet.slice(0, 5).map((item) => {
+          const raw = CLASSES_38[item.idx];
+          const [cPrefix, dLabel] = raw.split('___');
+          const span = document.createElement('span');
+          span.className = 'badge badge-accent';
+          span.textContent = `${cPrefix.replace(/_/g, ' ')}: ${dLabel.replace(/_/g, ' ')} (${(item.prob * 100).toFixed(1)}%)`;
+          return span;
+        })
+      );
 
-      // Top 5 Probabilities Bar
-      const top5 = sortedIdxs.slice(0, 5);
-      probBars.innerHTML = top5.map(item => {
-        const raw = CLASSES_38[item.idx];
-        const label = raw.replace(/___/g, ' → ').replace(/_/g, ' ');
-        const pct = (item.prob * 100).toFixed(1);
-        return `
-          <div class="bar-row">
-            <div class="bar-header">
-              <span style="color:#d1d5db;">${label}</span>
-              <span style="font-weight:600; color:#86efac;">${pct}%</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: ${pct}%;"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      probBars.replaceChildren(
+        ...sortedIdxs.slice(0, 5).map((item) => {
+          const label = CLASSES_38[item.idx].replace(/___/g, ' → ').replace(/_/g, ' ');
+          const pct = (item.prob * 100).toFixed(1);
 
-      // Agronomic Advisory
+          const row = document.createElement('div');
+          row.className = 'bar-row';
+
+          const header = document.createElement('div');
+          header.className = 'bar-header';
+          const lblSpan = document.createElement('span');
+          lblSpan.textContent = label;
+          const pctSpan = document.createElement('span');
+          pctSpan.className = 'bar-pct';
+          pctSpan.textContent = `${pct}%`;
+          header.append(lblSpan, pctSpan);
+
+          const track = document.createElement('div');
+          track.className = 'bar-track';
+          const fill = document.createElement('div');
+          fill.className = 'bar-fill';
+          fill.style.width = `${pct}%`;
+          track.appendChild(fill);
+
+          row.append(header, track);
+          return row;
+        })
+      );
+
       renderAdvisory(diseaseParts[1]);
-
-      // Render Saliency Heatmap Mask
       renderSaliencyMask(maskData);
     }
 
-    // Render Saliency Mask (14x14 continuous gating values)
     function renderSaliencyMask(mask14x14) {
       maskCanvas.width = 224;
       maskCanvas.height = 224;
       mCtx.clearRect(0, 0, 224, 224);
 
-      // Create an offscreen 14x14 canvas then scale up with smoothing
       const offCanvas = document.createElement('canvas');
       offCanvas.width = 14;
       offCanvas.height = 14;
@@ -821,101 +1060,119 @@
 
       for (let i = 0; i < 14 * 14; i++) {
         const val = Math.min(1.0, Math.max(0.0, mask14x14[i]));
-        // Emerald green / amber heatmap: RGBA
-        const r = Math.floor(val * 240);
-        const g = Math.floor(val * 210);
-        const b = Math.floor(val * 40);
-        const a = Math.floor(val * 210);
-
-        imgData.data[i * 4] = r;
-        imgData.data[i * 4 + 1] = g;
-        imgData.data[i * 4 + 2] = b;
-        imgData.data[i * 4 + 3] = a;
+        imgData.data[i * 4] = Math.floor(val * 240);
+        imgData.data[i * 4 + 1] = Math.floor(val * 210);
+        imgData.data[i * 4 + 2] = Math.floor(val * 40);
+        imgData.data[i * 4 + 3] = Math.floor(val * 210);
       }
 
       offCtx.putImageData(imgData, 0, 0);
-
       mCtx.imageSmoothingEnabled = true;
       mCtx.imageSmoothingQuality = 'high';
       mCtx.drawImage(offCanvas, 0, 0, 224, 224);
     }
 
-    // Render Treatment Advisory
     function renderAdvisory(diseaseKey) {
+      const lowerKey = diseaseKey.toLowerCase();
       let matched = null;
-      for (const k of Object.keys(TREATMENT_ADVISORY)) {
-        if (diseaseKey.toLowerCase().includes(k.toLowerCase())) {
-          matched = TREATMENT_ADVISORY[k];
+      for (const [pattern, adv] of TREATMENT_ADVISORY) {
+        if (lowerKey.includes(pattern)) {
+          matched = adv;
           break;
         }
       }
       if (!matched) {
         matched = {
-          "organic": "Prune symptomatic infected leaves and sanitize tools with 70% isopropyl alcohol.",
-          "chemical": "Consult local agricultural extension for registered broad-spectrum fungicides.",
-          "cultural": "Avoid overhead watering; ensure adequate sunlight and soil drainage."
+          organic: 'Remove symptomatic leaves, sanitize tools with 70% alcohol, and apply bio-fungicide only if fungal infection is confirmed.',
+          chemical: 'Consult local agricultural extension for crop-specific registered control.',
+          cultural: 'Isolate affected foliage and switch to base drip irrigation.',
         };
       }
 
-      advisoryBox.innerHTML = `
-        <div class="advisory-row"><strong>🌿 Organic Management:</strong> ${matched.organic}</div>
-        <div class="advisory-row"><strong>🧪 Chemical Control:</strong> ${matched.chemical}</div>
-        <div class="advisory-row" style="margin-bottom:0;"><strong>🚜 Cultural Practices:</strong> ${matched.cultural}</div>
-      `;
+      const rows = [
+        ['🌿 Organic Management:', matched.organic],
+        ['🧪 Chemical / Vector Control:', matched.chemical],
+        ['🚜 Cultural Practices:', matched.cultural],
+      ];
+      advisoryBox.replaceChildren(
+        ...rows.map(([title, body]) => {
+          const div = document.createElement('div');
+          div.className = 'advisory-row';
+          const strong = document.createElement('strong');
+          strong.textContent = `${title} `;
+          div.append(strong, document.createTextNode(body));
+          return div;
+        })
+      );
     }
 
-    // Opacity Slider Event
-    opacitySlider.addEventListener('input', (e) => {
-      const val = e.target.value;
-      opacityVal.innerText = `${val}%`;
-      maskCanvas.style.opacity = val / 100;
-    });
-
-    // Sample Loader
     function loadSample(url) {
       const img = new Image();
-      img.crossOrigin = "anonymous";
+      img.crossOrigin = 'anonymous';
       img.onload = () => processImage(img);
       img.src = url;
     }
 
-    // File Upload / Dropzone
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files[0]) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const img = new Image();
-          img.onload = () => processImage(img);
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
+    // Event bindings (no inline onclick handlers)
+    document.getElementById('samplesGrid').addEventListener('click', (e) => {
+      const btn = e.target.closest('.sample-btn');
+      if (btn?.dataset.sample) {
+        loadSample(btn.dataset.sample);
       }
     });
 
-    // Drag and Drop
-    ['dragenter', 'dragover'].forEach(name => {
+    opacitySlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      opacityVal.textContent = `${val}%`;
+      maskCanvas.style.opacity = val / 100;
+      e.target.style.setProperty('--progress', `${val}%`);
+    });
+
+    retryBtn.addEventListener('click', initModel);
+    refreshCacheBtn.addEventListener('click', async () => {
+      await clearCachedModel();
+      initModel();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        processImage(img);
+        URL.revokeObjectURL(objectUrl);
+      };
+      img.src = objectUrl;
+    });
+
+    ['dragenter', 'dragover'].forEach((name) => {
       dropzone.addEventListener(name, (e) => {
         e.preventDefault();
         dropzone.classList.add('dragover');
       });
     });
-    ['dragleave', 'drop'].forEach(name => {
+    ['dragleave', 'drop'].forEach((name) => {
       dropzone.addEventListener(name, (e) => {
         e.preventDefault();
         dropzone.classList.remove('dragover');
       });
     });
     dropzone.addEventListener('drop', (e) => {
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      if (e.dataTransfer.files?.length) {
         fileInput.files = e.dataTransfer.files;
-        const event = new Event('change');
-        fileInput.dispatchEvent(event);
+        fileInput.dispatchEvent(new Event('change'));
       }
     });
 
-    // Initialize on window load
-    window.addEventListener('DOMContentLoaded', initModel);
+    window.addEventListener('DOMContentLoaded', () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.warn('Service worker registration failed:', err);
+        });
+      }
+      initModel();
+    });
   </script>
 </body>
 </html>

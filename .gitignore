@@ -32,7 +32,9 @@ kaggle_upload/**
 *.pdf
 *.docx
 *.aux
+*.aux
 *.log
+test_*.pdf
 *.out
 *.toc
 *.synctex.gz

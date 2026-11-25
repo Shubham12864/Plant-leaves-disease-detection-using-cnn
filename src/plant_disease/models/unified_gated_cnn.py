@@ -129,7 +129,7 @@ class UnifiedGatedPlantCNN(nn.Module):
             self.stages.append(stage)
             cur += depths[i]
 
-        # Spatial Saliency & Leaf Gating Module (placed after Stage 3, dim=384)
+        # Spatial Saliency & Leaf Gating Module (placed after Stage 2 [0-indexed stages[2]], dim=384, H/16 x W/16)
         self.saliency_gating = SpatialSaliencyGating(in_channels=dims[2])
 
         # Global Pooling
@@ -231,12 +231,13 @@ class UnifiedGatedPlantCNN(nn.Module):
 
         model_dict = self.state_dict()
         matched = {}
+        layer_scales = {}
         for k, v in state.items():
             if k in model_dict and model_dict[k].shape == v.shape:
                 matched[k] = v
                 continue
 
-            # Map torchvision features to downsample layers and stages
+            # Map torchvision ConvNeXt-Tiny features to downsample layers, stages, and head
             m_k = k
             if k.startswith("features.0."):
                 m_k = k.replace("features.0.", "downsample_layers.0.")
@@ -254,6 +255,22 @@ class UnifiedGatedPlantCNN(nn.Module):
                 m_k = k.replace("features.6.", "downsample_layers.3.")
             elif k.startswith("features.7."):
                 m_k = k.replace("features.7.", "stages.3.")
+            elif k.startswith("classifier.0."):
+                m_k = k.replace("classifier.0.", "head.norm.")
+            elif k.startswith("classifier.2."):
+                m_k = k.replace("classifier.2.", "head.disease_head.")
+            elif k.startswith("norm."):
+                m_k = k.replace("norm.", "head.norm.")
+            elif k.startswith("disease_head."):
+                m_k = k.replace("disease_head.", "head.disease_head.")
+            elif k.startswith("crop_head."):
+                m_k = k.replace("crop_head.", "head.crop_head.")
+
+            if m_k.endswith(".layer_scale"):
+                # Track torchvision CNBlock layer_scale (C, 1, 1) to fold into pwconv2
+                prefix = m_k[: -len(".layer_scale")]
+                layer_scales[prefix] = v.reshape(-1)
+                continue
 
             m_k = (
                 m_k.replace(".block.0.", ".dwconv.")
@@ -264,10 +281,19 @@ class UnifiedGatedPlantCNN(nn.Module):
             if m_k in model_dict and model_dict[m_k].shape == v.shape:
                 matched[m_k] = v
 
+        # Fold layer_scale into pwconv2 weights & biases so transferred CNBlock magnitudes remain exact
+        for prefix, gamma in layer_scales.items():
+            w_key = f"{prefix}.pwconv2.weight"
+            b_key = f"{prefix}.pwconv2.bias"
+            if w_key in matched and matched[w_key].shape[0] == gamma.shape[0]:
+                matched[w_key] = matched[w_key] * gamma.view(-1, 1)
+            if b_key in matched and matched[b_key].shape[0] == gamma.shape[0]:
+                matched[b_key] = matched[b_key] * gamma
+
         missing = len(model_dict) - len(matched)
         model_dict.update(matched)
         self.load_state_dict(model_dict)
-        return {"matched": len(matched), "missing": missing}
+        return {"matched": len(matched), "missing": missing, "folded_layer_scales": len(layer_scales)}
 
 
 def build_unified_plant_cnn(
